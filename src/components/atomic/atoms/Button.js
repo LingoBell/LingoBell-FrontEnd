@@ -1,25 +1,29 @@
 import React from 'react'
 import styled from 'styled-components'
-import { PRIMARY_COLOR } from '../../consts/color'
 import PropTypes from 'prop-types'
+import { PRIMARY_COLOR } from '../../../consts/color'
 
 const buttonTypes = {
   bordered: `
-    border: 2px solid #000;
+    border: 1px solid #000;
     color: black;
     background-color: white;
   `,
   'bordered-filled': `
-    border: 2px solid #000;
+    border: 1px solid #000;
     color: black;
     background-color: white;
     &:hover {
+
       background-color: ${PRIMARY_COLOR};
       color: white;
     }
+  `,
+  black: `
+    background-color: black;
+    color: white;
   `
 }
-
 
 const Button = styled.button`
   /* height: 40px; */
