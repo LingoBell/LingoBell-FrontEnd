@@ -19,6 +19,8 @@ export default () => {
         <Route element={<Layout />}>
           <Route path="/" element={<IndexPage />} />
           <Route path='/chat-history' element={<ChatHistory />} />
+          <Route path="/Main" element={<Main />} />
+
         </Route>
       </Routes>
       
