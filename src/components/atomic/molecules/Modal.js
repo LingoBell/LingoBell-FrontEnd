@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import Button from '../atoms/Button';
 
 const Background = styled.div`
     background-color: gray;
@@ -25,29 +26,24 @@ const ModalBox = styled.div`
 `
 
 export default props => {
-    const [clicked, setClicked] = useState(false);
-
-    const handleCloseBttn = () => {
-        setClicked(true);
-    };
-  
-    const handleBackgroundClick = () => {
-        setClicked(true);
-    };
- 
+    const {onClickCloseBtn, isOpened, onClickAlertBtn} = props;
 
     return (
-        !clicked && (
-            <Background onClick={() => handleBackgroundClick()}>
+        isOpened && (
+            <Background onClick={onClickCloseBtn}>
                 <ModalBox onClick={e => e.stopPropagation()} >
                     <span
                         className='material-icons'
-                        onClick={() => handleCloseBttn()}
+                        onClick={onClickCloseBtn}
                         style={{ display: 'flex', justifyContent: 'flex-end', cursor: 'pointer' }}
                     >
                         close
                     </span>
+                    <Button onClick={onClickAlertBtn}>버튼</Button>
+
                 </ModalBox>
+
+
             </Background>
         )
     );
