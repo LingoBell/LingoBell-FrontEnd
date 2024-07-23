@@ -46,9 +46,11 @@ export default props => {
                         onClick={() => handleCloseBttn()}
                         style={{ display: 'flex', justifyContent: 'flex-end', cursor: 'pointer' }}
                     >
+
                         close
                     </span>
                 </ModalBox>
+                <h1>hi</h1>
             </Background>
         )
     );
