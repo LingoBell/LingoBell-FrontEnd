@@ -29,13 +29,12 @@ export default props => {
 
     const handleCloseBttn = () => {
         setClicked(true);
-        console.log("close button clicked!");
     };
-
+  
     const handleBackgroundClick = () => {
         setClicked(true);
-        console.log("background clicked!");
     };
+ 
 
     return (
         !clicked && (
@@ -46,11 +45,9 @@ export default props => {
                         onClick={() => handleCloseBttn()}
                         style={{ display: 'flex', justifyContent: 'flex-end', cursor: 'pointer' }}
                     >
-
                         close
                     </span>
                 </ModalBox>
-                <h1>hi</h1>
             </Background>
         )
     );

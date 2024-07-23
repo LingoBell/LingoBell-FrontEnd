@@ -1,7 +1,8 @@
-import React from 'react'
+import React, {useState} from 'react'
 import styled from 'styled-components'
 import CenteredMainLayout from '../templates/CenteredMainLayout' 
 import ProfileItem from '../molecules/ProfileItem'
+import Modal from '../molecules/Modal'
 const profiles = [
   {
       'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
@@ -59,9 +60,20 @@ const Container = styled.div`
 `
 
 export default props => {
+  const [clicked, setClicked] = useState(false);
+
+  const handleCloseBttn = () => {
+      setClicked(true);
+  };
+
+  const handleBackgroundClick = () => {
+      setClicked(true);
+  };
+
   return (
     <CenteredMainLayout>
       <Container>
+        <Modal clicked={clicked} onClick={() => {handleBackgroundClick(); handleCloseBttn();}}/>
         {
           profiles.map((profile, index) => {
             const {
@@ -71,7 +83,10 @@ export default props => {
               selfIntroduction: content
             } = profile
             return (
-              <ProfileItem key={index} title={title} src={src} tags={tags} content={content} />
+              <ProfileItem key={index} title={title} src={src} tags={tags} content={content} onClick={() => {
+                return (<Modal />)}
+              }>
+              </ProfileItem>
             )
           })
         }
