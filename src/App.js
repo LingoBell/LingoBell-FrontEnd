@@ -1,10 +1,7 @@
 import * as React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import axios from 'axios'
-import Main from "./components/atomic/pages/Main";
-import Layout from "./components/layout";
-import IndexPage from "./components/atomic/pages/IndexPage";
-import ChatHistory from "./components/atomic/pages/ChatHistory";
+import ProfileCard_Test from "./components/atomic/pages/ProfileCard_Test";
 // export let mainDomain = 'http://localhost:8000'
 
 export let mainDomain = ''
@@ -16,11 +13,8 @@ export default () => {
     <BrowserRouter>
       
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<IndexPage />} />
-          <Route path='/chat-history' element={<ChatHistory />} />
-          <Route path="/Main" element={<Main />} />
-
+        <Route>
+          <Route path="/" element={<ProfileCard_Test />} />
         </Route>
       </Routes>
       

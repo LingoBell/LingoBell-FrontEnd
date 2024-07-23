@@ -11,9 +11,10 @@ const BaseImage = styled.div`
 `
 
 export const Tag = styled.div`
-  background-color: #ccc;
+  background-color: rgba(217, 217, 217, 0.5);
   padding: 2px 4px;
   color: #000;
+  border-radius : 8px;
 `
 
 export default BaseImage
