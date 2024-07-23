@@ -12,7 +12,7 @@ export default () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
+        <Route>
           <Route path="/" element={<Main />} />
         </Route>
       </Routes>
