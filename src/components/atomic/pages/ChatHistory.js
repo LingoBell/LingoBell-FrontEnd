@@ -53,8 +53,8 @@ const Container = styled.div`
     padding-right: 12px;
     > div {
       min-width: calc(50% - 24px);
-      margin-left: 12px;
-      margin-right: 12px;
+      // margin-left: 12px;
+      // margin-right: 12px;
     }
   }
 `

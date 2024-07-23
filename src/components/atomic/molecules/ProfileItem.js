@@ -8,6 +8,8 @@ const Container = styled.div`
   border : 1px solid #ccc;
   padding-top : 12px;
   padding-bottom : 12px;
+  margin-left: 12px;
+  margin-right: 12px;
 `
 const ProfileImage = styled(BaseImage)`
   width : 100px;
