@@ -6,6 +6,7 @@ import ChatForm from "./components/atomic/molecules/ChatForm";
 import Layout from "./components/layout";
 import IndexPage from "./components/atomic/pages/IndexPage";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
+import Header from "./components/layout/Header";
 // export let mainDomain = 'http://localhost:8000'
 
 export let mainDomain = ''
@@ -13,6 +14,7 @@ export let mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
 export default () => {
+  console.log('test')
   return (
     <BrowserRouter>
       <Routes>
@@ -21,6 +23,7 @@ export default () => {
           <Route path='/chat-history' element={<ChatHistory />} />
           <Route path="/Main" element={<Main />} />
           <Route path="/chat" element={<ChatForm />} />
+          <Route path="/test" element={Header}></Route>
         </Route>
       </Routes>
       
