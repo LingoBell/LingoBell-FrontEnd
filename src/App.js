@@ -12,9 +12,9 @@ export default () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<Layout />}>
+        {/* <Route element={<Layout />}> */}
           <Route path="/" element={<Main />} />
-        </Route>
+        {/* </Route> */}
       </Routes>
     </BrowserRouter>
   )
