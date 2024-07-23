@@ -31,26 +31,21 @@ const StyledTag = styled(Tag)`
   padding : 2px 4px 2px 4px;
 `
 
-const Wrap = styled.div`
-  border: 1px solid #333;
-  height: 100px;
-`
-
 
 export default props => {
   return (
     <Container>
       <ProfileImage src={props.src}/>
-        <Wrap>
-          <UserName>{props.title}</UserName>
-          <div style={{display : 'flex'}}>
-            {props.tags.map(tag =>   // tags라는 데이터
-                <StyledTag>{tag}</StyledTag>
-            )}
-          </div>
-          <Paragraph>{props.content}</Paragraph>
-          {props.children} 
-        </Wrap>
+      <Wrap>
+        <UserName>{props.title}</UserName>
+        <div style={{display : 'flex'}}>
+          {props.tags?.map(tag =>   // tags라는 데이터
+              <StyledTag>{tag}</StyledTag>
+          )}
+        </div>
+        <Paragraph>{props.content}</Paragraph>
+        {props.children} 
+      </Wrap>
     </Container>
   )
 }

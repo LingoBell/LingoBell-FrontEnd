@@ -4,37 +4,37 @@ import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
 const profiles = [
   {
-      'image': 'https://source.unsplash.com/random/200x200?person1',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Sungwoo Cho',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://source.unsplash.com/random/200x200?person2',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Tom',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://source.unsplash.com/random/200x200?person3',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Scarlett',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://source.unsplash.com/random/200x200?person4',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Jinwoo',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://source.unsplash.com/random/200x200?person5',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Max',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://source.unsplash.com/random/200x200?person6',
+      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
       'name': 'Jay',
       'language': ['Language Learner', 'Korean', 'English'],
       'selfIntroduction': 'Update your profile information'
@@ -63,9 +63,15 @@ export default props => {
     <CenteredMainLayout>
       <Container>
         {
-          profiles.map(profile => {
+          profiles.map((profile, index) => {
+            const {
+              name: title,
+              image: src,
+              language: tags,
+              selfIntroduction: content
+            } = profile
             return (
-              <ProfileItem {...profile} />
+              <ProfileItem key={index} title={title} src={src} tags={tags} content={content} />
             )
           })
         }
