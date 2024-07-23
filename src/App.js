@@ -11,11 +11,13 @@ axios.defaults.baseURL = mainDomain;
 export default () => {
   return (
     <BrowserRouter>
+      
       <Routes>
         <Route>
           <Route path="/" element={<ProfileCard_Test />} />
         </Route>
       </Routes>
+      
     </BrowserRouter>
   )
 }

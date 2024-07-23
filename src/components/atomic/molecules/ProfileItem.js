@@ -31,6 +31,11 @@ const StyledTag = styled(Tag)`
   padding : 2px 4px 2px 4px;
 `
 
+const Wrap = styled.div`
+  border: 1px solid #333;
+  height: 100px;
+`
+
 
 export default props => {
   return (
