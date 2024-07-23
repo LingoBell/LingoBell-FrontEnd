@@ -13,6 +13,7 @@ export let mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
 export default () => {
+  console.log('test')
   return (
     <BrowserRouter>
       
