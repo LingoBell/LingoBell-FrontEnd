@@ -8,9 +8,14 @@ import { Paragraph, Title } from '../atoms/Typograpy'
  * 
  */
 
+const Wrap = styled.div`
+  border: 1px solid #333;
+  height: 100px;
+`
+
 
 export default props => {
   return (
-    <div>dkdkdk</div>
+    <Wrap>dkdkdk</Wrap>
   )
 }
