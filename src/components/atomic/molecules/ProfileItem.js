@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
@@ -33,18 +33,21 @@ const StyledTag = styled(Tag)`
 
 
 export default props => {
+  const { onClick } = props;
+  
+
   return (
-    <Container>
-      <ProfileImage src={props.src}/>
+    <Container onClick={onClick || handleClick}>
+      <ProfileImage src={props.src} />
       <Wrap>
         <UserName>{props.title}</UserName>
-        <div style={{display : 'flex'}}>
+        <div style={{ display: 'flex' }}>
           {props.tags?.map(tag =>   // tags라는 데이터
-              <StyledTag>{tag}</StyledTag>
+            <StyledTag>{tag}</StyledTag>
           )}
         </div>
         <Paragraph>{props.content}</Paragraph>
-        {props.children} 
+        {props.children}
       </Wrap>
     </Container>
   )

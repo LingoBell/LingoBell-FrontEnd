@@ -1,44 +1,44 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import CenteredMainLayout from '../templates/CenteredMainLayout' 
+import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
 const profiles = [
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Sungwoo Cho',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Sungwoo Cho',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Tom',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Tom',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Scarlett',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Scarlett',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Jinwoo',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Jinwoo',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Max',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Max',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   },
   {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Jay',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
+    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
+    'name': 'Jay',
+    'language': ['Language Learner', 'Korean', 'English'],
+    'selfIntroduction': 'Update your profile information'
   }
 ]
 
@@ -60,20 +60,28 @@ const Container = styled.div`
 `
 
 export default props => {
-  const [clicked, setClicked] = useState(false);
+  const [isOpened, setIsOpened] = useState(false);
 
-  const handleCloseBttn = () => {
-      setClicked(true);
+  const handleOpenModal = () => {
+    setIsOpened(true);
   };
 
-  const handleBackgroundClick = () => {
-      setClicked(true);
+  const handleCloseModal = () => {
+    setIsOpened(false);
   };
+
+  const raiseAlert = () => {
+    alert("Alert!");
+  }
 
   return (
     <CenteredMainLayout>
       <Container>
-        <Modal clicked={clicked} onClick={() => {handleBackgroundClick(); handleCloseBttn();}}/>
+        <Modal 
+        isOpened={isOpened} 
+        onClickCloseBtn={() => handleCloseModal()} 
+        onClickAlertBtn={() => raiseAlert()}
+        />
         {
           profiles.map((profile, index) => {
             const {
@@ -83,10 +91,13 @@ export default props => {
               selfIntroduction: content
             } = profile
             return (
-              <ProfileItem key={index} title={title} src={src} tags={tags} content={content} onClick={() => {
-                return (<Modal />)}
-              }>
-              </ProfileItem>
+              <ProfileItem
+                key={index}
+                title={title}
+                src={src}
+                tags={tags}
+                content={content}
+                onClick={() => handleOpenModal()} />
             )
           })
         }
