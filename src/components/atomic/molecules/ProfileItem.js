@@ -32,22 +32,20 @@ const StyledTag = styled(Tag)`
 `
 
 
-
-
 export default props => {
   return (
     <Container>
       <ProfileImage src={props.src}/>
-        <Wrap>
-          <UserName>{props.title}</UserName>
-          <div style={{display : 'flex'}}>
-            {props.tags.map(tag =>   // tags라는 데이터
-                <StyledTag>{tag}</StyledTag>
-            )}
-          </div>
-          <Paragraph>{props.content}</Paragraph>
-          {props.children} 
-        </Wrap>
+      <Wrap>
+        <UserName>{props.title}</UserName>
+        <div style={{display : 'flex'}}>
+          {props.tags?.map(tag =>   // tags라는 데이터
+              <StyledTag>{tag}</StyledTag>
+          )}
+        </div>
+        <Paragraph>{props.content}</Paragraph>
+        {props.children} 
+      </Wrap>
     </Container>
   )
 }
