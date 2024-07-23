@@ -34,9 +34,11 @@ export const ChatMessage = styled.div`
 
         } else if (props.type === 'partner' && props.isOriginal) {
             return CHAT_MESSAGE_STYLE['partner-original']
-            
+
         } else {
             return CHAT_MESSAGE_STYLE['partner-translated']
         }
     }}
     `;
+
+    
