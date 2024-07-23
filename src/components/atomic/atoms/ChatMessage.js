@@ -1,19 +1,42 @@
 import React from "react";
-import { ORIGINAL_PARTNER_MESSAGE } from "./Color";
-import { oneOf } from "prop-types";
+import { ORIGINAL_MESSAGE, ORIGINAL_PARTNER_MESSAGE, TRANSLATED_MESSAGE, TRANSLATED_PARTNER_MESSAGE } from "./Color";
 import styled from "styled-components";
 
+const CHAT_MESSAGE_STYLE = {
+    'me-original': `
+        background-color: ${ORIGINAL_MESSAGE};
+        border: 2px solid #000;
+        color: black;
+    `,
+    'me-translated': `
+        background-color: ${TRANSLATED_MESSAGE};
+        color: black;
+    `,
+    'partner-original': `
+        background-color: ${ORIGINAL_PARTNER_MESSAGE};
+        color: white;
+    `,
+    'partner-translated':`
+        background-color: ${TRANSLATED_PARTNER_MESSAGE};
+        color: white;
+    `
+}
 export const ChatMessage = styled.div`
     display: block;
     padding: 15px 12px;
-    background-color: ${props => {
-        if (props.type === 'me') {
-            return props.isOriginal ? 'white' : '#d5d5d5';
-        } else {
-            return props.isOriginal ? '#283593' : '#007AFF';
-        }
-    }};
-    border: ${props => (props.type === 'me' && props.isOriginal) ? '2px solid #000000' : 'none'};
-    color: ${ props => props.type === 'me' ? 'black' : 'white' };
     border-radius: 8px;
+    ${props => {
+        if (props.type === 'me' && props.isOriginal) {
+            return CHAT_MESSAGE_STYLE['me-original']
+
+        } else if (props.type === 'me') {
+            return CHAT_MESSAGE_STYLE['me-translated']
+
+        } else if (props.type === 'partner' && props.isOriginal) {
+            return CHAT_MESSAGE_STYLE['partner-original']
+            
+        } else {
+            return CHAT_MESSAGE_STYLE['partner-translated']
+        }
+    }}
     `;

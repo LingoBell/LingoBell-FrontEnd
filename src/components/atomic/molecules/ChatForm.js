@@ -41,6 +41,7 @@ function ChatForm() {
         <ChatCard>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
+                
                 return (
                     <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType}>
                         <ChatMessage
