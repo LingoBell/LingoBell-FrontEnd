@@ -8,6 +8,7 @@ const Container = styled.div`
 `
 const ProfileImage = styled(BaseImage)`
   width : 100px;
+  min-width : 100px;
   height : 100px;
 `
 const Wrap = styled.div`
@@ -26,10 +27,13 @@ const StyledTag = styled(Tag)`
   margin-right : 6px;
   padding : 2px 4px 2px 4px;
 `
-
+const StyledParagraph = styled(Paragraph)`
+  word-break : break-all;
+  
+`
 
 export default props => {
-  const { onClick, handleClick } = props;
+  const { onClick, handleClick, textEllipsis } = props;
   
 
   return (
@@ -42,7 +46,7 @@ export default props => {
             <StyledTag>{tag}</StyledTag>
           )}
         </div>
-        <Paragraph>{props.content}</Paragraph>
+        <StyledParagraph textEllipsis>{props.content}</StyledParagraph>
         {props.children}
       </Wrap>
     </Container>
