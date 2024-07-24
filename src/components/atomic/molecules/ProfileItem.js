@@ -5,19 +5,16 @@ import { Paragraph, Title } from '../atoms/Typograpy'
 
 const Container = styled.div`
   display : flex;
-  border : 1px solid #ccc;
-  padding-top : 12px;
-  padding-bottom : 12px;
 `
 const ProfileImage = styled(BaseImage)`
   width : 100px;
+  min-width : 100px;
   height : 100px;
-  margin-left : 20px;
 `
 const Wrap = styled.div`
   margin-top : auto;
   margin-bottom: auto;
-  margin-left : 40px;
+  padding-left : 12px;
   line-height : 1.5;
   
 `
@@ -30,14 +27,17 @@ const StyledTag = styled(Tag)`
   margin-right : 6px;
   padding : 2px 4px 2px 4px;
 `
-
+const StyledParagraph = styled(Paragraph)`
+  word-break : break-all;
+  
+`
 
 export default props => {
-  const { onClick } = props;
+  const { onClick, handleClick, textEllipsis } = props;
   
 
   return (
-    <Container onClick={onClick || handleClick}>
+    <Container className={props.className} onClick={onClick || handleClick}>
       <ProfileImage src={props.src} />
       <Wrap>
         <UserName>{props.title}</UserName>
@@ -46,7 +46,7 @@ export default props => {
             <StyledTag>{tag}</StyledTag>
           )}
         </div>
-        <Paragraph>{props.content}</Paragraph>
+        <StyledParagraph textEllipsis>{props.content}</StyledParagraph>
         {props.children}
       </Wrap>
     </Container>

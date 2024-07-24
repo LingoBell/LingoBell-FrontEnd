@@ -38,27 +38,38 @@ const profiles = [
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Jay',
     'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
+    'selfIntroduction': 'dasljnawlajwdnlawddUpdatedasljnawlajwdnlawddUpdate your profile information'
   }
 ]
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-
-  @media screen and (min-width: 1024px) {
+  background-color : red;
+  padding-top : 12px;
+  padding-left : 12px;
+  padding-right : 12px;
+  @media screen and (min-width: 800px) {
+    // justify-content : center;
     flex-direction: row;
     flex-wrap: wrap;
-    padding-left: 12px;
-    padding-right: 12px;
-    > div {
-      min-width: calc(50% - 24px);
-      margin-left: 12px;
-      margin-right: 12px;
-    }
+
   }
 `
-
+const StyledProfileItem = styled(ProfileItem)`
+  width : 100%;
+  border : 1px solid #ccc;
+  padding : 12px 12px;
+  margin : 12px 12px;
+  @media screen and (min-width : 800px){
+    // margin : 
+    width : calc(50% - 24px)
+  }
+`
+const ModalProfileItem = styled(ProfileItem)`
+  padding : 12px 12px;
+  margin : 12px 12px;
+`
 export default props => {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -75,10 +86,20 @@ export default props => {
       <Container>
         <Modal 
         isOpened={isOpened} 
+
+        onClickCloseBtn={() => handleCloseModal()} 
+        onClickAlertBtn={() => raiseAlert()}
+        >
+          <ModalProfileItem
+            title={profiles[0].name}
+            src={profiles[0].image}
+            tags={profiles[0].language}
+            content={profiles[0].selfIntroduction}
+          />
+        </Modal>
         onClickCloseBtn={() => handleCloseModal()}
         bttnTxt="대화 요청"
         />
-
         {
           profiles.map((profile, index) => {
             const {
@@ -88,7 +109,7 @@ export default props => {
               selfIntroduction: content
             } = profile
             return (
-              <ProfileItem
+              <StyledProfileItem
                 key={index}
                 title={title}
                 src={src}

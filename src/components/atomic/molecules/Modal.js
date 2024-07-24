@@ -3,25 +3,27 @@ import styled from 'styled-components';
 import Button from '../atoms/Button';
 
 const Background = styled.div`
-    background-color: gray;
+    background-color: rgba(0,0,0,0.4);
     width: 100vw;
     height: 100vh;
-    opacity: 80%;
     position: fixed;
     left: 0;
     top: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
 `
 
 const ModalBox = styled.div`
-    width: 50vw;
-    height: 50vh;
     background-color: white;
+    padding-bottom : 24px;
+    border-radius : 8px;
+    // min-width: 600px;
     z-index: 1;
 `
+const TestButton = styled(Button)`
+    width : calc(80% - 24px);
+    `
 
 export default props => {
     const { onClickCloseBtn, isOpened, bttnTxt } = props;
@@ -37,8 +39,11 @@ export default props => {
                     >
                         close
                     </span>
+                    {props.children}
+                    <div style={{"textAlign" : "center"}}>
+                    <TestButton onClick={onClickAlertBtn}>버튼</TestButton>
+                    </div>
 
-                    <Button>{bttnTxt}</Button>
                 </ModalBox>
             </Background>
         )
