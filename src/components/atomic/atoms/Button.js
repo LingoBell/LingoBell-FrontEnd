@@ -22,6 +22,10 @@ const buttonTypes = {
   black: `
     background-color: black;
     color: white;
+  `,
+  empty: `
+    color: black;
+    background-color: transparent;
   `
 }
 
@@ -35,6 +39,7 @@ const Button = styled.button`
   padding-right: 24px;
   padding-top: 12px;
   padding-bottom: 12px;
+  cursor: pointer;
   ${props => buttonTypes[props.$type]}
 
 `

@@ -1,117 +1,62 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
-import Modal from '../molecules/Modal'
-const profiles = [
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Sungwoo Cho',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
-  },
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Tom',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
-  },
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Scarlett',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
-  },
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Jinwoo',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
-  },
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Max',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
-  },
-  {
-    'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Jay',
-    'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'dasljnawaeflaelfnalfnlaksfalskfsldkflaksdefnlkaesfnlkaesfnlseflnkaeskfnlajwdnlawddUpdatedasljnawlajwdnlawddUpdate your profile information'
-  }
-]
+
+import ChatCard from '../templates/ChatSectionCard'
+import ChatForm from '../molecules/ChatForm'
+import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/sampleData'
+import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
+import ChatHistoryList from '../organisms/ChatHistoryList'
+import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
+
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
-  background-color : red;
-  padding-top : 12px;
-  padding-left : 12px;
-  padding-right : 12px;
-  @media screen and (min-width: 800px) {
-    // justify-content : center;
-    flex-direction: row;
-    flex-wrap: wrap;
+  height: 100%;
+`
 
+
+
+const HistorySectionContainer = styled.main`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(200%);
+  background-color: white;
+  transition: transform 0.3s;
+  ${props => props.isOpen && `
+    transform: translateX(0);
+  `}
+  @media screen and (min-width: 1024px) {
+    display: none;
+    transform: translateX(0);
+    position: static;
+    flex: 1;
+    width: auto;
+    height: auto;
+    ${props => props.isOpen && 'display: block;'}
   }
 `
-const StyledProfileItem = styled(ProfileItem)`
-  width : 100%;
-  border : 1px solid #ccc;
-  padding : 12px 12px;
-  margin : 12px 12px;
-  @media screen and (min-width : 800px){
-    // margin : 
-    width : calc(50% - 24px)
-  }
-`
+
+const profiles = PROFILE_DATA
+
 
 export default props => {
-  const [isOpened, setIsOpened] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState(null);
+  const {
+    chatId
+  } = useParams()
 
-  const handleOpenModal = (profile) => {
-    setIsOpened(true);
-    setSelectedProfile(profile);
-  };
-
-  const handleCloseModal = () => {
-    setIsOpened(false);
-    setSelectedProfile(null);
-  };
-
+  const isChatDetailOpen = !!chatId
   return (
-    <CenteredMainLayout>
-      <Container>
-        {selectedProfile && (
-          <Modal
-            isOpened={isOpened}
-            onClickCloseBtn={() => handleCloseModal()}
-            bttnTxt="대화 요청"
-            selectedProfile={selectedProfile}
-          />
-        )}
-        {
-          profiles.map((profile, index) => {
-            const {
-              name: title,
-              image: src,
-              language: tags,
-              selfIntroduction: content
-            } = profile
-            return (
-              <StyledProfileItem
-                key={index}
-                title={title}
-                src={src}
-                tags={tags}
-                content={content}
-                onClick={() => handleOpenModal(profile)} />
-            )
-          })
-        }
-      </Container>
-    </CenteredMainLayout>
+    <Container>
+      <ChatHistoryList />
+      <HistorySectionContainer 
+        isOpen={isChatDetailOpen}
+      >
+        <ChatHistoryDetail />
+      </HistorySectionContainer>
+    </Container>
   )
 }
