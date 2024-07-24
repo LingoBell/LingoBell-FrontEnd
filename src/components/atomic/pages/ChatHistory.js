@@ -70,18 +70,15 @@ export default props => {
     setIsOpened(false);
   };
 
-  const raiseAlert = () => {
-    alert("Alert!");
-  }
-
   return (
     <CenteredMainLayout>
       <Container>
         <Modal 
         isOpened={isOpened} 
-        onClickCloseBtn={() => handleCloseModal()} 
-        onClickAlertBtn={() => raiseAlert()}
+        onClickCloseBtn={() => handleCloseModal()}
+        bttnTxt="대화 요청"
         />
+
         {
           profiles.map((profile, index) => {
             const {
