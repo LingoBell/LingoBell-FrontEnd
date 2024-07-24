@@ -45,6 +45,7 @@ export default props => {
                         close
                     </span>
                     {props.children}
+
                     <div style={{ "textAlign": "center" }}>
                         <ModalProfileItem
                             title={selectedProfile.name}
