@@ -24,7 +24,7 @@ export default () => {
           <Route path='/chat-history' element={<ChatHistory />} />
           <Route path="/Main" element={<Main />} />
           <Route path="/chat" element={<ChatForm />} />
-          <Route path="/liveChat" element={<LiveChat />} />
+          <Route path="/chat/liveChat" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
         </Route>
       </Routes>

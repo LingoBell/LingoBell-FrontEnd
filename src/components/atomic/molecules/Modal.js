@@ -31,7 +31,7 @@ const TestButton = styled(Button)`
 `
 
 export default props => {
-    const { onClickCloseBtn, isOpened, bttnTxt, selectedProfile } = props;
+    const { onClickCloseBtn, isOpened, bttnTxt, selectedProfile, onClickBttn } = props;
 
     return (
         isOpened && (
@@ -50,7 +50,9 @@ export default props => {
                             title={selectedProfile.name}
                             src={selectedProfile.image}
                             tags={selectedProfile.language}
-                            content={selectedProfile.selfIntroduction} />                    <TestButton>{bttnTxt}</TestButton>
+                            content={selectedProfile.selfIntroduction}
+                        />
+                        <TestButton onClick={onClickBttn}>{bttnTxt}</TestButton>
                     </div>
                 </ModalBox>
             </Background>

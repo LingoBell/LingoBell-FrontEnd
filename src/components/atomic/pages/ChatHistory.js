@@ -3,6 +3,8 @@ import styled from 'styled-components'
 import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
+import { Link, useNavigate } from 'react-router-dom'
+import LiveChat from './LiveChat'
 const profiles = [
   {
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
@@ -71,6 +73,8 @@ export default props => {
   const [isOpened, setIsOpened] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
 
+  const navigate = useNavigate();
+
   const handleOpenModal = (profile) => {
     setIsOpened(true);
     setSelectedProfile(profile);
@@ -81,6 +85,10 @@ export default props => {
     setSelectedProfile(null);
   };
 
+  const handleClickRequestBttn = () => {
+    navigate('/chat/liveChat');
+  }
+
   return (
     <CenteredMainLayout>
       <Container>
@@ -90,6 +98,7 @@ export default props => {
             onClickCloseBtn={() => handleCloseModal()}
             bttnTxt="대화 요청"
             selectedProfile={selectedProfile}
+            onClickBttn={handleClickRequestBttn}
           />
         )}
         {
