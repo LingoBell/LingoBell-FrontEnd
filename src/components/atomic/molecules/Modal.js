@@ -6,7 +6,7 @@ const Background = styled.div`
     background-color: gray;
     width: 100vw;
     height: 100vh;
-    opacity: 30%;
+    opacity: 80%;
     position: fixed;
     left: 0;
     top: 0;
@@ -20,13 +20,11 @@ const ModalBox = styled.div`
     width: 50vw;
     height: 50vh;
     background-color: white;
-
-    // min-width: 600px;
     z-index: 1;
 `
 
 export default props => {
-    const {onClickCloseBtn, isOpened, onClickAlertBtn} = props;
+    const { onClickCloseBtn, isOpened, bttnTxt } = props;
 
     return (
         isOpened && (
@@ -39,11 +37,9 @@ export default props => {
                     >
                         close
                     </span>
-                    <Button onClick={onClickAlertBtn}>버튼</Button>
 
+                    <Button>{bttnTxt}</Button>
                 </ModalBox>
-
-
             </Background>
         )
     );
