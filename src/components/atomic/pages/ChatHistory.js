@@ -38,7 +38,7 @@ const profiles = [
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Jay',
     'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'dasljnawlajwdnlawddUpdatedasljnawlajwdnlawddUpdate your profile information'
+    'selfIntroduction': 'dasljnawaeflaelfnalfnlaksfalskfsldkflaksdefnlkaesfnlkaesfnlseflnkaeskfnlajwdnlawddUpdatedasljnawlajwdnlawddUpdate your profile information'
   }
 ]
 
@@ -86,9 +86,9 @@ export default props => {
       <Container>
         <Modal 
         isOpened={isOpened} 
-
         onClickCloseBtn={() => handleCloseModal()} 
         onClickAlertBtn={() => raiseAlert()}
+        bttnTxt="대화 요청"
         >
           <ModalProfileItem
             title={profiles[0].name}
@@ -97,9 +97,6 @@ export default props => {
             content={profiles[0].selfIntroduction}
           />
         </Modal>
-        onClickCloseBtn={() => handleCloseModal()}
-        bttnTxt="대화 요청"
-        />
         {
           profiles.map((profile, index) => {
             const {

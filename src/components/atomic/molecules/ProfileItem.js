@@ -27,13 +27,13 @@ const StyledTag = styled(Tag)`
   margin-right : 6px;
   padding : 2px 4px 2px 4px;
 `
+
 const StyledParagraph = styled(Paragraph)`
-  word-break : break-all;
-  
+
 `
 
 export default props => {
-  const { onClick, handleClick, textEllipsis } = props;
+  const { onClick, handleClick } = props;
   
 
   return (
@@ -46,7 +46,7 @@ export default props => {
             <StyledTag>{tag}</StyledTag>
           )}
         </div>
-        <StyledParagraph textEllipsis>{props.content}</StyledParagraph>
+        <StyledParagraph $type="word-break">{props.content}</StyledParagraph>
         {props.children}
       </Wrap>
     </Container>

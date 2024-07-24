@@ -41,7 +41,7 @@ export default props => {
                     </span>
                     {props.children}
                     <div style={{"textAlign" : "center"}}>
-                    <TestButton onClick={onClickAlertBtn}>버튼</TestButton>
+                    <TestButton>버튼</TestButton>
                     </div>
 
                 </ModalBox>
