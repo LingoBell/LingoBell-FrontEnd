@@ -81,10 +81,35 @@ export default props => {
     setIsOpened(false);
   };
 
+  const showProfileItem = () => {
+    profiles.map((profile, index) => {
+      const {
+        name: title,
+        image: src,
+        language: tags,
+        selfIntroduction: content
+      } = profile
+      return (
+        <ProfileItem
+          key={index}
+          title={title}
+          src={src}
+          tags={tags}
+          content={content}
+          onClick={() => handleOpenModal()} />
+      )
+    })
+  };
+
   return (
     <CenteredMainLayout>
       <Container>
-        <Modal 
+        <Modal
+          isOpened={isOpened}
+          onClickCloseBtn={() => handleCloseModal()}
+          bttnTxt="대화 요청"
+          profile={profile}
+        
         isOpened={isOpened} 
 
         onClickCloseBtn={() => handleCloseModal()} 
@@ -94,12 +119,9 @@ export default props => {
             title={profiles[0].name}
             src={profiles[0].image}
             tags={profiles[0].language}
-            content={profiles[0].selfIntroduction}
-          />
+            content={profiles[0].selfIntroduction}/>
+          
         </Modal>
-        onClickCloseBtn={() => handleCloseModal()}
-        bttnTxt="대화 요청"
-        />
         {
           profiles.map((profile, index) => {
             const {
