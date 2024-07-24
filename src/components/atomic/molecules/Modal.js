@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import Button from '../atoms/Button';
+import ProfileItem from './ProfileItem';
 
 const Background = styled.div`
     background-color: rgba(0,0,0,0.4);
@@ -18,15 +19,19 @@ const ModalBox = styled.div`
     background-color: white;
     padding-bottom : 24px;
     border-radius : 8px;
-    // min-width: 600px;
     z-index: 1;
 `
+const ModalProfileItem = styled(ProfileItem)`
+  padding : 12px 12px;
+  margin : 12px 12px;
+`
+
 const TestButton = styled(Button)`
     width : calc(80% - 24px);
-    `
+`
 
 export default props => {
-    const { onClickCloseBtn, isOpened, bttnTxt } = props;
+    const { onClickCloseBtn, isOpened, bttnTxt, selectedProfile } = props;
 
     return (
         isOpened && (
@@ -40,10 +45,13 @@ export default props => {
                         close
                     </span>
                     {props.children}
-                    <div style={{"textAlign" : "center"}}>
-                    <TestButton onClick={onClickAlertBtn}>버튼</TestButton>
+                    <div style={{ "textAlign": "center" }}>
+                        <ModalProfileItem
+                            title={selectedProfile.name}
+                            src={selectedProfile.image}
+                            tags={selectedProfile.language}
+                            content={selectedProfile.selfIntroduction} />                    <TestButton>{bttnTxt}</TestButton>
                     </div>
-
                 </ModalBox>
             </Background>
         )
