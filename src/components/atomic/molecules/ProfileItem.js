@@ -5,21 +5,15 @@ import { Paragraph, Title } from '../atoms/Typograpy'
 
 const Container = styled.div`
   display : flex;
-  border : 1px solid #ccc;
-  padding-top : 12px;
-  padding-bottom : 12px;
-  margin-left: 12px;
-  margin-right: 12px;
 `
 const ProfileImage = styled(BaseImage)`
   width : 100px;
   height : 100px;
-  margin-left : 20px;
 `
 const Wrap = styled.div`
   margin-top : auto;
   margin-bottom: auto;
-  margin-left : 40px;
+  padding-left : 12px;
   line-height : 1.5;
   
 `
@@ -35,11 +29,11 @@ const StyledTag = styled(Tag)`
 
 
 export default props => {
-  const { onClick } = props;
+  const { onClick, handleClick } = props;
   
 
   return (
-    <Container onClick={onClick || handleClick}>
+    <Container className={props.className} onClick={onClick || handleClick}>
       <ProfileImage src={props.src} />
       <Wrap>
         <UserName>{props.title}</UserName>

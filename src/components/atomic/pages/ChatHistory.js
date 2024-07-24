@@ -45,20 +45,26 @@ const profiles = [
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-
+  background-color : red;
+  padding-top : 12px;
+  padding-left : 12px;
+  padding-right : 12px;
   @media screen and (min-width: 1024px) {
+    justify-content : center;
     flex-direction: row;
     flex-wrap: wrap;
-    padding-left: 12px;
-    padding-right: 12px;
-    > div {
-      min-width: calc(50% - 24px);
-      // margin-left: 12px;
-      // margin-right: 12px;
-    }
+
   }
 `
-
+const StyledProfileItem = styled(ProfileItem)`
+  border : 1px solid #ccc;
+  padding : 12px 12px;
+  margin : 12px 12px;
+`
+const ModalProfileItem = styled(ProfileItem)`
+  padding : 12px 12px;
+  margin : 12px 12px;
+`
 export default props => {
   const [isOpened, setIsOpened] = useState(false);
 
@@ -81,7 +87,14 @@ export default props => {
         isOpened={isOpened} 
         onClickCloseBtn={() => handleCloseModal()} 
         onClickAlertBtn={() => raiseAlert()}
-        />
+        >
+          <ModalProfileItem
+            title={profiles[0].name}
+            src={profiles[0].image}
+            tags={profiles[0].language}
+            content={profiles[0].selfIntroduction}
+          />
+        </Modal>
         {
           profiles.map((profile, index) => {
             const {
@@ -91,7 +104,7 @@ export default props => {
               selfIntroduction: content
             } = profile
             return (
-              <ProfileItem
+              <StyledProfileItem
                 key={index}
                 title={title}
                 src={src}
