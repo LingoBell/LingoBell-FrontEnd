@@ -66,62 +66,32 @@ const StyledProfileItem = styled(ProfileItem)`
     width : calc(50% - 24px)
   }
 `
-const ModalProfileItem = styled(ProfileItem)`
-  padding : 12px 12px;
-  margin : 12px 12px;
-`
+
 export default props => {
   const [isOpened, setIsOpened] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState(null);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (profile) => {
     setIsOpened(true);
+    setSelectedProfile(profile);
   };
 
   const handleCloseModal = () => {
     setIsOpened(false);
-  };
-
-  const showProfileItem = () => {
-    profiles.map((profile, index) => {
-      const {
-        name: title,
-        image: src,
-        language: tags,
-        selfIntroduction: content
-      } = profile
-      return (
-        <ProfileItem
-          key={index}
-          title={title}
-          src={src}
-          tags={tags}
-          content={content}
-          onClick={() => handleOpenModal()} />
-      )
-    })
+    setSelectedProfile(null);
   };
 
   return (
     <CenteredMainLayout>
       <Container>
-        <Modal
-          isOpened={isOpened}
-          onClickCloseBtn={() => handleCloseModal()}
-          bttnTxt="대화 요청"
-          profile={profile}
-        
-        isOpened={isOpened} 
-
-        onClickCloseBtn={() => handleCloseModal()} 
-        onClickAlertBtn={() => raiseAlert()}
-        >
-          <ModalProfileItem
-            title={profiles[0].name}
-            src={profiles[0].image}
-            tags={profiles[0].language}
-            content={profiles[0].selfIntroduction}/>
-          
-        </Modal>
+        {selectedProfile && (
+          <Modal
+            isOpened={isOpened}
+            onClickCloseBtn={() => handleCloseModal()}
+            bttnTxt="대화 요청"
+            selectedProfile={selectedProfile}
+          />
+        )}
         {
           profiles.map((profile, index) => {
             const {
@@ -137,7 +107,7 @@ export default props => {
                 src={src}
                 tags={tags}
                 content={content}
-                onClick={() => handleOpenModal()} />
+                onClick={() => handleOpenModal(profile)} />
             )
           })
         }
