@@ -26,7 +26,7 @@ const TestButton = styled(Button)`
     `
 
 export default props => {
-    const {onClickCloseBtn, isOpened, onClickAlertBtn} = props;
+    const { onClickCloseBtn, isOpened, bttnTxt } = props;
 
     return (
         isOpened && (
@@ -43,9 +43,8 @@ export default props => {
                     <div style={{"textAlign" : "center"}}>
                     <TestButton onClick={onClickAlertBtn}>버튼</TestButton>
                     </div>
+
                 </ModalBox>
-
-
             </Background>
         )
     );
