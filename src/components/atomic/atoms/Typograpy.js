@@ -5,7 +5,20 @@ export const Title = styled.div`
   font-weight: bold;
 `
 
+
+const textTypes = {
+  ellipsis: `
+    text-overflow: ellipsis;
+    // white-space:nowrap;
+
+  `,
+  'word-break' : `
+     word-break : break-all;
+  `
+}
+
 export const Paragraph = styled.div`
   color: rgba(51,51,51, 0.8);
+    ${props => textTypes[props.$type]}
 `
 

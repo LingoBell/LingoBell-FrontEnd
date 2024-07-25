@@ -62,3 +62,9 @@ body {
   -ms-overflow-style: none;  /* Internet Explorer 10+ */
   scrollbar-width: none;  /* Firefox */
 }
+a {
+  text-decoration: none;
+}
+a:visited {
+  text-decoration: none;
+}

@@ -1,81 +1,62 @@
 import React from 'react'
 import styled from 'styled-components'
-import CenteredMainLayout from '../templates/CenteredMainLayout' 
 import ProfileItem from '../molecules/ProfileItem'
-const profiles = [
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Sungwoo Cho',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  },
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Tom',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  },
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Scarlett',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  },
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Jinwoo',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  },
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Max',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  },
-  {
-      'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-      'name': 'Jay',
-      'language': ['Language Learner', 'Korean', 'English'],
-      'selfIntroduction': 'Update your profile information'
-  }
-]
+
+import ChatCard from '../templates/ChatSectionCard'
+import ChatForm from '../molecules/ChatForm'
+import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/sampleData'
+import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
+import ChatHistoryList from '../organisms/ChatHistoryList'
+import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
+
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  height: 100%;
+`
 
+
+
+const HistorySectionContainer = styled.main`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(200%);
+  background-color: white;
+  transition: transform 0.3s;
+  ${props => props.isOpen && `
+    transform: translateX(0);
+  `}
   @media screen and (min-width: 1024px) {
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding-left: 12px;
-    padding-right: 12px;
-    > div {
-      min-width: calc(50% - 24px);
-      margin-left: 12px;
-      margin-right: 12px;
-    }
+    display: none;
+    transform: translateX(0);
+    position: static;
+    flex: 1;
+    width: auto;
+    height: auto;
+    ${props => props.isOpen && 'display: block;'}
   }
 `
 
+const profiles = PROFILE_DATA
+
+
 export default props => {
+  const {
+    chatId
+  } = useParams()
+
+  const isChatDetailOpen = !!chatId
   return (
-    <CenteredMainLayout>
-      <Container>
-        {
-          profiles.map((profile, index) => {
-            const {
-              name: title,
-              image: src,
-              language: tags,
-              selfIntroduction: content
-            } = profile
-            return (
-              <ProfileItem key={index} title={title} src={src} tags={tags} content={content} />
-            )
-          })
-        }
-      </Container>
-    </CenteredMainLayout>
+    <Container>
+      <ChatHistoryList />
+      <HistorySectionContainer 
+        isOpen={isChatDetailOpen}
+      >
+        <ChatHistoryDetail />
+      </HistorySectionContainer>
+    </Container>
   )
 }

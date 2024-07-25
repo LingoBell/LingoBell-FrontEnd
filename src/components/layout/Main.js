@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
-export default props => {
-  return (
-    <main>{props.children}</main>
-  )
-}
+
+const Main = styled.main`
+  padding-top: 60px;
+  
+`
+export default Main
