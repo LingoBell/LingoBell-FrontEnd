@@ -9,6 +9,7 @@ import ProfileList from "./components/atomic/pages/ProfileList";
 import Header from "./components/layout/Header";
 import LiveChat from "./components/atomic/pages/LiveChat";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
+import Video from "./components/atomic/pages/Video";
 // export let mainDomain = 'http://localhost:8000'
 
 export let mainDomain = ''
@@ -16,7 +17,6 @@ export let mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
 export default () => {
-  console.log('test')
   return (
     <BrowserRouter>
       <Routes>
@@ -33,6 +33,7 @@ export default () => {
           <Route path="/chat" element={<ChatForm />} />
           <Route path="/live-chat/:chatId" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
+          <Route path='/video' element={<Video />} />
         </Route>
       </Routes>
       

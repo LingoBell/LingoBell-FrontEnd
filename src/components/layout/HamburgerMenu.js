@@ -23,7 +23,8 @@ const HamburgerMenuContainer = styled.div`
   position: fixed;
   top: 0;
   right: 0;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   background-color: white;
   z-index: 10;
   transform: translateX(200%);

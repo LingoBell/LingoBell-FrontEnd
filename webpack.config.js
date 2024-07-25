@@ -40,7 +40,7 @@ module.exports = {
       path.join(__dirname, 'public')
     ],
     compress: true,
-    port: 9000,
+    port: 3000,
     historyApiFallback: true,
     client: {
       overlay: false,
