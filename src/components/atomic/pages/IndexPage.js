@@ -1,7 +1,14 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { Title, Paragraph } from '../atoms/Typograpy'
+import { useSelector, useDispatch } from 'react-redux';
+import { auth, googleProvider } from '../../../firebase/firebase';
+import { onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { clearUser, setUser, signInWithGoogle } from '../../../redux/userSlice';
+
+
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,11 +78,58 @@ const StyledButton = styled(Button)`
   margin-bottom: 12px;
 
 `
-export default props => {
+// export default props => {
+//   return (
+//     <Container>
+//       <ImageWrap>
+//         <img width='80%' src='/indexImage.png' />
+//       </ImageWrap>
+//       <ContentFullWrap>
+//         <ContentWrap>
+//           <StyledTitle>Welcome to LingoBell</StyledTitle>
+//           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
+//         </ContentWrap>
+//         <ButtonWrap>
+//           <StyledButton $type='bordered'>구글 계정으로 로그인</StyledButton>
+//           <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
+//           <StyledButton>회원 가입</StyledButton>
+//         </ButtonWrap>
+//       </ContentFullWrap>
+      
+//     </Container>
+//   )
+// }
+
+const IndexPage = (props) => {
+  const dispatch = useDispatch()
+  const user = useSelector((state)=> {
+    console.log('state : ')
+    console.log(state)
+    return state.user?.user
+  })
+  const trySigninWithGoogle = () => {
+    dispatch(signInWithGoogle())
+  }
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     console.log('result : ')
+  //     console.log(result)
+  //     const idToken = await result.user.getIdToken(); // ID 토큰 가져옴
+  //     console.log(idToken)
+  //     const verificationResult = await axios.post('http://127.0.0.1:8000/verify-token', { idToken }); //토큰을 서버로 전송
+  //     if (verificationResult) {
+  //       dispatch(setUser(result.user));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error signing in with Google", error);
+  //   }
+  // };
+
   return (
     <Container>
       <ImageWrap>
-        <img width='80%' src='/indexImage.png' />
+        <img width='80%' src='/indexImage.png' alt="Welcome" />
       </ImageWrap>
       <ContentFullWrap>
         <ContentWrap>
@@ -83,12 +137,13 @@ export default props => {
           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
         </ContentWrap>
         <ButtonWrap>
-          <StyledButton $type='bordered'>구글 계정으로 로그인</StyledButton>
+          <StyledButton $type='bordered' onClick={trySigninWithGoogle}>구글 계정으로 로그인</StyledButton>
           <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
           <StyledButton>회원 가입</StyledButton>
         </ButtonWrap>
       </ContentFullWrap>
-      
     </Container>
-  )
-}
+  );
+};
+
+export default IndexPage;
