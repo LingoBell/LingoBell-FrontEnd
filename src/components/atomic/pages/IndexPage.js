@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { Title, Paragraph } from '../atoms/Typograpy'
 import { useSelector, useDispatch } from 'react-redux';
-import { auth } from '../../../firebase/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
-import { clearUser, setUser } from '../../../userSlice';
+import { auth, googleProvider } from '../../../firebase/firebase';
+import { onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { clearUser, setUser, signInWithGoogle } from '../../../userSlice';
 // import { setUser, clearUser } from '../../userSlice';
 
 
@@ -101,24 +101,31 @@ const StyledButton = styled(Button)`
 //   )
 // }
 
-const IndexPage = ({ signInWithGoogle, signOut }) => {
-  const dispatch = useDispatch();
+const IndexPage = (props) => {
+  const dispatch = useDispatch()
   const user = useSelector((state)=> {
     console.log('state : ')
     console.log(state)
-    return  state.user.user
+    return state.user?.user
   })
-
-  useEffect(()=>{
-    const unsubscribe = onAuthStateChanged(auth,(user)=>{
-      if(user){
-        dispatch(setUser(user))
-      } else {
-        dispatch(clearUser ());
-      }
-    });
-    return()=> unsubscribe();
-  }, [dispatch]);
+  const trySigninWithGoogle = () => {
+    dispatch(signInWithGoogle())
+  }
+  // const signInWithGoogle = async () => {
+  //   try {
+  //     const result = await signInWithPopup(auth, googleProvider);
+  //     console.log('result : ')
+  //     console.log(result)
+  //     const idToken = await result.user.getIdToken(); // ID 토큰 가져옴
+  //     console.log(idToken)
+  //     const verificationResult = await axios.post('http://127.0.0.1:8000/verify-token', { idToken }); //토큰을 서버로 전송
+  //     if (verificationResult) {
+  //       dispatch(setUser(result.user));
+  //     }
+  //   } catch (error) {
+  //     console.error("Error signing in with Google", error);
+  //   }
+  // };
 
   return (
     <Container>
@@ -131,11 +138,7 @@ const IndexPage = ({ signInWithGoogle, signOut }) => {
           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
         </ContentWrap>
         <ButtonWrap>
-          {user ? (
-            <StyledButton $type='bordered' onClick={signOut}>로그아웃</StyledButton>
-          ) : (
-            <StyledButton $type='bordered' onClick={signInWithGoogle}>구글 계정으로 로그인</StyledButton>
-          )}
+          <StyledButton $type='bordered' onClick={trySigninWithGoogle}>구글 계정으로 로그인</StyledButton>
           <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
           <StyledButton>회원 가입</StyledButton>
         </ButtonWrap>

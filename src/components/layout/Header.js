@@ -2,6 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import TopBar from '../atomic/atoms/TopBar'
 import BaseImage from '../atomic/atoms/BaseImage'
+import { useDispatch } from 'react-redux'
+import { signOutAll } from '../../userSlice'
 
 const LogoContainer = styled.div`
     display : flex;
@@ -31,6 +33,10 @@ const Wrap = styled.div`
 const menu = {data : ["Home", "Profile", "Partner", "History", "Logout"]}
 
 export default props => {
+  const dispatch = useDispatch()
+  const trySignout = () => {
+    dispatch(signOutAll())
+  }
   return (
     <TopBar>
       <LogoContainer>
@@ -38,8 +44,18 @@ export default props => {
         <LogoName>LingoBell</LogoName>
         </LogoContainer>
         <Wrap>
-          { menu.data.map(item => 
-            <MenuTab>{item}</MenuTab>
+          { menu.data.map(item => {
+            if (item == 'Logout') {
+              return (
+                <MenuTab onClick={trySignout} >
+                  {item}
+                </MenuTab>
+              )
+            }
+            return (
+              <MenuTab>{item}</MenuTab>
+            )
+          }
           )
           }   
         </Wrap>
