@@ -5,8 +5,7 @@ import { Title, Paragraph } from '../atoms/Typograpy'
 import { useSelector, useDispatch } from 'react-redux';
 import { auth, googleProvider } from '../../../firebase/firebase';
 import { onAuthStateChanged, signInWithPopup } from 'firebase/auth';
-import { clearUser, setUser, signInWithGoogle } from '../../../userSlice';
-// import { setUser, clearUser } from '../../userSlice';
+import { clearUser, setUser, signInWithGoogle } from '../../../redux/userSlice';
 
 
 
