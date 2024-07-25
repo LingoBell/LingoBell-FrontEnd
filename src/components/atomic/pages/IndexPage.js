@@ -1,7 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { Title, Paragraph } from '../atoms/Typograpy'
+import { useSelector, useDispatch } from 'react-redux';
+import { auth } from '../../../firebase/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { clearUser, setUser } from '../../../userSlice';
+// import { setUser, clearUser } from '../../userSlice';
+
+
+
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -71,11 +79,51 @@ const StyledButton = styled(Button)`
   margin-bottom: 12px;
 
 `
-export default props => {
+// export default props => {
+//   return (
+//     <Container>
+//       <ImageWrap>
+//         <img width='80%' src='/indexImage.png' />
+//       </ImageWrap>
+//       <ContentFullWrap>
+//         <ContentWrap>
+//           <StyledTitle>Welcome to LingoBell</StyledTitle>
+//           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
+//         </ContentWrap>
+//         <ButtonWrap>
+//           <StyledButton $type='bordered'>구글 계정으로 로그인</StyledButton>
+//           <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
+//           <StyledButton>회원 가입</StyledButton>
+//         </ButtonWrap>
+//       </ContentFullWrap>
+      
+//     </Container>
+//   )
+// }
+
+const IndexPage = ({ signInWithGoogle, signOut }) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state)=> {
+    console.log('state : ')
+    console.log(state)
+    return  state.user.user
+  })
+
+  useEffect(()=>{
+    const unsubscribe = onAuthStateChanged(auth,(user)=>{
+      if(user){
+        dispatch(setUser(user))
+      } else {
+        dispatch(clearUser ());
+      }
+    });
+    return()=> unsubscribe();
+  }, [dispatch]);
+
   return (
     <Container>
       <ImageWrap>
-        <img width='80%' src='/indexImage.png' />
+        <img width='80%' src='/indexImage.png' alt="Welcome" />
       </ImageWrap>
       <ContentFullWrap>
         <ContentWrap>
@@ -83,12 +131,17 @@ export default props => {
           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
         </ContentWrap>
         <ButtonWrap>
-          <StyledButton $type='bordered'>구글 계정으로 로그인</StyledButton>
+          {user ? (
+            <StyledButton $type='bordered' onClick={signOut}>로그아웃</StyledButton>
+          ) : (
+            <StyledButton $type='bordered' onClick={signInWithGoogle}>구글 계정으로 로그인</StyledButton>
+          )}
           <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
           <StyledButton>회원 가입</StyledButton>
         </ButtonWrap>
       </ContentFullWrap>
-      
     </Container>
-  )
-}
+  );
+};
+
+export default IndexPage;
