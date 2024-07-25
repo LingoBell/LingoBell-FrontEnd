@@ -2,14 +2,28 @@ import React from 'react'
 import styled from 'styled-components'
 import TopBar from '../atomic/atoms/TopBar'
 import BaseImage from '../atomic/atoms/BaseImage'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { signOutAll } from '../../userSlice'
+import { Link, useLocation } from 'react-router-dom'
+import HamburgerMenu from './HamburgerMenu'
+import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
+
+const HeaderContainer = styled.header`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  background-color: white;
+`
+
 
 const LogoContainer = styled.div`
-    display : flex;
-    align-items: center;
+  display : flex;
+  align-items: center;
+  
+  
 
-  `
+`
 const Logo = styled(BaseImage)`
   width : 40px;
   height : 40px;
@@ -24,41 +38,92 @@ const LogoName = styled.div`
 `
 const MenuTab = styled.div`
   margin-right : 30px;
+  border-bottom: 0;
+  text-decoration: none;
+  font-size: 16px;
+  color: ${MENU_DEFAULT_COLOR};
+  ${props => props.$selected ? `
+    color: ${SELECTED_MENU_COLOR};
+    
+    font-weight:bold;
+  ` : ``
+  };
+  &:visited {
+    color: inherit;
+  }
 `
 const Wrap = styled.div`
+  
+  
+  @media screen and (max-width: 1024px) {
+    display: none;
+  }
   display : flex;
 
 `
 
-const menu = {data : ["Home", "Profile", "Partner", "History", "Logout"]}
+export const MENUS = [
+  { title: "Home", link: '/' },
+  { title: "Profile", link: '/' },
+  { title: "Partner", link: '/partners' },
+  { title: "History", link: '/chat-history' },
+  { title: "Logout", link: '/' },
 
+]
 export default props => {
   const dispatch = useDispatch()
+  const isLoginUser = useSelector(state => {
+    return !!state.user.user
+  })
   const trySignout = () => {
     dispatch(signOutAll())
   }
+
+  const location = useLocation()
   return (
-    <TopBar>
-      <LogoContainer>
-        <Logo />
-        <LogoName>LingoBell</LogoName>
+    <HeaderContainer>
+    
+      <TopBar>
+        <LogoContainer as={Link} to='/'>
+          
+          <Logo />
+          <LogoName>LingoBell</LogoName>
+          
         </LogoContainer>
-        <Wrap>
-          { menu.data.map(item => {
-            if (item == 'Logout') {
-              return (
-                <MenuTab onClick={trySignout} >
-                  {item}
-                </MenuTab>
-              )
-            }
-            return (
-              <MenuTab>{item}</MenuTab>
-            )
-          }
+        {
+          isLoginUser && (
+            <>
+              <HamburgerMenu/>
+              <Wrap>
+                { 
+                  MENUS.map(menu => {
+                    if (menu.title == 'Logout') {
+                      return (
+                        <MenuTab
+                          key={menu.title} 
+                          onClick={trySignout} 
+                        >
+                          {menu.title}
+                        </MenuTab>
+                      )
+                    }
+                    return (
+                      <MenuTab 
+                        as={Link} 
+                        key={menu.title} 
+                        to={menu.link}
+                        $selected={menu.link == location.pathname}
+                      >
+                        {menu.title}
+                      </MenuTab>
+                    )
+                  })
+                }   
+              </Wrap>
+            </>
           )
-          }   
-        </Wrap>
-    </TopBar>
+        }
+      </TopBar>
+    </HeaderContainer>
   )
 }
