@@ -21,6 +21,9 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
+axios.defaults.withCredentials = true;
+
+
 
 
 export default () => {
@@ -32,7 +35,13 @@ export default () => {
 
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
+      console.log(user)
+
       if(user){
+       const accessToken  = user.accessToken
+       axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        console.log(accessToken)
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
       } else {
         dispatch(clearUser ());

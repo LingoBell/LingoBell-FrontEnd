@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import ProfileItem from '../molecules/ProfileItem'
 
@@ -8,6 +8,7 @@ import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/
 import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
 import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
+import axios from 'axios'
 
 
 const Container = styled.div`
@@ -39,7 +40,6 @@ const HistorySectionContainer = styled.main`
     ${props => props.isOpen && 'display: block;'}
   }
 `
-
 const profiles = PROFILE_DATA
 
 
@@ -47,6 +47,22 @@ export default props => {
   const {
     chatId
   } = useParams()
+
+  const testAxiox = async() => {
+    try{
+      const result = await axios.get('http://localhost:8000/test-user-token')
+      const userData = result.data
+      console.log(userData)
+    }catch(error){
+      console.error('Error:',error)
+    }
+  }
+
+  useEffect(()=>{
+    testAxiox()
+  },[])
+
+
 
   const isChatDetailOpen = !!chatId
   return (
