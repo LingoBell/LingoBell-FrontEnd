@@ -1,4 +1,5 @@
 {
+  "proxy": "http://127.0.0.1:8000",
   "name": "stockvibe_front",
   "version": "1.0.0",
   "description": "",

@@ -50,7 +50,7 @@ export default props => {
 
   const testAxiox = async() => {
     try{
-      const result = await axios.get('http://localhost:8000/test-user-token')
+      const result = await axios.get('http://127.0.0.1:8000/test-user-token')
       const userData = result.data
       console.log(userData)
     }catch(error){
