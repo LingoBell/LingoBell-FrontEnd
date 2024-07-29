@@ -3,6 +3,7 @@ import ChatForm from "../molecules/ChatForm";
 import styled, { createGlobalStyle } from "styled-components";
 import { AI_SAMPLE_DATA, USER_SAMPLE_DATA } from "../../../consts/sampleData";
 import CenteredMainLayout from "../templates/CenteredMainLayout";
+import Video from "./Video";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -162,8 +163,7 @@ function LiveChat() {
                 
 
                 <VideoWrap>
-                    <Video1 />
-                    <Video2 />
+                    <Video />
                     <ButtonWrap>
                         <CallButton><span className='material-icons'>mic</span></CallButton>
                         <CallButton><span className='material-icons'>videocam</span></CallButton>
