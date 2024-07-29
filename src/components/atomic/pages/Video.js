@@ -31,7 +31,7 @@ export default props => {
     };
 
     useEffect(() => {
-        socket.current = io.connect('http://192.168.0.105:8080')
+        socket.current = io.connect('http://192.168.0.245:8080')
         peerConnection.current = new RTCPeerConnection(pcConfig)
         peerConnection.current.onicecandidate = (event) => {
             if (event.candidate) {
