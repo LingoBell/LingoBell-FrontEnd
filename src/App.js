@@ -21,7 +21,7 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
-axios.defaults.headers.common.Authorization = 'JHKIM';
+axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
 export default () => {
   const dispatch = useDispatch();
