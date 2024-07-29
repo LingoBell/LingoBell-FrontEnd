@@ -8,12 +8,8 @@ import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
 import { CreateChat } from '../../../apis/ChatAPI'
 import { GetUserList } from '../../../apis/UserAPI'
-const profiles = PROFILE_DATA
-// const profiles = async () => {
-//   const userList = await GetUserList();
-//   console.log(userList);
-//   return userList;
-// }
+
+// const profiles = PROFILE_DATA
 
 const Container = styled.div`
   display: flex;
@@ -45,23 +41,22 @@ export default props => {
   const navigate = useNavigate()
   const [isOpened, setIsOpened] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
-  // const [profiles, setProfiles] = useState([]);
+  const [profiles, setProfiles] = useState([]);
   const user = useSelector((state) => state.user.user);
   console.log('user의 uid : ', user.uid);
 
-  // useEffect(() => {
-  //   const fetchProfiles = async () => {
-  //     try {
-  //       const userList = await GetUserList();
-  //       console.log(userList);
-  //       setProfiles(userList);
+  useEffect(() => {
+    const fetchProfiles = async () => {
+      try {
+        const userList = await GetUserList();
+        setProfiles(userList);
 
-  //     } catch (error) {
-  //       console.log('유저 리스트 불러오기 실패 : ', error);
-  //     }
-  //   };
-  //   fetchProfiles();
-  // }, [])
+      } catch (error) {
+        console.log('유저 리스트 불러오기 실패 : ', error);
+      }
+    };
+    fetchProfiles();
+  }, [])
 
   const handleOpenModal = (profile) => {
     setIsOpened(true);
@@ -73,15 +68,15 @@ export default props => {
     setSelectedProfile(null);
   };
 
-  const onClickModalButton = async (id) => {
-    console.log(id)
+  const onClickModalButton = async (userId) => {
+    console.log(userId)
 
     const chat_room = {
       accessStatus: 1,
-      chatName: 'Chat with ' + id,
+      chatName: 'Chat with ' + userId,
       chatRoomDescript: null,
       chatContents: null,
-      partnerId: id,
+      partnerId: userId,
     };
 
     try {
@@ -102,19 +97,20 @@ export default props => {
             onClickCloseBtn={() => handleCloseModal()}
             bttnTxt="대화 요청"
             selectedProfile={selectedProfile}
-            onClickButton={() => onClickModalButton(selectedProfile.id)}
+            onClickButton={() => onClickModalButton(selectedProfile.userId)}
           // userId={user.uid}
           // chatUserId={selectedProfile.id}
           />
         )}
         {
           profiles?.map((profile, index) => {
-            const {
-              name: userName,
-              // image: src,
-              // language: tags,
-              selfIntroduction: description
-            } = profile
+            // const {
+            //   name: userName,
+            //   // image: src,
+            //   // language: tags,
+            //   selfIntroduction: description,
+            // } = profile
+            const { userCode, userName, selfIntroduction } = profile;
 
             return (
               <StyledProfileItem
@@ -122,7 +118,8 @@ export default props => {
                 title={userName}
                 // src={src}
                 // tags={tags}
-                content={description}
+                content={selfIntroduction}
+                userCode={userCode}
 
                 onClick={() => handleOpenModal(profile)} />
             )

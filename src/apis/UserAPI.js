@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const GetUserList = async () => {
-    const url = `http://localhost:8080/partners`;
+    const url = `http://localhost:8000/users/partners`;
 
     try {
         const response = await axios.get(url);
