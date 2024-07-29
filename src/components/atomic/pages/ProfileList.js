@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
@@ -7,7 +7,13 @@ import { useNavigate } from 'react-router-dom'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
 import { CreateChat } from '../../../apis/ChatAPI'
+import { GetUserList } from '../../../apis/UserAPI'
 const profiles = PROFILE_DATA
+// const profiles = async () => {
+//   const userList = await GetUserList();
+//   console.log(userList);
+//   return userList;
+// }
 
 const Container = styled.div`
   display: flex;
@@ -39,8 +45,23 @@ export default props => {
   const navigate = useNavigate()
   const [isOpened, setIsOpened] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  // const [profiles, setProfiles] = useState([]);
   const user = useSelector((state) => state.user.user);
   console.log('user의 uid : ', user.uid);
+
+  // useEffect(() => {
+  //   const fetchProfiles = async () => {
+  //     try {
+  //       const userList = await GetUserList();
+  //       console.log(userList);
+  //       setProfiles(userList);
+
+  //     } catch (error) {
+  //       console.log('유저 리스트 불러오기 실패 : ', error);
+  //     }
+  //   };
+  //   fetchProfiles();
+  // }, [])
 
   const handleOpenModal = (profile) => {
     setIsOpened(true);
@@ -82,26 +103,26 @@ export default props => {
             bttnTxt="대화 요청"
             selectedProfile={selectedProfile}
             onClickButton={() => onClickModalButton(selectedProfile.id)}
-            // userId={user.uid}
-            // chatUserId={selectedProfile.id}
+          // userId={user.uid}
+          // chatUserId={selectedProfile.id}
           />
         )}
         {
-          profiles.map((profile, index) => {
+          profiles?.map((profile, index) => {
             const {
-              name: title,
-              image: src,
-              language: tags,
-              selfIntroduction: content
+              name: userName,
+              // image: src,
+              // language: tags,
+              selfIntroduction: description
             } = profile
 
             return (
               <StyledProfileItem
                 key={index}
-                title={title}
-                src={src}
-                tags={tags}
-                content={content}
+                title={userName}
+                // src={src}
+                // tags={tags}
+                content={description}
 
                 onClick={() => handleOpenModal(profile)} />
             )
