@@ -72,9 +72,12 @@ export const MENUS = [
 ]
 export default props => {
   const dispatch = useDispatch()
-  const isLoginUser = useSelector(state => {
-    return !!state.user.user
+  const {isLoginUser, isFirstLogin } = useSelector((state) => {
+    return {isLoginUser : state.user?.user,
+            isFirstLogin : state.user.isFirstLogin
+    }
   })
+  console.log('dddddd',isFirstLogin)
   const trySignout = () => {
     dispatch(signOutAll())
   }
@@ -97,6 +100,10 @@ export default props => {
               <Wrap>
                 { 
                   MENUS.map(menu => {
+                    if(isFirstLogin == 3 && menu.title != 'Logout') {
+                      return null
+                    }
+                    
                     if (menu.title == 'Logout') {
                       return (
                         <MenuTab

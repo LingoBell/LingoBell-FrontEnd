@@ -6,6 +6,7 @@ import axios from "axios";
 const initialState = {
     user : null,
     processFinished: false,
+    isFirstLogin: 1 // 1 : pending, 2: 기존 유저, 3: 신규 유저
 };
 
 
@@ -31,7 +32,12 @@ export const signInWithGoogle = createAsyncThunk(
 export const checkFirstLogin = createAsyncThunk(
     'user/checkFirstLogin',
     async (_, thunkAPI) => {
+        // 로그인 요청
 
+
+        const result = await axios.get('http://localhost:8000/api/auth/check-first-user')
+        
+        thunkAPI.dispatch(setFirstLogin({ result }))
     }
 )
 
@@ -53,7 +59,7 @@ const userSlice = createSlice({
     reducers : {
         // 유저 로그인
         setUser(state, action) {
-            console.log(action)
+            // console.log(action)
             state.user = action.payload;
             state.processFinished = true
         },
@@ -61,7 +67,10 @@ const userSlice = createSlice({
             state.processFinished = true
         },
         setFirstLogin(state, action) {
-
+            console.log(action)
+            const firstLoginResult = action.payload.result
+            console.log(firstLoginResult)
+            state.isFirstLogin = 3//firstLoginResult ? 3 : 2
         },
         // 유저 로그아웃
         clearUser(state) {
@@ -70,5 +79,5 @@ const userSlice = createSlice({
     },
 })
 
-export const { setUser, clearUser, setProcessFinished } = userSlice.actions;
+export const { setUser, clearUser, setProcessFinished, setFirstLogin } = userSlice.actions;
 export default userSlice.reducer;

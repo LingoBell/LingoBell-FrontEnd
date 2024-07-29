@@ -11,7 +11,7 @@ import LiveChat from "./components/atomic/pages/LiveChat";
 import { auth, googleProvider } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, clearUser, setProcessFinished } from './redux/userSlice';
+import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
 import useAuth from "./useAuth";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
 import Video from "./components/atomic/pages/Video";
@@ -29,11 +29,11 @@ window.accessToken = null
 export default () => {
   const dispatch = useDispatch();
 
-  const { user, processFinished, isFirstJoinUser } = useSelector((state) => {
+  const { user, processFinished, isFirstLogin } = useSelector((state) => {
     return { 
       user: state.user?.user, 
       processFinished: state.user.processFinished,
-      isFirstJoinUser: state.user.isFirstJoinUser
+      isFirstLogin: state.user.isFirstLogin
     }
   })
 
@@ -44,6 +44,7 @@ export default () => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
         console.log(accessToken)
+        dispatch(checkFirstLogin())
         /**
          *  1. 누군가가 구글 로그인(프론트)
          *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
@@ -72,11 +73,34 @@ export default () => {
       <IndexPage />
     )
   }
-  if (isFirstJoinUser) {
+  const renderRoutes = () => {
+    if (isFirstLogin == 3) {
+      return (
+        // <ProfilePage />
+        <Route path='*' element={<div>profile page</div>} />
+      )
+    }
+
     return (
-      <ProfilePage />
+      <>
+        {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
+        <Route path='/' element={<ChatHistory />} />
+        <Route path='/chat-history'>
+          <Route path=':chatId' element={<ChatHistory />} />
+
+          <Route path='' element={<ChatHistory />} />
+        </Route>
+        <Route path='/partners' element={<ProfileList />} />
+        <Route path="/Main" element={<Main />} />
+        {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
+        <Route path="/chat" element={<ChatForm />} />
+        <Route path="/live-chat/:chatId" element={<LiveChat />} />
+        <Route path="/test" element={Header}></Route>
+        <Route path='/video' element={<Video />} />
+      </>
     )
   }
+  
   /**
    *  1. 누군가가 구글 로그인(프론트)
    *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로)
@@ -89,20 +113,7 @@ export default () => {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
-          <Route path='/' element={<ChatHistory />} />
-          <Route path='/chat-history'>
-            <Route path=':chatId' element={<ChatHistory />} />
-
-            <Route path='' element={<ChatHistory />} />
-          </Route>
-          <Route path='/partners' element={<ProfileList />} />
-          <Route path="/Main" element={<Main />} />
-          {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
-          <Route path="/chat" element={<ChatForm />} />
-          <Route path="/live-chat/:chatId" element={<LiveChat />} />
-          <Route path="/test" element={Header}></Route>
-          <Route path='/video' element={<Video />} />
+          {renderRoutes()}
         </Route>
       </Routes>
       
