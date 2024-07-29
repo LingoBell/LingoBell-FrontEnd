@@ -25,7 +25,7 @@ axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_
 
 export default () => {
   const dispatch = useDispatch();
-
+  
   const { user, processFinished } = useSelector((state) => {
     return { user: state.user?.user, processFinished: state.user.processFinished }
   })
@@ -86,7 +86,7 @@ export default () => {
           <Route path="/Main" element={<Main />} />
           {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
           <Route path="/chat" element={<ChatForm />} />
-          <Route path="/live-chat/:chatId" element={<LiveChat />} />
+          <Route path="/live-chat/:roomName" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
           <Route path='/video' element={<Video />} />
         </Route>

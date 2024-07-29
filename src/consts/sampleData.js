@@ -72,7 +72,7 @@ export const PROFILE_DATA = [
   {
     id: '4',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Jinwoo',
+    'name': 'JHKIM',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
