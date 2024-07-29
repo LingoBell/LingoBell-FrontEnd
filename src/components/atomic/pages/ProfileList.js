@@ -5,6 +5,8 @@ import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
 import { useNavigate } from 'react-router-dom'
 import { PROFILE_DATA } from '../../../consts/sampleData'
+import { useSelector } from 'react-redux'
+import { CreateChat } from '../../../apis/ChatAPI'
 const profiles = PROFILE_DATA
 
 const Container = styled.div`
@@ -37,6 +39,8 @@ export default props => {
   const navigate = useNavigate()
   const [isOpened, setIsOpened] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const user = useSelector((state) => state.user.user);
+  console.log('user의 uid : ', user.uid);
 
   const handleOpenModal = (profile) => {
     setIsOpened(true);
@@ -48,9 +52,24 @@ export default props => {
     setSelectedProfile(null);
   };
 
-  const onClickModalButton = (id) => {
+  const onClickModalButton = async (id) => {
     console.log(id)
-    navigate(`/live-chat/${id}`)
+
+    const chat_room = {
+      accessStatus: 1,
+      chatName: 'Chat with ' + id,
+      chatRoomDescript: null,
+      chatContents: null,
+      partnerId: id,
+    };
+
+    try {
+      const chatRoomId = await CreateChat(chat_room);
+      navigate(`/live-chat/${chatRoomId}`); // 채팅 요청시 생성된 채팅방으로 이동
+
+    } catch (error) {
+      console.log('채팅방 생성 실패', error);
+    }
   }
 
   return (
@@ -63,6 +82,8 @@ export default props => {
             bttnTxt="대화 요청"
             selectedProfile={selectedProfile}
             onClickButton={() => onClickModalButton(selectedProfile.id)}
+            // userId={user.uid}
+            // chatUserId={selectedProfile.id}
           />
         )}
         {
@@ -73,6 +94,7 @@ export default props => {
               language: tags,
               selfIntroduction: content
             } = profile
+
             return (
               <StyledProfileItem
                 key={index}
@@ -80,7 +102,7 @@ export default props => {
                 src={src}
                 tags={tags}
                 content={content}
-                
+
                 onClick={() => handleOpenModal(profile)} />
             )
           })

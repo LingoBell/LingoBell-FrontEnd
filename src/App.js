@@ -21,7 +21,7 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
-
+axios.defaults.headers.common.Authorization = 'JHKIM';
 
 export default () => {
   const dispatch = useDispatch();
@@ -33,6 +33,7 @@ export default () => {
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
+
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
       } else {
         dispatch(clearUser ());

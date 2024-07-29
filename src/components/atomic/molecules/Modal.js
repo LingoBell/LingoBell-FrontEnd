@@ -45,9 +45,13 @@ export default props => {
         isOpened, 
         bttnTxt, 
         selectedProfile,
-        onClickButton
+        onClickButton,
+        // userId,
+        // chatUserId,
     } = props;
 
+    // console.log('모달에서 확인', userId);
+    // console.log('모달에서 확인', chatUserId);
     return (
         isOpened && (
             <Background onClick={onClickCloseBtn}>

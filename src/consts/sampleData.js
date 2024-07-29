@@ -49,42 +49,42 @@ export const USER_SAMPLE_DATA = [
 
 export const PROFILE_DATA = [
   {
-    id: 'id-2221',
+    id: '1',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Sungwoo Cho',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
   {
-    id: 'id-2222',
+    id: '2',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Tom',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
   {
-    id: 'id-2223',
+    id: '3',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Scarlett',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
   {
-    id: 'id-2224',
+    id: '4',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Jinwoo',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
   {
-    id: 'id-2225',
+    id: '5',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Max',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
   {
-    id: 'id-2226',
+    id: '6',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Jay',
     'language': ['Language Learner', 'Korean', 'English'],
