@@ -28,6 +28,13 @@ export const signInWithGoogle = createAsyncThunk(
     }
 );
 
+export const checkFirstLogin = createAsyncThunk(
+    'user/checkFirstLogin',
+    async (_, thunkAPI) => {
+
+    }
+)
+
 export const signOutAll = createAsyncThunk(
     'user/signout',
     async (_, thunkAPI) => {
@@ -52,6 +59,9 @@ const userSlice = createSlice({
         },
         setProcessFinished(state) {
             state.processFinished = true
+        },
+        setFirstLogin(state, action) {
+
         },
         // 유저 로그아웃
         clearUser(state) {

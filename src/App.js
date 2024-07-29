@@ -21,18 +21,37 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
+axios.defaults.withCredentials = true;
 
+
+window.accessToken = null
 
 export default () => {
   const dispatch = useDispatch();
 
-  const { user, processFinished } = useSelector((state) => {
-    return { user: state.user?.user, processFinished: state.user.processFinished }
+  const { user, processFinished, isFirstJoinUser } = useSelector((state) => {
+    return { 
+      user: state.user?.user, 
+      processFinished: state.user.processFinished,
+      isFirstJoinUser: state.user.isFirstJoinUser
+    }
   })
 
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
+        const accessToken  = user.accessToken
+        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+        console.log(accessToken)
+        /**
+         *  1. 누군가가 구글 로그인(프론트)
+         *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
+         *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
+         * 
+         * */ 
+        
+
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
       } else {
         dispatch(clearUser ());
@@ -52,23 +71,19 @@ export default () => {
     return (
       <IndexPage />
     )
-    // return (
-    //   <BrowserRouter>
-    //     <Routes>
-    //       <Route element={<Layout />}>
-    //         <Route path="/" element={<IndexPage />} />
-    //         {/* <Route path='/chat-history' element={<ChatHistory />} />
-    //         <Route path="/Main" element={<Main />} />
-    //         <Route path="/chat" element={<ChatForm />} />
-    //         <Route path="/liveChat" element={<LiveChat />} />
-    //         <Route path="/test" element={Header}></Route> */}
-    //       </Route>
-    //     </Routes>
-        
-    //   </BrowserRouter>
-    // )
   }
-
+  if (isFirstJoinUser) {
+    return (
+      <ProfilePage />
+    )
+  }
+  /**
+   *  1. 누군가가 구글 로그인(프론트)
+   *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로)
+   *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
+   * 
+   * */ 
+  
 
   return (
     <BrowserRouter>
