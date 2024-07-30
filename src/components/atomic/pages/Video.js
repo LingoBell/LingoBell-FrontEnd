@@ -167,7 +167,7 @@ export default props => {
             }, 100);
         };
         const startVideo = async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
             localVideoRef.current.srcObject = stream;
 
             stream.getTracks().forEach(track => peerConnection.current.addTrack(track, stream));
