@@ -71,7 +71,9 @@ export default props => {
                             // tags={selectedProfile.language}
                             // content={selectedProfile.selfIntroduction}
                             userCode={selectedProfile.userCode}
-                            content={selectedProfile.selectedProfile}
+                            content={selectedProfile.description}
+                            chatName={selectedProfile.chatName}
+                            chatDescription={selectedProfile.chatDescription}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>
