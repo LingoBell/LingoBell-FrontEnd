@@ -15,6 +15,7 @@ import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux
 import useAuth from "./useAuth";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
 import Video from "./components/atomic/pages/Video";
+import ProfilePage from "./components/atomic/pages/ProfilePage";
 // export let mainDomain = 'http://localhost:8000'
 
 export let mainDomain = ''
@@ -77,7 +78,7 @@ export default () => {
     if (isFirstLogin == 3) {
       return (
         // <ProfilePage />
-        <Route path='*' element={<div>profile page</div>} />
+        <Route path='*' element={<ProfilePage/>}/>
       )
     }
 
