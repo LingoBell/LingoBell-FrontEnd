@@ -16,6 +16,7 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
+axios.defaults.headers.common["Authorization"] = 'JWLEE'
 export default () => {
   return (
     <BrowserRouter>

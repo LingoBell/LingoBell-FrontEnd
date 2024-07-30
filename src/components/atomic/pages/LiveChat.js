@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatForm from "../molecules/ChatForm";
 import styled, { createGlobalStyle } from "styled-components";
 import { AI_SAMPLE_DATA, USER_SAMPLE_DATA } from "../../../consts/sampleData";
 import CenteredMainLayout from "../templates/CenteredMainLayout";
+import axios from "axios";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -152,9 +153,29 @@ const CallEndButton = styled(CallButton)`
 
 
 function LiveChat() {
-
     const [openedTab, setOpenedTab] = useState('AI')
+    const [transcription, setTranscription] = useState('');
 
+    const startTranscription = async () => {
+        try {
+            await axios.get('http://localhost:8000/transcribe/start_transcription');
+        } catch (err) {
+            console.error('Error starting transcription', err);
+        }
+    }
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/transcribe/get_latest_transcription');
+                setTranscription(response.data.transcription);
+            } catch (err) {
+                console.error('Error fetching transcription', err);
+            }
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
+    
     return (
         <StyledCenteredLayout>
             <MainStyle />
@@ -170,7 +191,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <CallButton><span className='material-icons'>translate</span></CallButton>
+                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
@@ -181,6 +202,7 @@ function LiveChat() {
                     <StyledChatForm data={USER_SAMPLE_DATA}>
                         SCRIPT
                     </StyledChatForm>
+                    <h1>STT: {transcription}</h1>
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>
