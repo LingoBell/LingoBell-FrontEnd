@@ -2,6 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import TopBar from '../atomic/atoms/TopBar'
 import BaseImage from '../atomic/atoms/BaseImage'
+import { useDispatch, useSelector } from 'react-redux'
+import { signOutAll } from '../../redux/userSlice'
 import { Link, useLocation } from 'react-router-dom'
 import HamburgerMenu from './HamburgerMenu'
 import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
@@ -69,6 +71,13 @@ export const MENUS = [
 
 ]
 export default props => {
+  const dispatch = useDispatch()
+  const isLoginUser = useSelector(state => {
+    return !!state.user.user
+  })
+  const trySignout = () => {
+    dispatch(signOutAll())
+  }
 
   const location = useLocation()
   return (
@@ -81,26 +90,39 @@ export default props => {
           <LogoName>LingoBell</LogoName>
           
         </LogoContainer>
-        <HamburgerMenu/>
-        <Wrap>
-          
-          { 
-            MENUS.map(menu => {
-              return (
-                <MenuTab 
-                  as={Link} 
-                  key={menu.title} 
-                  to={menu.link}
-                  $selected={menu.link == location.pathname}
-                >
-                  {menu.title}
-                </MenuTab>
-
-              )
-            })
-            
-          }   
-        </Wrap>
+        {
+          isLoginUser && (
+            <>
+              <HamburgerMenu/>
+              <Wrap>
+                { 
+                  MENUS.map(menu => {
+                    if (menu.title == 'Logout') {
+                      return (
+                        <MenuTab
+                          key={menu.title} 
+                          onClick={trySignout} 
+                        >
+                          {menu.title}
+                        </MenuTab>
+                      )
+                    }
+                    return (
+                      <MenuTab 
+                        as={Link} 
+                        key={menu.title} 
+                        to={menu.link}
+                        $selected={menu.link == location.pathname}
+                      >
+                        {menu.title}
+                      </MenuTab>
+                    )
+                  })
+                }   
+              </Wrap>
+            </>
+          )
+        }
       </TopBar>
     </HeaderContainer>
   )
