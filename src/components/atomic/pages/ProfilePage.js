@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import Button from '../atoms/Button'
 
 const languages = ['English', 'Spanish', 'French', 'German', 'Korean', 'Japanese', 'Chinese']
 const interests = ['Traveling', 'Reading', 'Cooking', 'Hiking', 'Photography', 'Music', 'Movies', 'Fitness', 'Technology',
@@ -66,8 +67,15 @@ export default props => {
     // const [languageWithLevel , setLanguageWithLevel] = useState({})    
     const [languageWithLevel, setLanguageWithLevel] = useState()
     // 
-    const changeSwCho = () => {
-
+    const submit = () => {
+        console.log(
+            selectedInterests,
+            gender,
+            name,
+            mainLanguage,
+            learningLanguages,
+            languageWithLevel
+        )
     }
     return (
         <Wrap>
@@ -97,12 +105,13 @@ export default props => {
                     
                 </div>
             </FormItemWrap>
-                <FormItemWrap>
-                    <LabelText>Choose Your Interests</LabelText>
-                    <div style={{display : 'flex', flexWrap : 'wrap'}}>
-                    </div>
-                </FormItemWrap>
+            <FormItemWrap>
+                <LabelText>Choose Your Interests</LabelText>
+                <div style={{display : 'flex', flexWrap : 'wrap'}}>
+                </div>
+            </FormItemWrap>
             
+            <Button onClick={submit}>테스트</Button>
 
         </Wrap>
     )
