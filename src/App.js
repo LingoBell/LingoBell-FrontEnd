@@ -21,7 +21,7 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
-axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
+// axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
 export default () => {
   const dispatch = useDispatch();
@@ -33,8 +33,10 @@ export default () => {
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
-
+        const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
+        axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
+
       } else {
         dispatch(clearUser ());
       }
