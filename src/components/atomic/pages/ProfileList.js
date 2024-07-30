@@ -6,7 +6,7 @@ import Modal from '../molecules/Modal'
 import { useNavigate } from 'react-router-dom'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
-import { CreateChat } from '../../../apis/ChatAPI'
+import { CreateChat, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
 import { GetRequestUserList, GetUserList } from '../../../apis/UserAPI'
 
 // const profiles = PROFILE_DATA
@@ -102,6 +102,7 @@ export default props => {
 
     fetchProfiles();
     fetchRequestProfiles();
+
   }, [user.uid]);
 
   /* Chat Request Partners */
@@ -168,6 +169,9 @@ export default props => {
     try {
       console.log('채팅방 입장~');
       navigate(`/live-chat/${chatRoomtId}`);
+
+      await UpdateChatRoomStatus(chatRoomtId);
+      console.log('join Status update 필요');
 
     } catch (error) {
       console.log('채팅방 입장 실패', error);
