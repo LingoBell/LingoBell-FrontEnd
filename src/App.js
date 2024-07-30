@@ -21,11 +21,11 @@ export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
-
+axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
 export default () => {
   const dispatch = useDispatch();
-
+  
   const { user, processFinished } = useSelector((state) => {
     return { user: state.user?.user, processFinished: state.user.processFinished }
   })
@@ -33,6 +33,7 @@ export default () => {
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
+
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
       } else {
         dispatch(clearUser ());
@@ -85,7 +86,7 @@ export default () => {
           <Route path="/Main" element={<Main />} />
           {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
           <Route path="/chat" element={<ChatForm />} />
-          <Route path="/live-chat/:chatId" element={<LiveChat />} />
+          <Route path="/live-chat/:roomName" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
           <Route path='/video' element={<Video />} />
         </Route>

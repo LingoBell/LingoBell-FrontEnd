@@ -45,9 +45,11 @@ export default props => {
         isOpened, 
         bttnTxt, 
         selectedProfile,
-        onClickButton
+        onClickButton,
     } = props;
 
+    // console.log('모달에서 확인', selectedProfile.userCode);
+    // console.log('모달에서 확인', selectedProfile.userName);
     return (
         isOpened && (
             <Background onClick={onClickCloseBtn}>
@@ -64,11 +66,14 @@ export default props => {
                     {props.children}
                     <div>
                         <ModalProfileItem
-                            title={selectedProfile.name}
-                            src={selectedProfile.image}
-                            tags={selectedProfile.language}
-                            content={selectedProfile.selfIntroduction}
-                            
+                            title={selectedProfile.userName}
+                            // src={selectedProfile.image}
+                            // tags={selectedProfile.language}
+                            // content={selectedProfile.selfIntroduction}
+                            userCode={selectedProfile.userCode}
+                            content={selectedProfile.description}
+                            chatName={selectedProfile.chatName}
+                            chatDescription={selectedProfile.chatDescription}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>
