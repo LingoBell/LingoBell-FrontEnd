@@ -34,7 +34,7 @@ export const checkFirstLogin = createAsyncThunk(
     async (_, thunkAPI) => {
         // 로그인 요청
 
-
+        // 해당 api 만들어야함
         const result = await axios.get('http://localhost:8000/api/auth/check-first-user')
         
         thunkAPI.dispatch(setFirstLogin({ result }))
