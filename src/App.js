@@ -23,6 +23,7 @@ export let mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
 axios.defaults.withCredentials = true;
+// axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
 
 window.accessToken = null
@@ -41,10 +42,14 @@ export default () => {
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
-        const accessToken  = user.accessToken
-        axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-        console.log(accessToken)
+        const accessToken  = user.accessToken
+        
+        const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
+        axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
+//         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+//         console.log(accessToken)
         dispatch(checkFirstLogin())
         /**
          *  1. 누군가가 구글 로그인(프론트)
@@ -55,6 +60,7 @@ export default () => {
         
 
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
+
       } else {
         dispatch(clearUser ());
       }
@@ -115,6 +121,7 @@ export default () => {
       <Routes>
         <Route element={<Layout />}>
           {renderRoutes()}
+
         </Route>
       </Routes>
       

@@ -59,7 +59,6 @@ const userSlice = createSlice({
     reducers : {
         // 유저 로그인
         setUser(state, action) {
-            // console.log(action)
             state.user = action.payload;
             state.processFinished = true
         },
@@ -80,4 +79,5 @@ const userSlice = createSlice({
 })
 
 export const { setUser, clearUser, setProcessFinished, setFirstLogin } = userSlice.actions;
+
 export default userSlice.reducer;
