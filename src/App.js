@@ -21,7 +21,7 @@ import ProfilePage from "./components/atomic/pages/ProfilePage";
 export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
-axios.defaults.baseURL = mainDomain;
+axios.defaults.baseURL = mainDomain + "/api"
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
