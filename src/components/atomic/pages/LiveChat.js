@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ChatForm from "../molecules/ChatForm";
 import styled, { createGlobalStyle } from "styled-components";
 import { AI_SAMPLE_DATA, USER_SAMPLE_DATA } from "../../../consts/sampleData";
 import CenteredMainLayout from "../templates/CenteredMainLayout";
+import axios from "axios";
 import Video from "./Video";
 
 const MainStyle = createGlobalStyle`
@@ -28,7 +29,7 @@ const LiveChatWrap = styled.div`
         flex-direction: row;
         gap: 16px;
     }
-`;
+`
 
 const CommonWrap = styled.div`
     width: 33.33333333%;
@@ -47,6 +48,7 @@ const AIChatWrap = styled.div`
         width: 30%;
     }
 `
+
 const VideoWrap = styled.div`
     
     display: flex;
@@ -61,7 +63,6 @@ const VideoWrap = styled.div`
     }
 `
 
-
 const CommonVideo = styled.video`
     /* width: 100%; */
     flex: 1;
@@ -72,7 +73,7 @@ const CommonVideo = styled.video`
         
         width: 100%;
     }
-    `
+`
 
 const Video1 = styled(CommonVideo)`
     background-color: blue;
@@ -87,7 +88,6 @@ const UserChatWrap = styled.div`
         height: 300px;
         min-height: 300px;
         display: ${props => props.isOpen ? `block` : 'none'}
-
     }
     @media screen and (min-width: 1024px) {
         width: 30%;
@@ -96,6 +96,7 @@ const UserChatWrap = styled.div`
 
     /* display: none; */
 `
+
 const StyledChatForm = styled(ChatForm)`
     height: 100%;
     border-radius: 0;
@@ -128,7 +129,6 @@ const ButtonWrap = styled.div`
         padding-bottom: 0;
         border-top: 0;
     }
-
 `
 
 const CallButton = styled.button`
@@ -141,7 +141,6 @@ const CallButton = styled.button`
         height: 60px;
         color: #111;
     }
-
 `
 
 const CallEndButton = styled(CallButton)`
@@ -150,18 +149,34 @@ const CallEndButton = styled(CallButton)`
     color: white !important;
 `
 
-
-
 function LiveChat() {
-
     const [openedTab, setOpenedTab] = useState('AI')
+    const [transcription, setTranscription] = useState('');
 
+    const startTranscription = async () => {
+        try {
+            await axios.get('http://localhost:8000/transcribe/start_transcription');
+        } catch (err) {
+            console.error('Error starting transcription', err);
+        }
+    }
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/transcribe/get_latest_transcription');
+                setTranscription(response.data.transcription);
+            } catch (err) {
+                console.error('Error fetching transcription', err);
+            }
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
+    
     return (
         <StyledCenteredLayout>
             <MainStyle />
             <LiveChatWrap>
-                
-
                 <VideoWrap>
                     <Video />
                     <ButtonWrap>
@@ -170,7 +185,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <CallButton><span className='material-icons'>translate</span></CallButton>
+                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
@@ -181,6 +196,7 @@ function LiveChat() {
                     <StyledChatForm data={USER_SAMPLE_DATA}>
                         SCRIPT
                     </StyledChatForm>
+                    <h1>STT: {transcription}</h1>
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>
