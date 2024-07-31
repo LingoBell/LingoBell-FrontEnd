@@ -48,6 +48,29 @@ export default props => {
     chatId
   } = useParams()
 
+// <<<<<<< Updated upstream
+// =======
+//   const testAxiox = async() => {
+//     try{
+//       const result = await axios.get('http://localhost:8000/test-user-token', {
+//         headers: {
+//           Authorization: window.accessToken
+//         }
+//       })
+//       const userData = result.data
+//       console.log(userData)
+//     }catch(error){
+//       console.error('Error:',error)
+//     }
+//   }
+
+//   useEffect(()=>{
+//     testAxiox()
+//   },[])
+
+
+
+// >>>>>>> Stashed changes
   const isChatDetailOpen = !!chatId
   return (
     <Container>

@@ -11,30 +11,54 @@ import LiveChat from "./components/atomic/pages/LiveChat";
 import { auth, googleProvider } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser, clearUser, setProcessFinished } from './redux/userSlice';
+import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
 import useAuth from "./useAuth";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
 import Video from "./components/atomic/pages/Video";
+import ProfilePage from "./components/atomic/pages/ProfilePage";
 // export let mainDomain = 'http://localhost:8000'
 
 export let mainDomain = ''
 // mainDomain = ''
 //  mainDomain
 axios.defaults.baseURL = mainDomain;
+axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
+
+
+window.accessToken = null
 
 export default () => {
   const dispatch = useDispatch();
-  
-  const { user, processFinished } = useSelector((state) => {
-    return { user: state.user?.user, processFinished: state.user.processFinished }
+
+  const { user, processFinished, isFirstLogin } = useSelector((state) => {
+    return { 
+      user: state.user?.user, 
+      processFinished: state.user.processFinished,
+      isFirstLogin: state.user.isFirstLogin
+    }
   })
 
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, (user)=>{
       if(user){
+
+        const accessToken  = user.accessToken
+        
         const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
         axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
+//         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+//         console.log(accessToken)
+        dispatch(checkFirstLogin())
+        /**
+         *  1. 누군가가 구글 로그인(프론트)
+         *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
+         *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
+         * 
+         * */ 
+        
+
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
 
       } else {
@@ -55,42 +79,49 @@ export default () => {
     return (
       <IndexPage />
     )
-    // return (
-    //   <BrowserRouter>
-    //     <Routes>
-    //       <Route element={<Layout />}>
-    //         <Route path="/" element={<IndexPage />} />
-    //         {/* <Route path='/chat-history' element={<ChatHistory />} />
-    //         <Route path="/Main" element={<Main />} />
-    //         <Route path="/chat" element={<ChatForm />} />
-    //         <Route path="/liveChat" element={<LiveChat />} />
-    //         <Route path="/test" element={Header}></Route> */}
-    //       </Route>
-    //     </Routes>
-        
-    //   </BrowserRouter>
-    // )
   }
+  const renderRoutes = () => {
+    if (isFirstLogin == 3) {
+      return (
+        // <ProfilePage />
+        <Route path='*' element={<ProfilePage/>}/>
+      )
+    }
 
+    return (
+      <>
+        {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
+        <Route path='/' element={<ChatHistory />} />
+        <Route path='/chat-history'>
+          <Route path=':chatId' element={<ChatHistory />} />
+
+          <Route path='' element={<ChatHistory />} />
+        </Route>
+        <Route path='/partners' element={<ProfileList />} />
+        <Route path="/Main" element={<Main />} />
+        {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
+        <Route path="/chat" element={<ChatForm />} />
+        <Route path="/live-chat/:chatId" element={<LiveChat />} />
+        <Route path="/test" element={Header}></Route>
+        <Route path='/video' element={<Video />} />
+      </>
+    )
+  }
+  
+  /**
+   *  1. 누군가가 구글 로그인(프론트)
+   *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로)
+   *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
+   * 
+   * */ 
+  
 
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
-          <Route path='/' element={<ChatHistory />} />
-          <Route path='/chat-history'>
-            <Route path=':chatId' element={<ChatHistory />} />
+          {renderRoutes()}
 
-            <Route path='' element={<ChatHistory />} />
-          </Route>
-          <Route path='/partners' element={<ProfileList />} />
-          <Route path="/Main" element={<Main />} />
-          {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}
-          <Route path="/chat" element={<ChatForm />} />
-          <Route path="/live-chat/:roomName" element={<LiveChat />} />
-          <Route path="/test" element={Header}></Route>
-          <Route path='/video' element={<Video />} />
         </Route>
       </Routes>
       
