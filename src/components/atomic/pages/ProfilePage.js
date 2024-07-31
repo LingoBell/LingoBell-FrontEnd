@@ -131,7 +131,9 @@ export default props => {
         setNation(nation)
     }
 
-    const submit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         const formData = [
             selectedInterests,
             gender,
@@ -142,7 +144,7 @@ export default props => {
             userIntroduce,
             nation,
         ]
-        
+
         if (selectedInterests.length === 0 ||
             !gender || name === '' || mainLanguage === '' ||
             learningLanguages.length === 0 || Object.keys(languageWithLevel).length === 0
@@ -151,7 +153,11 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            console.log('form submitted')
+            try{
+                const response = a
+            }catch(error){
+
+            }
         }
     }
     return (
