@@ -46,6 +46,7 @@ module.exports = {
       overlay: false,
       
     },
+    allowedHosts: ['*'],
     proxy: [{
       context: ['/api'],
       target: 'http://localhost:8000/',

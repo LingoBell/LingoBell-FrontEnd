@@ -44,31 +44,35 @@ export default () => {
   }, [dispatch]);
   if (!processFinished) {
     return null
+
+
+    
   }
+  
   const isLoginUser = !!user
   // if (pending) {
   //   return null
   // }
-  if (!isLoginUser) {
-    return (
-      <IndexPage />
-    )
-    // return (
-    //   <BrowserRouter>
-    //     <Routes>
-    //       <Route element={<Layout />}>
-    //         <Route path="/" element={<IndexPage />} />
-    //         {/* <Route path='/chat-history' element={<ChatHistory />} />
-    //         <Route path="/Main" element={<Main />} />
-    //         <Route path="/chat" element={<ChatForm />} />
-    //         <Route path="/liveChat" element={<LiveChat />} />
-    //         <Route path="/test" element={Header}></Route> */}
-    //       </Route>
-    //     </Routes>
+  // if (!isLoginUser ||) {
+  //   return (
+  //     <IndexPage />
+  //   )
+  //   // return (
+  //   //   <BrowserRouter>
+  //   //     <Routes>
+  //   //       <Route element={<Layout />}>
+  //   //         <Route path="/" element={<IndexPage />} />
+  //   //         {/* <Route path='/chat-history' element={<ChatHistory />} />
+  //   //         <Route path="/Main" element={<Main />} />
+  //   //         <Route path="/chat" element={<ChatForm />} />
+  //   //         <Route path="/liveChat" element={<LiveChat />} />
+  //   //         <Route path="/test" element={Header}></Route> */}
+  //   //       </Route>
+  //   //     </Routes>
         
-    //   </BrowserRouter>
-    // )
-  }
+  //   //   </BrowserRouter>
+  //   // )
+  // }
 
 
   return (

@@ -12,7 +12,7 @@ export default props => {
     const remoteVideoRef = useRef(null);
     const streamRef = useRef(null)
     const remoteStreamRef = useRef(new MediaStream())
-    let isInitiator = useRef(false);
+    let isInitiator = false;
     let isChannelReady = false; // 1. 방이 성립되었음을 의미 하는 것으로 보임
     let localStream; // 2. localStream까지 생성
     let isStarted = false; // 3. peerConnection이 생성되었음을 의미하는 것으로 보임
@@ -33,45 +33,50 @@ export default props => {
     };
     const createConnection = () => {
         console.log('1. create connection')
-        
+        if (peerConnection.current) {
+            console.log('2. closing')
+            peerConnection.current.close();
+            console.log(peerConnection.current)
+            peerConnection.current = null;
+        }
         console.log(peerConnection.current)
         peerConnection.current = new RTCPeerConnection(pcConfig)
-        console.log(JSON.stringify(peerConnection.current, 0, 2))
-        peerConnection.current.onicecandidate = event => {
-            // console.log('iddddkdkdkdkdk', event)
+        peerConnection.current.onicecandidate = (event) => {
             if (event.candidate) {
-                socket.current.emit('CANDIDATE', event.candidate)
+                socket.current.emit('CANDIDATE', {
+                    candidate: event.candidate,
+                    roomName
+                })
             }
         }
-
-        // if (peerConnection.current.addTrack !== undefined) {
-        console.log('3. addddddtrack', JSON.stringify(peerConnection.current, 0, 2))
-        peerConnection.current.ontrack = (event) => {
-            console.log('pc added stream')
-            const remoteStream = event.streams;
-            remoteStream[0].getTracks().forEach(track => {
-                console.log('trasskskssksksksksk k  k ksks ks k : ')
-                remoteStreamRef.current.addTrack(track)
-            })
-            
-            // console.log(remoteStream)
-            // if (remoteVideoRef.current) {
-            //     remoteVideoRef.current.srcObject = event.streams[0];;
-            // }
-            // remoteVideoRef.current.srcObject = stream;
-            // remoteVideoRef.current.play();
-        };
-        // } else {
-        //     peerConnection.current.onaddstream = (event) => {
-        //         console.log('pc added strea2m', peerConnection.current)
-        //         const remoteStream = event.stream;
-        //         // if (remoteVideoRef.current) {
-        //             remoteStreamRef.current.addTrack(remoteStream);
-        //         // }
-        //         // remoteVideoRef.current.srcObject = stream;
-        //         // remoteVideoRef.current.play();
-        //     };
-        // }
+        if (peerConnection.current.addTrack !== undefined) {
+            console.log('3. addddddtrack', JSON.stringify(peerConnection.current, 0, 2))
+            peerConnection.current.ontrack = (event) => {
+                console.log('pc added stream')
+                const remoteStream = event.streams;
+                remoteStream[0].getTracks().forEach(track => {
+                    console.log('trasskskssksksksksk k  k ksks ks k : ')
+                    remoteStreamRef.current.addTrack(track)
+                })
+                
+                // console.log(remoteStream)
+                // if (remoteVideoRef.current) {
+                //     remoteVideoRef.current.srcObject = event.streams[0];;
+                // }
+                // remoteVideoRef.current.srcObject = stream;
+                // remoteVideoRef.current.play();
+            };
+        } else {
+            peerConnection.current.onaddstream = (event) => {
+                console.log('pc added strea2m', peerConnection.current)
+                const remoteStream = event.stream;
+                // if (remoteVideoRef.current) {
+                    remoteStreamRef.current.addTrack(remoteStream);
+                // }
+                // remoteVideoRef.current.srcObject = stream;
+                // remoteVideoRef.current.play();
+            };
+        }
             
         
         peerConnection.current.ondatachannel = (event) =>{
@@ -86,33 +91,33 @@ export default props => {
             // receiveChannel.onerror = handleDataChannelError;
         
         };
-        peerConnection.current.oniceconnectionstatechange = () => {
-            console.log('ICE Connection State:', peerConnection.current.iceConnectionState);
-        };
         
-        peerConnection.current.onconnectionstatechange = () => {
-            console.log('Connection State:', peerConnection.current.connectionState);
-        };
-        
-        peerConnection.current.onicecandidateerror = (event) => {
-            console.error('ICE Candidate Error:', event);
-        };
         function sendMessage(message) {
             console.log('Client sending message: ', message);
             socket.current.emit('message', message);
         }
         // dataChannel
-        // dataChannel.current = peerConnection.current.createDataChannel('faceDataChannel')
-        // dataChannel.current.onopen = () => {
-        //     console.log('data channel opened')
-        // }
-        // dataChannel.current.onmessage = (event) => {
-        //     console.log('face data')
-        //     const faceData = JSON.parse(event.data)
-        //     console.log(faceData)
-        // }
+        dataChannel.current = peerConnection.current.createDataChannel('faceDataChannel')
+        dataChannel.current.onopen = () => {
+            console.log('data channel opened')
+        }
+        dataChannel.current.onmessage = (event) => {
+            console.log('face data')
+            const faceData = JSON.parse(event.data)
+            console.log(faceData)
+        }
 
-        
+        peerConnection.current.onicecandidate = event => {
+            // console.log('iddddkdkdkdkdk', event)
+            if (event.candidate) {
+                socket.current.emit('CANDIDATE', {
+                    label: event.candidate.sdpMLineIndex,
+                    id: event.candidate.sdpMid,
+                    candidate: event.candidate.candidate
+                })
+            }
+        }
+
         addTrackToPc()
         // streamRef.current.getTracks().forEach(track => {
 
@@ -127,53 +132,36 @@ export default props => {
         // addTrackToPc()
         console.log('create connection done')
     }
-    // const setupVideo = async () => {
+    const setupVideo = async () => {
         
-    //     // streamRef.current.getTracks().forEach(track => {
+        // streamRef.current.getTracks().forEach(track => {
 
-    //     //     console.log('track : ')
-    //     //     console.log(track)
-    //     //     if (peerConnection.current) {
-    //     //         // addTrackToPc()
-    //     //         peerConnection.current.addTrack(track, streamRef.current)
-    //     //     }
+        //     console.log('track : ')
+        //     console.log(track)
+        //     if (peerConnection.current) {
+        //         // addTrackToPc()
+        //         peerConnection.current.addTrack(track, streamRef.current)
+        //     }
             
-    //     // });
-    // }
+        // });
+    }
 
     const addTrackToPc = async () => {
-        console.log('5. add track to pc finally');
-        try {
-            // getUserMedia를 호출하여 비디오 스트림을 가져옴
-            streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-            console.log('Local stream:', streamRef.current);
-            console.log('Peer connection state:', peerConnection.current?.connectionState);
+        console.log('5. add track to pc finally')
+        streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+        console.log(streamRef.current, peerConnection.current)
+        console.log(peerConnection.current?.connectionState)
+        if (streamRef.current && peerConnection.current?.connectionState != 'closed') {
+            console.log('6. sslskskskdkjsldkjlskj')
+            streamRef.current.getTracks().forEach(track => {
     
-            // peerConnection이 초기화된 상태이고 닫혀 있지 않은 경우에만 트랙 추가
-            if (streamRef.current && peerConnection.current && peerConnection.current.connectionState !== 'closed') {
-                console.log('6. Adding local tracks to peer connection');
-                const tracks = streamRef.current.getTracks();
-                console.log('Local tracks:', tracks);
+                console.log('track : ')
+                console.log(track)
+                peerConnection.current.addTrack(track, streamRef.current)
                 
-                tracks.forEach(track => {
-                    console.log('Adding track:', track);
-                    peerConnection.current.addTrack(track, streamRef.current);
-                });
-    
-                // 로컬 비디오 요소에 스트림 설정
-                localVideoRef.current.srcObject = streamRef.current;
-                localVideoRef.current.onloadedmetadata = () => {
-                    localVideoRef.current.play();
-                    // detectFaces(localVideoRef.current); // 얼굴 감지 함수 호출 (필요 시)
-                };
-            } else {
-                console.error('Peer connection is not initialized or already closed.');
-            }
-        } catch (error) {
-            // 오류 발생 시 콘솔에 출력
-            console.error('Error accessing media devices:', error);
+            });
         }
-    };
+    }
     useEffect(() => {
         console.log('peer connection : ')
         console.log(peerConnection.current)
@@ -186,34 +174,24 @@ export default props => {
 
         socket.current.on('CREATED', (room) => {
             console.log('CREATED')
-            isInitiator.current = true
+            isInitiator = true
         })
         socket.current.on('JOIN', async (room) => {
-            console.log('A. JOIN')
-            if (!peerConnection.current) {
-                createConnection()
-            }
-            if (isInitiator.current) {
+            console.log('JOIN')
+            const offer = await peerConnection.current.createOffer()
+            socket.current.emit('OFFER', offer)
+            setLocalAndSendMessage(offer)
+        })
+
+        socket.current.on('JOINED', async room => {
+            console.log('A. JOINED')
+            if (isInitiator) {
                 const offer = await peerConnection.current.createOffer()
                 console.log('B. EMIT OFFER')
                 socket.current.emit('OFFER', offer)
-                // setLocalAndSendMessage(offer)
-                await peerConnection.current.setLocalDescription(offer)
+                setLocalAndSendMessage(offer)
             }
-            // const offer = await peerConnection.current.createOffer()
-            // socket.current.emit('OFFER', offer)
-            // setLocalAndSendMessage(offer)
         })
-
-        // socket.current.on('JOINED', async room => {
-        //     console.log('A. JOINED')
-        //     if (isInitiator.current) {
-        //         const offer = await peerConnection.current.createOffer()
-        //         console.log('B. EMIT OFFER')
-        //         socket.current.emit('OFFER', offer)
-        //         setLocalAndSendMessage(offer)
-        //     }
-        // })
 
         socket.current.on('OFFER_RECEIVED', async offer => {
             console.log('OFFER_RECEIVED')
@@ -222,7 +200,7 @@ export default props => {
             await peerConnection.current.setRemoteDescription(new RTCSessionDescription(offer))
             // }
             const answer = await peerConnection.current.createAnswer()
-            await peerConnection.current.setLocalDescription(answer)
+            setLocalAndSendMessage(answer)
             socket.current.emit('ANSWER', answer)
         })
 
@@ -238,13 +216,14 @@ export default props => {
         socket.current.on('CANDIDATE_RECEIVED', async message => {
             console.log('CANDIDATE_RECEIVED')
             console.log(message)
-            var candidate = new RTCIceCandidate(message);
-            console.log(peerConnection.current)
+            var candidate = new RTCIceCandidate({
+                sdpMLineIndex: message.label,
+                candidate: message.candidate
+            });
             peerConnection.current.addIceCandidate(candidate).catch(e => {
                 console.log('added aice failed')
                 console.error(e)
             });
-            console.log('added icd candidate')
         })
 
         socket.current.on('OPP_DISCONNECTED', async () => {
@@ -253,19 +232,9 @@ export default props => {
             // if (peerConnection.current) {
                 /* `isInitiator = true` sets the variable `isInitiator` to `true`, indicating that the
                 current user is the initiator of the connection. */
-                isInitiator.current = true
-                if (peerConnection.current) {
-                    remoteStreamRef.current = new MediaStream()
-                    console.log('2. closing')
-        
-                    peerConnection.current.close();
-                    
-                    console.log(peerConnection.current)
-                    peerConnection.current = null;
-                }
-                setTimeout(() => {
-                    createConnection()
-                }, 100)
+                isInitiator = true
+                
+                createConnection()
                 
                 // await peerConnection.current.setRemoteDescription(new RTCSessionDescription({
                 //     type: 'rollback'
@@ -276,16 +245,16 @@ export default props => {
 
         })
         // socket.current.on('connect')
-        // function setLocalAndSendMessage(sessionDescription) {
+        function setLocalAndSendMessage(sessionDescription) {
             
-        //     // pc.setLocalDescription(sessionDescription);
-        //     // console.log('setLocalAndSendMessage sending message', sessionDescription);
-        //     // sendMessage(sessionDescription);
-        //     console.log('B. SESSION DESCRIPTION', sessionDescription);
+            // pc.setLocalDescription(sessionDescription);
+            // console.log('setLocalAndSendMessage sending message', sessionDescription);
+            // sendMessage(sessionDescription);
+            console.log('setLocalAndSendMessage setting local description and sending message', sessionDescription);
             
-        //     peerConnection.current.setLocalDescription(sessionDescription)
+            peerConnection.current.setLocalDescription(sessionDescription)
 
-        // }
+        }
         // 얼굴 인식 및 좌표값 전송
         const detectFaces = async (video) => {
             // await window.faceapi.nets.tinyFaceDetector.loadFromUri('/models');
@@ -308,21 +277,21 @@ export default props => {
                 // }
             }, 100);
         };
-        // const startVideo = async () => {
-        //     streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
-        //     localVideoRef.current.srcObject = streamRef.current;
+        const startVideo = async () => {
+            streamRef.current = await navigator.mediaDevices.getUserMedia({ video: true });
+            localVideoRef.current.srcObject = streamRef.current;
 
-        //     setupVideo()
+            setupVideo()
 
-        //     localVideoRef.current.onloadedmetadata = () => {
-        //         localVideoRef.current.play();
-        //         // detectFaces(localVideoRef.current);
-        //     };
-        // };
+            localVideoRef.current.onloadedmetadata = () => {
+                localVideoRef.current.play();
+                // detectFaces(localVideoRef.current);
+            };
+        };
         
         
-        // startVideo()
-        // setupVideo()
+        startVideo()
+        setupVideo()
         remoteVideoRef.current.srcObject = remoteStreamRef.current
         return () => {
             if (socket.current) {
