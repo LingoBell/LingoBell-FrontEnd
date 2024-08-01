@@ -79,13 +79,13 @@ export default () => {
     )
   }
   const renderRoutes = () => {
+    console.log('test',isFirstLogin)
     if (isFirstLogin == 3) {
       return (
         // <ProfilePage />
         <Route path='*' element={<ProfilePage/>}/>
       )
     }
-
     return (
       <>
         {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
@@ -104,7 +104,8 @@ export default () => {
         <Route path='/video' element={<Video />} />
       </>
     )
-  }
+  
+}
   
   /**
    *  1. 누군가가 구글 로그인(프론트)
