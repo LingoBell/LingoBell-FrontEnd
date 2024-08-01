@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const AddUserProfile = async (formData) => {
     try {
-        const response = await axios.post('users',
+        const response = await axios.post('/users',
             formData, {
             headers: {
                 'Content-Type': 'application/json',
