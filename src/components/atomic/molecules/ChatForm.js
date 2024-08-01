@@ -54,7 +54,7 @@ function ChatForm(props) {
                                     type={message?.type}
                                     isOriginal={false}
                                 >
-                                    {message?.traslatedMessage}
+                                    {message?.translatedMessage}
                                 </ChatMessage>
                             </ChatMessageWrapper>
                         )}

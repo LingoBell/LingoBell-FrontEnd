@@ -15,7 +15,7 @@ export const CreateChat = async (chat_room) => {
 };
 
 export const UpdateChatRoomStatus = async (chat_room_id) => {
-    const url = `chats/${chat_room_id}/vacancy`;
+    const url = `/chats/${chat_room_id}/vacancy`;
 
     try {
         const response = await axios.put(url, chat_room_id);

@@ -153,10 +153,12 @@ function LiveChat() {
     const [openedTab, setOpenedTab] = useState('AI')
     const [messages, setMessages] = useState([]);
     const [showTranslation, setShowTranslation] = useState(true);
+    const chatRoomId = 10; // Replace with the actual chat room ID
+    const timestamp = new Date().toISOString();
 
     const startTranscription = async () => {
         try {
-            await axios.get('http://localhost:8000/transcribe/start');
+            await axios.post(`/chats/${chatRoomId}/stt`);
         } catch (err) {
             console.error('Error starting transcription', err);
         }
@@ -165,14 +167,16 @@ function LiveChat() {
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
-                const response = await axios.get('http://localhost:8000/transcribe/chatmessages');
+                const response = await axios.get(`/chats/${chatRoomId}/stt`, {
+                    params: { timestamp }
+                });
                 setMessages(response.data.messages);
             } catch (err) {
                 console.error('Error fetching transcription', err);
             }
         }, 3000);
         return () => clearInterval(interval);
-    }, []);
+    }, [chatRoomId]);
 
     const toggleTranslation = () => {
         setShowTranslation(!showTranslation);
