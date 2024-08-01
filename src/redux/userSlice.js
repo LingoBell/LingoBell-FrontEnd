@@ -36,7 +36,8 @@ export const checkFirstLogin = createAsyncThunk(
         // 로그인 요청
 
         // 해당 api 만들어야함
-        const result = await axios.get('/users/check')
+        const response = await axios.get('/users/check')
+        const result = response.data
         
         thunkAPI.dispatch(setFirstLogin({ result }))
     }
@@ -69,8 +70,8 @@ const userSlice = createSlice({
         setFirstLogin(state, action) {
             console.log(action)
             const firstLoginResult = action.payload.result
-            console.log(firstLoginResult)
-            state.isFirstLogin = 3//firstLoginResult ? 3 : 2
+            console.log('fisrstLoginResult : ',firstLoginResult)
+            state.isFirstLogin = firstLoginResult.result
         },
         // 유저 로그아웃
         clearUser(state) {
