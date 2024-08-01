@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
-import axios from 'axios'
+import { AddUserProfile } from '../../../apis/UserAPI'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -132,7 +132,7 @@ export default props => {
         setNation(nation)
     }
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
         const formData = {
@@ -154,18 +154,7 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            try{
-                const response = await axios.post('http://127.0.0.1:8000/users/setUserProfile',
-                    formData, {
-                        headers: {
-                            'Content-Type' : 'application/json',
-                        }
-                    }
-                );
-                console.log('Success:', response.data)
-            }catch(error){
-                console.log('Error:', error)
-            }
+            AddUserProfile(formData)
         }
     }
     return (
