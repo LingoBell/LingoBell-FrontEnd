@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
 import { CreateChat, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
-import { GetRequestUserList, GetUserList } from '../../../apis/UserAPI'
+import { GetPartnerList, GetRequestPartnerList } from '../../../apis/PartnerAPI'
 
 // const profiles = PROFILE_DATA
 
@@ -81,7 +81,7 @@ export default props => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
-        const userList = await GetUserList();
+        const userList = await GetPartnerList();
         setProfiles(userList);
 
       } catch (error) {
@@ -92,7 +92,7 @@ export default props => {
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {
       try {
-        const requestUserList = await GetRequestUserList();
+        const requestUserList = await GetRequestPartnerList(user.uid);
         setChatRequests(requestUserList);
 
       } catch (error) {
