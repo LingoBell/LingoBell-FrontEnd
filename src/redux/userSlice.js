@@ -15,13 +15,14 @@ export const signInWithGoogle = createAsyncThunk(
     async (_, thunkAPI) => {
         const result = await signInWithPopup(auth, googleProvider);
         const idToken = await result.user.getIdToken(); // ID 토큰 가져옴
-        const verificationResult = await axios.post('http://127.0.0.1:8000/verify-token', { idToken }) //토큰을 서버로 전송
+        const verificationResult = await axios.post('/verify-token', { idToken }) //토큰을 서버로 전송
             .catch(e => {
                 return {
                     status: 200
                 }
             })
         if (verificationResult.status == 200) {
+            console.log('hihi',verificationResult.data)
             thunkAPI.dispatch(setUser(result.user))
         }
         

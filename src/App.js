@@ -16,12 +16,10 @@ import useAuth from "./useAuth";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
 import Video from "./components/atomic/pages/Video";
 import ProfilePage from "./components/atomic/pages/ProfilePage";
-// export let mainDomain = 'http://localhost:8000'
 
-export let mainDomain = ''
-// mainDomain = ''
-//  mainDomain
-axios.defaults.baseURL = mainDomain + "/api"
+
+export let mainDomain = 'http://localhost:8000'
+axios.defaults.baseURL = mainDomain + "/api" //api엔드포인트 defualtUrl설정
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
