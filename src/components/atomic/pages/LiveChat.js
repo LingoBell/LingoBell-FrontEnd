@@ -188,7 +188,7 @@ function LiveChat() {
             <LiveChatWrap>
                 <VideoWrap>
                     <Video />
-                    {/* <ButtonWrap>
+                    <ButtonWrap>
                         <CallButton><span className='material-icons'>mic</span></CallButton>
                         <CallButton><span className='material-icons'>videocam</span></CallButton>
                         <CallEndButton>
@@ -198,7 +198,7 @@ function LiveChat() {
                         {/* <임시 테스트용> 아래 토글버튼 디벨롭 예정 / 이진우 */}
                         <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
-                    </ButtonWrap> */}
+                    </ButtonWrap>
                 </VideoWrap>
                 <AIChatWrap isOpen={openedTab === 'AI'}>
                     <StyledChatForm data={AI_SAMPLE_DATA} />
@@ -207,7 +207,7 @@ function LiveChat() {
                     <StyledChatForm data={messages.map((msg, index) => ({
                         ...msg,
                         translatedMessage: showTranslation ? msg.translatedMessage : ''
-                    }))} />       
+                    }))} />
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>
