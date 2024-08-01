@@ -69,7 +69,7 @@ const userSlice = createSlice({
             console.log(action)
             const firstLoginResult = action.payload.result
             console.log(firstLoginResult)
-            state.isFirstLogin = 3//firstLoginResult ? 3 : 2
+            state.isFirstLogin = 1//firstLoginResult ? 3 : 2
         },
         // 유저 로그아웃
         clearUser(state) {

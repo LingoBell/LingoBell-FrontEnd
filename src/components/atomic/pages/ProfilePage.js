@@ -319,7 +319,7 @@ export default props => {
                     }} />
             </FormItemWrap>
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button onClick={submit}>submit</Button>
+                <Button onClick={handleSubmit}>submit</Button>
             </div>
 
         </Wrap>

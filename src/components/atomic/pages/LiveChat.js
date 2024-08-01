@@ -151,11 +151,12 @@ const CallEndButton = styled(CallButton)`
 
 function LiveChat() {
     const [openedTab, setOpenedTab] = useState('AI')
-    const [transcription, setTranscription] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [showTranslation, setShowTranslation] = useState(true);
 
     const startTranscription = async () => {
         try {
-            await axios.get('http://localhost:8000/transcribe/start_transcription');
+            await axios.get('http://localhost:8000/transcribe/start');
         } catch (err) {
             console.error('Error starting transcription', err);
         }
@@ -164,15 +165,19 @@ function LiveChat() {
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
-                const response = await axios.get('http://localhost:8000/transcribe/get_latest_transcription');
-                setTranscription(response.data.transcription);
+                const response = await axios.get('http://localhost:8000/transcribe/chatmessages');
+                setMessages(response.data.messages);
             } catch (err) {
                 console.error('Error fetching transcription', err);
             }
         }, 3000);
         return () => clearInterval(interval);
     }, []);
-    
+
+    const toggleTranslation = () => {
+        setShowTranslation(!showTranslation);
+    };
+
     return (
         <StyledCenteredLayout>
             <MainStyle />
@@ -186,6 +191,8 @@ function LiveChat() {
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
                         <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
+                        {/* <임시 테스트용> 아래 토글버튼 디벨롭 예정 / 이진우 */}
+                        <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
@@ -193,10 +200,10 @@ function LiveChat() {
                     <StyledChatForm data={AI_SAMPLE_DATA} />
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm data={USER_SAMPLE_DATA}>
-                        SCRIPT
-                    </StyledChatForm>
-                    <h1>STT: {transcription}</h1>
+                    <StyledChatForm data={messages.map((msg, index) => ({
+                        ...msg,
+                        translatedMessage: showTranslation ? msg.translatedMessage : ''
+                    }))} />
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>

@@ -32,12 +32,9 @@ const AiMessageWrapper = styled.div`
     display: flex;
 `;
 
-function ChatForm (props) {
+function ChatForm(props) {
     const { data, className } = props
 
-    
-
-    
     return (
         <StyledChatCard className={className}>
             {data && data?.map((message, index) => {
@@ -57,9 +54,7 @@ function ChatForm (props) {
                                     type={message?.type}
                                     isOriginal={false}
                                 >
-                                    {message?.traslatedMessage.split('.').map((sentence, i) => (
-                                        <span key={i}>{sentence.trim()}<br /></span>
-                                    ))}
+                                    {message?.traslatedMessage}
                                 </ChatMessage>
                             </ChatMessageWrapper>
                         )}
