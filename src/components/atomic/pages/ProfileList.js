@@ -149,10 +149,7 @@ export default props => {
 
     const chat_room = {
       accessStatus: 1,
-      chatName: 'Chat with ' + userId,
-      chatRoomDescript: null,
-      chatContents: null,
-      partnerId: userId,
+      partnerId: userId
     };
 
     try {

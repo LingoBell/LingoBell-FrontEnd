@@ -179,7 +179,7 @@ function LiveChat() {
             <LiveChatWrap>
                 <VideoWrap>
                     <Video />
-                    <ButtonWrap>
+                    {/* <ButtonWrap>
                         <CallButton><span className='material-icons'>mic</span></CallButton>
                         <CallButton><span className='material-icons'>videocam</span></CallButton>
                         <CallEndButton>
@@ -187,16 +187,16 @@ function LiveChat() {
                         </CallEndButton>
                         <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
-                    </ButtonWrap>
+                    </ButtonWrap> */}
                 </VideoWrap>
                 <AIChatWrap isOpen={openedTab === 'AI'}>
-                    <StyledChatForm data={AI_SAMPLE_DATA} />
+                    {/* <StyledChatForm data={AI_SAMPLE_DATA} /> */}
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm data={USER_SAMPLE_DATA}>
+                    {/* <StyledChatForm data={USER_SAMPLE_DATA}>
                         SCRIPT
                     </StyledChatForm>
-                    <h1>STT: {transcription}</h1>
+                    <h1>STT: {transcription}</h1> */}
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>

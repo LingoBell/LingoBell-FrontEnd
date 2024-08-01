@@ -61,7 +61,6 @@ export default props => {
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
       <ProfileImage src={props.src} />
       <Wrap>
-        <UserName>{props.chatName}</UserName>
         <UserName>{props.title}</UserName>
         <UserName>{props.content}</UserName>
         <UserName>{props.chatDescription}</UserName>
