@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
+import axios from 'axios'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -134,7 +135,7 @@ export default props => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formData = [
+        const formData = {
             selectedInterests,
             gender,
             name,
@@ -143,7 +144,7 @@ export default props => {
             languageWithLevel,
             userIntroduce,
             nation,
-        ]
+        }
 
         if (selectedInterests.length === 0 ||
             !gender || name === '' || mainLanguage === '' ||
@@ -154,9 +155,16 @@ export default props => {
             return false
         } else {
             try{
-                const response = a
+                const response = await axios.post('http://127.0.0.1:8000/users/setUserProfile',
+                    formData, {
+                        headers: {
+                            'Content-Type' : 'application/json',
+                        }
+                    }
+                );
+                console.log('Success:', response.data)
             }catch(error){
-
+                console.log('Error:', error)
             }
         }
     }
