@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const CreateChat = async (chat_room) => {
-    const url= `http://localhost:8000/chats/liveChat`;
+    const url= `/chats`;
     
     try {
         const response = await axios.post(url, chat_room);
@@ -15,7 +15,7 @@ export const CreateChat = async (chat_room) => {
 };
 
 export const UpdateChatRoomStatus = async (chat_room_id) => {
-    const url = `http://localhost:8000/chats/liveChat/${chat_room_id}`;
+    const url = `chats/${chat_room_id}/vacancy`;
 
     try {
         const response = await axios.put(url, chat_room_id);
