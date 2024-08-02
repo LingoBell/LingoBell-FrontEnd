@@ -42,7 +42,7 @@ const Arrow = styled.span`
 `;
 
 export default props => {
-  const { nativeLanguage, learningLanguages } = props;
+  const { nativeLanguage, learningLanguages = [] } = props;
 
   const getGaugeWidth = (level) => {
     return (level / 6) * 100 + '%';

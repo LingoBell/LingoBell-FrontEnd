@@ -49,8 +49,6 @@ export default props => {
         onClickButton,
     } = props;
 
-    // console.log('모달에서 확인', selectedProfile.userCode);
-    // console.log('모달에서 확인', selectedProfile.userName);
     return (
         isOpened && (
             <Background onClick={onClickCloseBtn}>
@@ -68,8 +66,7 @@ export default props => {
                     <div>
                         <ModalProfileItem
                             userName={selectedProfile.userName}
-                            // src={selectedProfile.image}
-                            // tags={selectedProfile.language}
+                            profileImages={selectedProfile.profileImages}
                             gender = {selectedProfile.gender}
                             interests = {selectedProfile.interests}
                             learningLanguages = {selectedProfile.learningLanguages}

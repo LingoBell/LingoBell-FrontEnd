@@ -45,7 +45,7 @@ const StyledTag = styled(Tag)`
 `
 
 const StyledParagraph = styled(Paragraph)`
-  padding : 12px;
+  padding-top : 12px;
   word-break : break-all;
   font-weight: light;
   
@@ -60,14 +60,13 @@ export default props => {
   const { 
     onClick, 
     handleClick, 
-    textEllipsis, 
     size,
     hideContent,
   } = props;
   
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
-      <ProfileImage src={props.src} />
+      <ProfileImage src ={props.profileImages} />
       <Wrap>
         <UserName>{props.userName}</UserName>
         <LanguageGauge //언어 + 레벨 게이지 컴포넌트

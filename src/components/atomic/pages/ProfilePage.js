@@ -4,6 +4,7 @@ import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
 import { AddUserProfile } from '../../../apis/UserAPI'
+import { useNavigate } from 'react-router-dom'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -128,6 +129,7 @@ export default props => {
     const [userIntroduce, setUserIntroduce] = useState('')
     const [hintModal, setHintModal] = useState(false)
 
+    const navigate = useNavigate()
     const handleChange = (nation) => {
         setNation(nation)
     }
@@ -162,7 +164,12 @@ export default props => {
             return false
         } else {
             AddUserProfile(formData)
-            console.log(formData)
+            .then(()=>{
+                navigate('/partners')
+            })
+            .catch(error => {
+                console.error("Error submitting form:", error)
+            })
         }
     }
     return (

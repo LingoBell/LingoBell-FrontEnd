@@ -207,20 +207,20 @@ export default props => {
                     nationName,
                     nativeLanguage,
                     userName,
-                    // src
+                    profileImages,
                      } = profile;
 
             return (
               <StyledProfileItem
                 key={index}
                 userName={userName}
-                // src={src}
                 nativeLanguage={nativeLanguage}
                 content={description}
                 gender = {gender}
                 interests = {interests}
                 learningLanguages = {learningLanguages}
                 nationName = {nationName}
+                profileImages = {profileImages}
                 hideContent = {false}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
