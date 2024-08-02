@@ -75,7 +75,6 @@ export default props => {
   const [chatRequests, setChatRequests] = useState([]);
 
   const user = useSelector((state) => state.user.user);
-  console.log('user의 uid : ', user.uid);
 
   useEffect(() => {
     /* Find Partners */
@@ -83,11 +82,16 @@ export default props => {
       try {
         const userList = await GetPartnerList();
         setProfiles(userList);
+        console.log('profile-info', profiles)
 
       } catch (error) {
         console.log('유저 리스트 불러오기 실패 : ', error);
       }
     };
+
+    // const fetchUserLearningLanguages = async () => {
+    //   try 
+    // }
 
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {
@@ -186,7 +190,7 @@ export default props => {
           <Modal
             isOpened={isOpened}
             onClickCloseBtn={() => handleCloseModal()}
-            bttnTxt="대화 요청"
+            bttnTxt="Request Language Exchange"
             selectedProfile={selectedProfile}
             onClickButton={() => onClickRequestModalButton(selectedProfile.userId)}
           // userId={user.uid}
@@ -195,23 +199,29 @@ export default props => {
         )}
         {activeTab === 'find' &&
           profiles?.map((profile, index) => {
-            // const {
-            //   name: userName,
-            //   // image: src,
-            //   // language: tags,
-            //   selfIntroduction: description,
-            // } = profile
-            const { userCode, userName, selfIntroduction } = profile;
+         
+            const { description,
+                    gender,
+                    interests,
+                    learningLanguages,
+                    nationName,
+                    nativeLanguage,
+                    userName,
+                    // src
+                     } = profile;
 
             return (
               <StyledProfileItem
                 key={index}
-                title={userName}
+                userName={userName}
                 // src={src}
-                // tags={tags}
-                content={selfIntroduction}
-                userCode={userCode}
-
+                nativeLanguage={nativeLanguage}
+                content={description}
+                gender = {gender}
+                interests = {interests}
+                learningLanguages = {learningLanguages}
+                nationName = {nationName}
+                hideContent = {false}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })

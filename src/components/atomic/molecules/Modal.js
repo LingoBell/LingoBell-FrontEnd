@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Button from '../atoms/Button';
 import ProfileItem from './ProfileItem';
+import { interests } from '../../../consts/profileDataKeyList';
 
 const Background = styled.div`
     background-color: rgba(0,0,0,0.4);
@@ -27,8 +28,8 @@ const ModalBox = styled.div`
 const ModalProfileItem = styled(ProfileItem)`
   padding : 12px 12px;
   margin : 12px 12px;
-  width: 400px;
-`
+  max-width : 500px;
+  `
 
 const ButtonWrap = styled.footer`
     display: flex;
@@ -66,12 +67,16 @@ export default props => {
                     {props.children}
                     <div>
                         <ModalProfileItem
-                            title={selectedProfile.userName}
+                            userName={selectedProfile.userName}
                             // src={selectedProfile.image}
                             // tags={selectedProfile.language}
-                            // content={selectedProfile.selfIntroduction}
-                            userCode={selectedProfile.userCode}
+                            gender = {selectedProfile.gender}
+                            interests = {selectedProfile.interests}
+                            learningLanguages = {selectedProfile.learningLanguages}
+                            nationName = {selectedProfile.nationName}
+                            nativeLanguage = {selectedProfile.nativeLanguage}
                             content={selectedProfile.description}
+                            hideContent = {true}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>

@@ -2,8 +2,10 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
+import LanguageGauge from './LanguageGauge'
 
 const Container = styled.div`
+  min-widht : 400px;
   display : flex;
   align-items: center;
 `
@@ -32,7 +34,9 @@ const UserName = styled(Title)`
   }
 `
 const StyledTag = styled(Tag)`
+  white-space : nowrap;
   font-size : 12px;
+  margin-top : 6px;
   margin-right : 6px;
   padding : 2px 4px 2px 4px;
   .small & {
@@ -41,10 +45,15 @@ const StyledTag = styled(Tag)`
 `
 
 const StyledParagraph = styled(Paragraph)`
-
+  padding : 12px;
   word-break : break-all;
   font-weight: light;
   
+`
+const TagWrap = styled.div`
+  display : flex;
+  flex-wrap : wrap;
+  margin-top : 4px;
 `
 
 export default props => {
@@ -53,27 +62,29 @@ export default props => {
     handleClick, 
     textEllipsis, 
     size,
-    hideContent = false
+    hideContent,
   } = props;
   
-
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
       <ProfileImage src={props.src} />
       <Wrap>
-        <UserName>{props.title}</UserName>
-        <UserName>{props.content}</UserName>
-        <UserName>{props.chatDescription}</UserName>
-        <div style={{ display: 'flex' }}>
-          {props.tags?.map(tag =>   // tags라는 데이터
-            <StyledTag>{tag}</StyledTag>
+        <UserName>{props.userName}</UserName>
+        <LanguageGauge //언어 + 레벨 게이지 컴포넌트
+          nativeLanguage = {props.nativeLanguage}
+          learningLanguages = {props.learningLanguages}
+          />
+
+          <TagWrap>
+          {props.interests?.map(interest =>   // tags라는 데이터
+            <StyledTag>{interest}</StyledTag>
           )}
-        </div>
+          </TagWrap>
 
         {
-          !hideContent && (
+          hideContent && (
             <>
-              <StyledParagraph  $type="word-break" textEllipsis={textEllipsis}>{props.content}</StyledParagraph>
+              <StyledParagraph>{props.content}</StyledParagraph>
               {props.children}
             </>
           )
