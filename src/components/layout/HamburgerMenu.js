@@ -94,7 +94,7 @@ export default props => {
           <>
             <HamburgerMenuContainer isOpen={isOpen}>
               <HamburgerHeader>
-                <div>메뉴</div>
+                <div>Menu</div>
                 <button style={{width: 60, height: 60}} onClick={onClose}>
                   <span className='material-icons'>close</span>
                 </button>

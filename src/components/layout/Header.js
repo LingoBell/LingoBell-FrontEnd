@@ -9,6 +9,7 @@ import HamburgerMenu from './HamburgerMenu'
 import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
 
 const HeaderContainer = styled.header`
+  z-index : 10;
   position: fixed;
   top: 0;
   left: 0;
