@@ -224,7 +224,7 @@ export default props => {
               gender,
               interests,
               learningLanguages,
-              nationName,
+              nation,
               nativeLanguage,
               userName,
               profileImages,
@@ -240,7 +240,7 @@ export default props => {
                 gender={gender}
                 interests={interests}
                 learningLanguages={learningLanguages}
-                nationName={nationName}
+                nation={nation}
                 profileImages={profileImages}
                 hideContent={false}
                 age={age}

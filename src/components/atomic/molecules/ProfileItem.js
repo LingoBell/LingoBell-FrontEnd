@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
 import LanguageGauge from './LanguageGauge'
+import Flag from 'react-world-flags'
 
 const Container = styled.div`
   min-widht : 400px;
@@ -10,6 +11,7 @@ const Container = styled.div`
   align-items: center;
 `
 const ProfileImage = styled(BaseImage)`
+  position : relative;
   width : 100px;
   min-width : 100px;
   height : 100px;
@@ -18,6 +20,24 @@ const ProfileImage = styled(BaseImage)`
     width: 60px;
     height: 60px;
   }
+`
+
+const FlagContainer = styled.div`
+  position : absolute;
+  bottom : 0;
+  width : 32px;
+  height : 32px;
+  border-radius : 50%;
+  display : flex;
+  justify-content : center;
+  background-color : red;
+  align-items : center;
+  overflow : hidden;
+`
+const RoundFlag = styled(Flag)`
+  width : auto%;
+  height : auto;
+  min-height : 100%;
 `
 const Wrap = styled.div`
   margin-top : auto;
@@ -100,7 +120,11 @@ export default props => {
   
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
-      <ProfileImage src ={props.profileImages} />
+      <ProfileImage src ={props.profileImages}>
+        <FlagContainer>
+          <RoundFlag code={props.nation}/>
+        </FlagContainer>
+      </ProfileImage>
       <Wrap>
         <NameWarp>
         <UserName>{props.userName}</UserName>
