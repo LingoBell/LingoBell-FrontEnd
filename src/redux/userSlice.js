@@ -33,9 +33,6 @@ export const signInWithGoogle = createAsyncThunk(
 export const checkFirstLogin = createAsyncThunk(
     'user/checkFirstLogin',
     async (_, thunkAPI) => {
-        // 로그인 요청
-
-        // 해당 api 만들어야함
         const response = await axios.get('/users/check')
         const result = response.data
         

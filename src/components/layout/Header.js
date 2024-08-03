@@ -103,7 +103,7 @@ export default props => {
                     if(isFirstLogin == 3 && menu.title != 'Logout') {
                       return null
                     }
-                    
+                     
                     if (menu.title == 'Logout') {
                       return (
                         <MenuTab

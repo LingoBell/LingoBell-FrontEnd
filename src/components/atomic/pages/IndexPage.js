@@ -151,7 +151,7 @@ const IndexPage = (props) => {
         <ButtonWrap>
           <StyledButton $type='bordered' onClick={trySigninWithGoogle}>
             <GoogleWrap>
-              <img width='9%' src='/googleLogo.png'
+              <img width='30px' src='/googleLogo.png'
               style={{paddingRight : '6px'}} />
               <StyledLogin>Sign in with Google</StyledLogin>
             </GoogleWrap>
