@@ -128,6 +128,7 @@ export default props => {
     const [languageWithLevel, setLanguageWithLevel] = useState({})
     const [userIntroduce, setUserIntroduce] = useState('')
     const [hintModal, setHintModal] = useState(false)
+    const [birthday, setBirthday] = useState('')
 
     const navigate = useNavigate()
     const handleChange = (nation) => {
@@ -153,23 +154,24 @@ export default props => {
             languageWithLevel,
             userIntroduce,
             nation,
+            birthday,
         }
 
         if (Object.keys(selectedInterests).length === 0 ||
             !gender || name === '' || mainLanguage.language === '' ||
             Object.keys(learningLanguages).length === 0 || Object.keys(languageWithLevel).length === 0
-            || nation === ''
+            || nation === '' || birthday === ''
         ) {
             alert("All fields required")
             return false
         } else {
             AddUserProfile(formData)
-            .then(()=>{
-                navigate('/partners')
+            .then(() => {
+                window.location.reload(); // 성공 시 페이지 새로고침
             })
             .catch(error => {
-                console.error("Error submitting form:", error)
-            })
+                console.error("Error submitting form:", error);
+            });
         }
     }
     return (
@@ -222,6 +224,17 @@ export default props => {
                 <CheckboxButton $cliked={gender == "Male"} onClick={() => {
                     setGender("Male")
                 }}>Male</CheckboxButton>
+            </FormItemWrap>
+
+            <FormItemWrap>
+                <LabelText>Enter your birthday</LabelText>
+                <Input
+                    type='date'
+                    value={birthday}
+                    onChange={(e)=> {
+                        setBirthday(e.target.value)
+                    }}
+                    />
             </FormItemWrap>
 
 

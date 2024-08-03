@@ -76,12 +76,31 @@ export default props => {
 
   const user = useSelector((state) => state.user.user);
 
+  const calculateAge = (birthday) => {
+    if (!birthday) {
+      return 20;
+    }
+
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
   useEffect(() => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
         const userList = await GetPartnerList();
-        setProfiles(userList);
+        const newUserList = userList.map(profile =>({
+          ...profile, age: calculateAge(profile.birthday)
+        }))
+        setProfiles(newUserList);
         console.log('profile-info', profiles)
 
       } catch (error) {
@@ -179,6 +198,7 @@ export default props => {
     }
   }
 
+
   return (
     <CenteredMainLayout>
       <PartnersTab>
@@ -199,16 +219,17 @@ export default props => {
         )}
         {activeTab === 'find' &&
           profiles?.map((profile, index) => {
-         
+
             const { description,
-                    gender,
-                    interests,
-                    learningLanguages,
-                    nationName,
-                    nativeLanguage,
-                    userName,
-                    profileImages,
-                     } = profile;
+              gender,
+              interests,
+              learningLanguages,
+              nationName,
+              nativeLanguage,
+              userName,
+              profileImages,
+              age,
+            } = profile;
 
             return (
               <StyledProfileItem
@@ -216,12 +237,13 @@ export default props => {
                 userName={userName}
                 nativeLanguage={nativeLanguage}
                 content={description}
-                gender = {gender}
-                interests = {interests}
-                learningLanguages = {learningLanguages}
-                nationName = {nationName}
-                profileImages = {profileImages}
-                hideContent = {false}
+                gender={gender}
+                interests={interests}
+                learningLanguages={learningLanguages}
+                nationName={nationName}
+                profileImages={profileImages}
+                hideContent={false}
+                age={age}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })
@@ -230,7 +252,7 @@ export default props => {
           <Modal
             isOpened={isOpened}
             onClickCloseBtn={() => handleCloseModal()}
-            bttnTxt="채팅방 입장"
+            bttnTxt="Enter Chat Room"
             selectedProfile={selectedChatRoom}
             onClickButton={() => onClickResponseModalButton(selectedChatRoom.chatRoomId)}
           />

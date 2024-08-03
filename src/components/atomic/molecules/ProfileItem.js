@@ -55,6 +55,40 @@ const TagWrap = styled.div`
   flex-wrap : wrap;
   margin-top : 4px;
 `
+const NameWarp = styled.div`
+  display : flex;
+  align-items : center;
+  `
+const AgeBox = styled.div`
+  color : white;
+  border-radius : 8px;
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  padding : 0 8px 0 8px;
+  font-size : 16px;
+  margin-left : 14px;
+  height : 24px;
+
+  ${props => props.$gender == 'Male' && `
+    background-color : #7086F3;
+    `}
+
+  ${props => props.$gender == 'Female' && `
+    background-color : #EB469B;
+    `}
+`
+
+const Gender = styled.div`
+  padding-right : 2px;
+  padding-left : 2px;
+`
+
+const Age = styled.div`
+  padding-right : 2px;
+  padding-left : 2px;
+
+`
 
 export default props => {
   const { 
@@ -68,7 +102,17 @@ export default props => {
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
       <ProfileImage src ={props.profileImages} />
       <Wrap>
+        <NameWarp>
         <UserName>{props.userName}</UserName>
+        <AgeBox $gender ={props.gender}>
+        <Gender>
+          {props.gender == 'Male' ? '♂' : '♀'}
+        </Gender>
+        <Age>
+          {props.age}
+        </Age>
+        </AgeBox>
+        </NameWarp>
         <LanguageGauge //언어 + 레벨 게이지 컴포넌트
           nativeLanguage = {props.nativeLanguage}
           learningLanguages = {props.learningLanguages}

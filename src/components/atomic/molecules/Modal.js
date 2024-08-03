@@ -53,7 +53,7 @@ export default props => {
         isOpened && (
             <Background onClick={onClickCloseBtn}>
                 <ModalBox onClick={e => e.stopPropagation()} >
-                    <button style={{width: 60, height: 60, position: 'absolute', top: 0, right: 0}}>
+                    <button style={{width: 60, height: 50, position: 'absolute', top: 0, right: 0}}>
                         <span
                             className='material-icons'
                             onClick={onClickCloseBtn}
@@ -68,6 +68,7 @@ export default props => {
                             userName={selectedProfile.userName}
                             profileImages={selectedProfile.profileImages}
                             gender = {selectedProfile.gender}
+                            age = {selectedProfile.age}
                             interests = {selectedProfile.interests}
                             learningLanguages = {selectedProfile.learningLanguages}
                             nationName = {selectedProfile.nationName}
