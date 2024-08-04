@@ -23,7 +23,13 @@ export const signInWithGoogle = createAsyncThunk(
             })
         if (verificationResult.status == 200) {
             console.log('hihi',verificationResult.data)
-            thunkAPI.dispatch(setUser(result.user))
+            // thunkAPI.dispatch(setUser(result.user))
+            const user = {
+                uid: result.user.uid,
+                accessToken: result.user.accessToken
+            };
+            thunkAPI.dispatch(setUser(user));
+
         }
         
         thunkAPI.dispatch(setProcessFinished())
@@ -35,7 +41,6 @@ export const checkFirstLogin = createAsyncThunk(
     async (_, thunkAPI) => {
         const response = await axios.get('/users/check')
         const result = response.data
-        
         thunkAPI.dispatch(setFirstLogin({ result }))
     }
 )

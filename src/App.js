@@ -47,7 +47,7 @@ export default () => {
         axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
 //         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
-//         console.log(accessToken)
+        console.log(accessToken)
         dispatch(checkFirstLogin())
         /**
          *  1. 누군가가 구글 로그인(프론트)
@@ -66,6 +66,8 @@ export default () => {
     });
     return()=> unsubscribe();
   }, [dispatch]);
+  
+
   if (!processFinished) {
     return null
   }
@@ -82,10 +84,10 @@ export default () => {
     console.log('test',isFirstLogin)
     if (isFirstLogin == 3) {
       return (
-        // <ProfilePage />
         <Route path='*' element={<ProfilePage/>}/>
       )
     }
+    if(isFirstLogin == 2){
     return (
       <>
         {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
@@ -104,7 +106,7 @@ export default () => {
         <Route path='/video' element={<Video />} />
       </>
     )
-  
+    }
 }
   
 

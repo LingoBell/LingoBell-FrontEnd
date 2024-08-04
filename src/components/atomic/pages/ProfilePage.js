@@ -129,6 +129,7 @@ export default props => {
     const [userIntroduce, setUserIntroduce] = useState('')
     const [hintModal, setHintModal] = useState(false)
     const [birthday, setBirthday] = useState('')
+    const [nativeLanguageCode, setNativeLanguageCode] = useState('')
 
     const navigate = useNavigate()
     const handleChange = (nation) => {
@@ -155,6 +156,7 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
+            nativeLanguageCode
         }
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -165,13 +167,14 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            AddUserProfile(formData)
-            .then(() => {
-                window.location.reload(); // 성공 시 페이지 새로고침
-            })
-            .catch(error => {
-                console.error("Error submitting form:", error);
-            });
+            console.log(formData)
+            // AddUserProfile(formData)
+            // .then(() => {
+            //     window.location.reload(); // 성공 시 페이지 새로고침
+            // })
+            // .catch(error => {
+            //     console.error("Error submitting form:", error);
+            // });
         }
     }
     return (
@@ -191,6 +194,8 @@ export default props => {
                         style={{ paddingBottom: '11px' }}
                         onChange={(e) => {
                             setMainLanguage(e.target.value)
+                            const langCode = languages.find(lang => lang.language == e.target.value)?.langCode || '';
+                            setNativeLanguageCode(langCode)
                         }}>
                         <option disabled value=''>Select Your Main Language</option>
                         {languages.map(lang => {

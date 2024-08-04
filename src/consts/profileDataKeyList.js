@@ -1,12 +1,12 @@
 export const languages = [
-    { langId: 1, language: 'English' },
-    { langId: 2, language: 'Spanish' },
-    { langId: 3, language: 'French' },
-    { langId: 4, language: 'German' },
-    { langId: 5, language: 'Korean' },
-    { langId: 6, language: 'Japanese' },
-    { langId: 7, language: 'Chinese' }
-  ]
+  { langId: 1, language: 'English', langCode: 'en' },
+  { langId: 2, language: 'Spanish', langCode: 'es' },
+  { langId: 3, language: 'French', langCode: 'fr' },
+  { langId: 4, language: 'German', langCode: 'de' },
+  { langId: 5, language: 'Korean', langCode: 'ko' },
+  { langId: 6, language: 'Japanese', langCode: 'ja' },
+  { langId: 7, language: 'Chinese', langCode: 'zh' }
+];
   
 export const interests = [
     { interestId: 1, interestName: 'Traveling' },
