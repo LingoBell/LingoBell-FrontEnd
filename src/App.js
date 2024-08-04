@@ -92,9 +92,9 @@ export default () => {
         <Route path='/' element={<ChatHistory />} />
         <Route path='/chat-history'>
           <Route path=':chatId' element={<ChatHistory />} />
-
           <Route path='' element={<ChatHistory />} />
         </Route>
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path='/partners' element={<ProfileList />} />
         <Route path="/Main" element={<Main />} />
         {/* <Route path='/live-chat/:chatSessionId' element={LiveChat} /> */}

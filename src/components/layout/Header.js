@@ -64,7 +64,7 @@ const Wrap = styled.div`
 
 export const MENUS = [
   { title: "Home", link: '/' },
-  { title: "Profile", link: '/' },
+  { title: "Profile", link: '/profile' },
   { title: "Partner", link: '/partners' },
   { title: "History", link: '/chat-history' },
   { title: "Logout", link: '/' },

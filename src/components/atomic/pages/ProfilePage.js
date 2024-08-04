@@ -4,6 +4,7 @@ import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
 import { AddUserProfile } from '../../../apis/UserAPI'
+import { useSelector } from 'react-redux'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -127,6 +128,13 @@ export default props => {
     const [languageWithLevel, setLanguageWithLevel] = useState({})
     const [userIntroduce, setUserIntroduce] = useState('')
     const [hintModal, setHintModal] = useState(false)
+    const { user, isFirstLogin } = useSelector((state) => {
+        return {
+            user: state.user?.user,
+            isFirstLogin: state?.user.isFirstLogin
+        }
+    })
+
 
     const handleChange = (nation) => {
         setNation(nation)
@@ -158,167 +166,332 @@ export default props => {
         }
     }
     return (
-        <Wrap>
-            <Title>Create User Profile</Title>
-            <FormItemWrap>
-                <LabelText>Name</LabelText>
-                <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
-                    setName(e.target.value)
-                }} />
-            </FormItemWrap>
+        <>
+            {isFirstLogin === 2 ?
+                <Wrap>
+                    <Title>Edit User Profile</Title>
+                    <FormItemWrap>
+                        <LabelText>Name</LabelText>
+                        <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
+                            setName(e.target.value)
+                        }} />
+                    </FormItemWrap>
 
-            <div style={{ display: 'flex' }}>
-                <FormItemWrap style={{ width: '49%' }}>
-                    <LabelText>Native Language</LabelText>
-                    <StyledSelect value={mainLanguage}
-                        style={{ paddingBottom: '11px' }}
-                        onChange={(e) => {
-                            setMainLanguage(e.target.value)
-                        }}>
-                        <option disabled value=''>Select Your Main Language</option>
-                        {languages.map(lang => {
-                            return (
-                                <option>{lang}</option>
-                            )
-                        })}
-                        {/* value = '' 는 기본값을 맞추기 위해서, disabled된 경우 첫번째 option 이 선택되어있지 않게 됨 */}
+                    <div style={{ display: 'flex' }}>
+                        <FormItemWrap style={{ width: '49%' }}>
+                            <LabelText>Native Language</LabelText>
+                            <StyledSelect value={mainLanguage}
+                                style={{ paddingBottom: '11px' }}
+                                onChange={(e) => {
+                                    setMainLanguage(e.target.value)
+                                }}>
+                                <option disabled value=''>Select Your Main Language</option>
+                                {languages.map(lang => {
+                                    return (
+                                        <option>{lang}</option>
+                                    )
+                                })}
+                                {/* value = '' 는 기본값을 맞추기 위해서, disabled된 경우 첫번째 option 이 선택되어있지 않게 됨 */}
 
-                    </StyledSelect>
-                </FormItemWrap>
-                <div style={{ flex: 1 }} />
-                <FormItemWrap style={{ width: '49%' }}>
-                    <LabelText>Nation</LabelText>
-                    <Select         //react-select
-                        value={nation}
-                        onChange={handleChange}
-                        options={options}
-                        placeholder="Select Your Country"
-                        isClearable />
-                </FormItemWrap>
-            </div>
+                            </StyledSelect>
+                        </FormItemWrap>
+                        <div style={{ flex: 1 }} />
+                        <FormItemWrap style={{ width: '49%' }}>
+                            <LabelText>Nation</LabelText>
+                            <Select         //react-select
+                                value={nation}
+                                onChange={handleChange}
+                                options={options}
+                                placeholder="Select Your Country"
+                                isClearable />
+                        </FormItemWrap>
+                    </div>
+
+                    <FormItemWrap style={{ flexDirection: 'row' }}>
+                        <LabelText>Gender</LabelText>
+                        <div style={{ flex: 1 }} />
+                        <CheckboxButton $cliked={gender == 1} onClick={() => {
+                            setGender(1)
+                        }}>Female</CheckboxButton>
+                        <CheckboxButton $cliked={gender == 2} onClick={() => {
+                            setGender(2)
+                        }}>Male</CheckboxButton>
+                        {/* 여자는 1 남자는 2 */}
+
+                    </FormItemWrap>
 
 
-            <FormItemWrap style={{ flexDirection: 'row' }}>
-                <LabelText>Gender</LabelText>
-                <div style={{ flex: 1 }} />
-                <CheckboxButton $cliked={gender == 1} onClick={() => {
-                    setGender(1)
-                }}>Female</CheckboxButton>
-                <CheckboxButton $cliked={gender == 2} onClick={() => {
-                    setGender(2)
-                }}>Male</CheckboxButton>
-                {/* 여자는 1 남자는 2 */}
+                    <FormItemWrap>
+                        <div style={{ display: 'flex' }}>
+                            <LabelText>Learning Language</LabelText>
+                            <HintButton onClick={() => {
+                                setHintModal(!hintModal)
+                            }}>?</HintButton>
+                        </div>
+                        {
+                            hintModal && (
+                                <HintBox>
+                                    <p>The numbers represent the user's language proficiency level.</p>
+                                    <p>1 - Beginner</p>
+                                    <p>2 - Elementary</p>
+                                    <p>3 - Intermediate</p>
+                                    <p>4 - Upper-Intermediate</p>
+                                    <p>5 - Advanced</p>
+                                    <p>6 - Proficient</p>
 
-            </FormItemWrap>
-
-
-            <FormItemWrap>
-                <div style={{ display: 'flex' }}>
-                    <LabelText>Learning Language</LabelText>
-                    <HintButton onClick={() => {
-                        setHintModal(!hintModal)
-                    }}>?</HintButton>
-                </div>
-                {
-                    hintModal && (
-                        <HintBox>
-                            <p>The numbers represent the user's language proficiency level.</p>
-                            <p>1 - Beginner</p>
-                            <p>2 - Elementary</p>
-                            <p>3 - Intermediate</p>
-                            <p>4 - Upper-Intermediate</p>
-                            <p>5 - Advanced</p>
-                            <p>6 - Proficient</p>
-
-                        </HintBox>
-                    )
-                }
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {languages.map(lang => {
-                        if (!mainLanguage.includes(lang)) {
-                            return (
-                                <RadioButton $cliked={learningLanguages.includes(lang)}
-                                    onClick={() => {
-                                        if (!learningLanguages.includes(lang)) {
-                                            setLearningLanguages([...learningLanguages, lang])
-                                        } else {
-                                            const newLearningLanguages = learningLanguages.filter(item => item !== lang)
-                                            setLearningLanguages(newLearningLanguages)
-                                            const newLangaugeWithLevel = {
-                                                ...languageWithLevel
-                                            }
-                                            delete newLangaugeWithLevel[lang]
-                                            setLanguageWithLevel(
-                                                newLangaugeWithLevel
-                                            )
-                                        }
-                                    }}
-                                >{lang}</RadioButton>
+                                </HintBox>
                             )
                         }
-                    })}
-                </div>
-            </FormItemWrap>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {languages.map(lang => {
+                                if (!mainLanguage.includes(lang)) {
+                                    return (
+                                        <RadioButton $cliked={learningLanguages.includes(lang)}
+                                            onClick={() => {
+                                                if (!learningLanguages.includes(lang)) {
+                                                    setLearningLanguages([...learningLanguages, lang])
+                                                } else {
+                                                    const newLearningLanguages = learningLanguages.filter(item => item !== lang)
+                                                    setLearningLanguages(newLearningLanguages)
+                                                    const newLangaugeWithLevel = {
+                                                        ...languageWithLevel
+                                                    }
+                                                    delete newLangaugeWithLevel[lang]
+                                                    setLanguageWithLevel(
+                                                        newLangaugeWithLevel
+                                                    )
+                                                }
+                                            }}
+                                        >{lang}</RadioButton>
+                                    )
+                                }
+                            })}
+                        </div>
+                    </FormItemWrap>
 
-            <FormItemWrap>
-                {learningLanguages.map(lang => {
-                    const thisLanguageLevel = languageWithLevel[lang]
-                    if (learningLanguages.includes(lang)) {
-                        return (
-                            <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <LabelText>{lang}</LabelText>
-                                <div style={{ flex: 1 }} />
-                                <StyledSelect style={{ width: 'calc(80% - 12px)' }}
-                                    value={thisLanguageLevel} onChange={(e) => {
-                                        const newLangaugeWithLevel = {
-                                            ...languageWithLevel, [lang]: e.target.value
-                                        }
-                                        setLanguageWithLevel(newLangaugeWithLevel)
-                                    }}>
-                                    <option disabled selected>Proficiency Level</option>
-                                    {[1, 2, 3, 4, 5, 6].map(level => {
-                                        return (
-                                            <option>{level}</option>
-                                        )
-                                    })}
-                                </StyledSelect>
-                            </div>
-                        )
-                    }
-                })}
-            </FormItemWrap>
+                    <FormItemWrap>
+                        {learningLanguages.map(lang => {
+                            const thisLanguageLevel = languageWithLevel[lang]
+                            if (learningLanguages.includes(lang)) {
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                        <LabelText>{lang}</LabelText>
+                                        <div style={{ flex: 1 }} />
+                                        <StyledSelect style={{ width: 'calc(80% - 12px)' }}
+                                            value={thisLanguageLevel} onChange={(e) => {
+                                                const newLangaugeWithLevel = {
+                                                    ...languageWithLevel, [lang]: e.target.value
+                                                }
+                                                setLanguageWithLevel(newLangaugeWithLevel)
+                                            }}>
+                                            <option disabled selected>Proficiency Level</option>
+                                            {[1, 2, 3, 4, 5, 6].map(level => {
+                                                return (
+                                                    <option>{level}</option>
+                                                )
+                                            })}
+                                        </StyledSelect>
+                                    </div>
+                                )
+                            }
+                        })}
+                    </FormItemWrap>
 
-            <FormItemWrap>
-                <LabelText>Choose Your Interests <span>(up to 5 interests)</span></LabelText>
-                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                    {interests.map(item => {
-                        return (
-                            <RadioButton $cliked={selectedInterests.includes(item)}
-                                onClick={() => {
-                                    if (!selectedInterests.includes(item) && selectedInterests.length < 5) {
-                                        setSelectedInterests([...selectedInterests, item])
-                                    } else {
-                                        const newSelectedInterests = selectedInterests.filter(interest => interest !== item)
-                                        setSelectedInterests(newSelectedInterests)
-                                    }
-                                }}
-                            >{item}</RadioButton>
-                        )
-                    })}
-                </div>
-            </FormItemWrap>
+                    <FormItemWrap>
+                        <LabelText>Choose Your Interests <span>(up to 5 interests)</span></LabelText>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {interests.map(item => {
+                                return (
+                                    <RadioButton $cliked={selectedInterests.includes(item)}
+                                        onClick={() => {
+                                            if (!selectedInterests.includes(item) && selectedInterests.length < 5) {
+                                                setSelectedInterests([...selectedInterests, item])
+                                            } else {
+                                                const newSelectedInterests = selectedInterests.filter(interest => interest !== item)
+                                                setSelectedInterests(newSelectedInterests)
+                                            }
+                                        }}
+                                    >{item}</RadioButton>
+                                )
+                            })}
+                        </div>
+                    </FormItemWrap>
 
-            <FormItemWrap>
-                <LabelText>Tell me about your-self!</LabelText>
-                <StyledTextArea placeholder='Introduce your self'
-                    value={userIntroduce} onChange={(event) => {
-                        setUserIntroduce(event.target.value)
-                    }} />
-            </FormItemWrap>
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button onClick={handleSubmit}>submit</Button>
-            </div>
+                    <FormItemWrap>
+                        <LabelText>Tell me about your-self!</LabelText>
+                        <StyledTextArea placeholder='Introduce your self'
+                            value={userIntroduce} onChange={(event) => {
+                                setUserIntroduce(event.target.value)
+                            }} />
+                    </FormItemWrap>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={handleSubmit}>submit</Button>
+                    </div>
 
-        </Wrap>
+                </Wrap>
+                :
+                <Wrap>
+                    <Title>Create User Profile</Title>
+                    <FormItemWrap>
+                        <LabelText>Name</LabelText>
+                        <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
+                            setName(e.target.value)
+                        }} />
+                    </FormItemWrap>
+
+                    <div style={{ display: 'flex' }}>
+                        <FormItemWrap style={{ width: '49%' }}>
+                            <LabelText>Native Language</LabelText>
+                            <StyledSelect value={mainLanguage}
+                                style={{ paddingBottom: '11px' }}
+                                onChange={(e) => {
+                                    setMainLanguage(e.target.value)
+                                }}>
+                                <option disabled value=''>Select Your Main Language</option>
+                                {languages.map(lang => {
+                                    return (
+                                        <option>{lang}</option>
+                                    )
+                                })}
+                                {/* value = '' 는 기본값을 맞추기 위해서, disabled된 경우 첫번째 option 이 선택되어있지 않게 됨 */}
+
+                            </StyledSelect>
+                        </FormItemWrap>
+                        <div style={{ flex: 1 }} />
+                        <FormItemWrap style={{ width: '49%' }}>
+                            <LabelText>Nation</LabelText>
+                            <Select         //react-select
+                                value={nation}
+                                onChange={handleChange}
+                                options={options}
+                                placeholder="Select Your Country"
+                                isClearable />
+                        </FormItemWrap>
+                    </div>
+
+                    <FormItemWrap style={{ flexDirection: 'row' }}>
+                        <LabelText>Gender</LabelText>
+                        <div style={{ flex: 1 }} />
+                        <CheckboxButton $cliked={gender == 1} onClick={() => {
+                            setGender(1)
+                        }}>Female</CheckboxButton>
+                        <CheckboxButton $cliked={gender == 2} onClick={() => {
+                            setGender(2)
+                        }}>Male</CheckboxButton>
+                        {/* 여자는 1 남자는 2 */}
+
+                    </FormItemWrap>
+
+
+                    <FormItemWrap>
+                        <div style={{ display: 'flex' }}>
+                            <LabelText>Learning Language</LabelText>
+                            <HintButton onClick={() => {
+                                setHintModal(!hintModal)
+                            }}>?</HintButton>
+                        </div>
+                        {
+                            hintModal && (
+                                <HintBox>
+                                    <p>The numbers represent the user's language proficiency level.</p>
+                                    <p>1 - Beginner</p>
+                                    <p>2 - Elementary</p>
+                                    <p>3 - Intermediate</p>
+                                    <p>4 - Upper-Intermediate</p>
+                                    <p>5 - Advanced</p>
+                                    <p>6 - Proficient</p>
+
+                                </HintBox>
+                            )
+                        }
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {languages.map(lang => {
+                                if (!mainLanguage.includes(lang)) {
+                                    return (
+                                        <RadioButton $cliked={learningLanguages.includes(lang)}
+                                            onClick={() => {
+                                                if (!learningLanguages.includes(lang)) {
+                                                    setLearningLanguages([...learningLanguages, lang])
+                                                } else {
+                                                    const newLearningLanguages = learningLanguages.filter(item => item !== lang)
+                                                    setLearningLanguages(newLearningLanguages)
+                                                    const newLangaugeWithLevel = {
+                                                        ...languageWithLevel
+                                                    }
+                                                    delete newLangaugeWithLevel[lang]
+                                                    setLanguageWithLevel(
+                                                        newLangaugeWithLevel
+                                                    )
+                                                }
+                                            }}
+                                        >{lang}</RadioButton>
+                                    )
+                                }
+                            })}
+                        </div>
+                    </FormItemWrap>
+
+                    <FormItemWrap>
+                        {learningLanguages.map(lang => {
+                            const thisLanguageLevel = languageWithLevel[lang]
+                            if (learningLanguages.includes(lang)) {
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                        <LabelText>{lang}</LabelText>
+                                        <div style={{ flex: 1 }} />
+                                        <StyledSelect style={{ width: 'calc(80% - 12px)' }}
+                                            value={thisLanguageLevel} onChange={(e) => {
+                                                const newLangaugeWithLevel = {
+                                                    ...languageWithLevel, [lang]: e.target.value
+                                                }
+                                                setLanguageWithLevel(newLangaugeWithLevel)
+                                            }}>
+                                            <option disabled selected>Proficiency Level</option>
+                                            {[1, 2, 3, 4, 5, 6].map(level => {
+                                                return (
+                                                    <option>{level}</option>
+                                                )
+                                            })}
+                                        </StyledSelect>
+                                    </div>
+                                )
+                            }
+                        })}
+                    </FormItemWrap>
+
+                    <FormItemWrap>
+                        <LabelText>Choose Your Interests <span>(up to 5 interests)</span></LabelText>
+                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                            {interests.map(item => {
+                                return (
+                                    <RadioButton $cliked={selectedInterests.includes(item)}
+                                        onClick={() => {
+                                            if (!selectedInterests.includes(item) && selectedInterests.length < 5) {
+                                                setSelectedInterests([...selectedInterests, item])
+                                            } else {
+                                                const newSelectedInterests = selectedInterests.filter(interest => interest !== item)
+                                                setSelectedInterests(newSelectedInterests)
+                                            }
+                                        }}
+                                    >{item}</RadioButton>
+                                )
+                            })}
+                        </div>
+                    </FormItemWrap>
+
+                    <FormItemWrap>
+                        <LabelText>Tell me about your-self!</LabelText>
+                        <StyledTextArea placeholder='Introduce your self'
+                            value={userIntroduce} onChange={(event) => {
+                                setUserIntroduce(event.target.value)
+                            }} />
+                    </FormItemWrap>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <Button onClick={handleSubmit}>submit</Button>
+                    </div>
+
+                </Wrap>
+            }
+        </>
     )
 }
