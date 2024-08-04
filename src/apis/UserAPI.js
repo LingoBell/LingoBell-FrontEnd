@@ -8,8 +8,9 @@ export const AddUserProfile = async (formData) => {
                 'Content-Type': 'application/json',
             }
         }
-        );
+        )
         console.log('Success:', response.data)
+        window.location.reload();
     } catch (error) {
         console.log('Error:', error)
     }

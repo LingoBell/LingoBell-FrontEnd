@@ -4,6 +4,7 @@ import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
 import { AddUserProfile } from '../../../apis/UserAPI'
+import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const options = nations.map(nation => ({
@@ -119,7 +120,7 @@ const HintBox = styled.div`
     
 `
 export default props => {
-    const [selectedInterests, setSelectedInterests] = useState([])
+    const [selectedInterests, setSelectedInterests] = useState({})
     const [nation, setNation] = useState('')
     const [gender, setGender] = useState(null)
     const [name, setName] = useState('')
@@ -128,6 +129,8 @@ export default props => {
     const [languageWithLevel, setLanguageWithLevel] = useState({})
     const [userIntroduce, setUserIntroduce] = useState('')
     const [hintModal, setHintModal] = useState(false)
+    const [birthday, setBirthday] = useState('')
+    const [nativeLanguageCode, setNativeLanguageCode] = useState('')
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
@@ -136,9 +139,17 @@ export default props => {
     })
 
 
+    const navigate = useNavigate()
     const handleChange = (nation) => {
         setNation(nation)
     }
+
+    const handleLevelChange = (lang, level) => {
+        setLanguageWithLevel({
+          ...languageWithLevel,
+          [lang]: { ...languageWithLevel[lang], level: parseInt(level,10) } // e.target.value로 저장한 level값은 항상 string으로 만들어줌으로, parseInt()를 통해 변환
+        });
+      };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -152,17 +163,26 @@ export default props => {
             languageWithLevel,
             userIntroduce,
             nation,
+            birthday,
+            nativeLanguageCode
         }
 
-        if (selectedInterests.length === 0 ||
-            !gender || name === '' || mainLanguage === '' ||
-            learningLanguages.length === 0 || Object.keys(languageWithLevel).length === 0
-            || nation === ''
+        if (Object.keys(selectedInterests).length === 0 ||
+            !gender || name === '' || mainLanguage.language === '' ||
+            Object.keys(learningLanguages).length === 0 || Object.keys(languageWithLevel).length === 0
+            || nation === '' || birthday === ''
         ) {
             alert("All fields required")
             return false
         } else {
+            console.log(formData)
             AddUserProfile(formData)
+            .then(() => {
+                window.location.reload(); // 성공 시 페이지 새로고침
+            })
+            .catch(error => {
+                console.error("Error submitting form:", error);
+            });
         }
     }
     return (
@@ -346,11 +366,13 @@ export default props => {
                                 style={{ paddingBottom: '11px' }}
                                 onChange={(e) => {
                                     setMainLanguage(e.target.value)
+                            const langCode = languages.find(lang => lang.language == e.target.value)?.langCode || '';
+                            setNativeLanguageCode(langCode)
                                 }}>
                                 <option disabled value=''>Select Your Main Language</option>
                                 {languages.map(lang => {
                                     return (
-                                        <option>{lang}</option>
+                                        <option value={lang.language}>{lang.language}</option>
                                     )
                                 })}
                                 {/* value = '' 는 기본값을 맞추기 위해서, disabled된 경우 첫번째 option 이 선택되어있지 않게 됨 */}
@@ -369,115 +391,127 @@ export default props => {
                         </FormItemWrap>
                     </div>
 
-                    <FormItemWrap style={{ flexDirection: 'row' }}>
-                        <LabelText>Gender</LabelText>
-                        <div style={{ flex: 1 }} />
-                        <CheckboxButton $cliked={gender == 1} onClick={() => {
-                            setGender(1)
-                        }}>Female</CheckboxButton>
-                        <CheckboxButton $cliked={gender == 2} onClick={() => {
-                            setGender(2)
-                        }}>Male</CheckboxButton>
-                        {/* 여자는 1 남자는 2 */}
 
-                    </FormItemWrap>
+            <FormItemWrap style={{ flexDirection: 'row' }}>
+                <LabelText>Gender</LabelText>
+                <div style={{ flex: 1 }} />
+                <CheckboxButton $cliked={gender == "Female"} onClick={() => {
+                    setGender("Female")
+                }}>Female</CheckboxButton>
+                <CheckboxButton $cliked={gender == "Male"} onClick={() => {
+                    setGender("Male")
+                }}>Male</CheckboxButton>
+            </FormItemWrap>
+
+            <FormItemWrap>
+                <LabelText>Enter your birthday</LabelText>
+                <Input
+                    type='date'
+                    value={birthday}
+                    onChange={(e)=> {
+                        setBirthday(e.target.value)
+                    }}
+                    />
+            </FormItemWrap>
 
 
-                    <FormItemWrap>
-                        <div style={{ display: 'flex' }}>
-                            <LabelText>Learning Language</LabelText>
-                            <HintButton onClick={() => {
-                                setHintModal(!hintModal)
-                            }}>?</HintButton>
-                        </div>
-                        {
-                            hintModal && (
-                                <HintBox>
-                                    <p>The numbers represent the user's language proficiency level.</p>
-                                    <p>1 - Beginner</p>
-                                    <p>2 - Elementary</p>
-                                    <p>3 - Intermediate</p>
-                                    <p>4 - Upper-Intermediate</p>
-                                    <p>5 - Advanced</p>
-                                    <p>6 - Proficient</p>
-
-                                </HintBox>
+            <FormItemWrap>
+                <div style={{ display: 'flex' }}>
+                    <LabelText>Learning Language</LabelText>
+                    <HintButton onClick={() => {
+                        setHintModal(!hintModal)
+                    }}>?</HintButton>
+                </div>
+                {
+                    hintModal && (
+                        <HintBox>
+                            <p>The numbers represent the user's language proficiency level.</p>
+                            <p>1 - Beginner</p>
+                            <p>2 - Elementary</p>
+                            <p>3 - Intermediate</p>
+                            <p>4 - Upper-Intermediate</p>
+                            <p>5 - Advanced</p>
+                            <p>6 - Proficient</p>
+                        </HintBox>
+                    )
+                }
+                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    {languages.map(lang => {
+                        if (!mainLanguage.includes(lang.language)) {
+                            return (
+                                <RadioButton
+                                    $cliked={learningLanguages.includes(lang.language)}
+                                    onClick={() => {
+                                        if (!learningLanguages.includes(lang.language)) {
+                                            setLearningLanguages([...learningLanguages, lang.language]);
+                                            setLanguageWithLevel({
+                                                ...languageWithLevel,
+                                                [lang.language] : {langId : lang.langId,
+                                                                    language : lang.language,
+                                                                    level : null }
+                                            })
+                                        } else {
+                                            const newLearningLanguages = learningLanguages.filter(item => item !== lang.language)
+                                            setLearningLanguages(newLearningLanguages)
+                                            const newLangaugeWithLevel = {
+                                                ...languageWithLevel
+                                            }
+                                            delete newLangaugeWithLevel[lang.language]
+                                            setLanguageWithLevel(
+                                                newLangaugeWithLevel
+                                            )
+                                        }
+                                    }}
+                                >{lang.language}</RadioButton>
                             )
                         }
-                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                            {languages.map(lang => {
-                                if (!mainLanguage.includes(lang)) {
-                                    return (
-                                        <RadioButton $cliked={learningLanguages.includes(lang)}
-                                            onClick={() => {
-                                                if (!learningLanguages.includes(lang)) {
-                                                    setLearningLanguages([...learningLanguages, lang])
-                                                } else {
-                                                    const newLearningLanguages = learningLanguages.filter(item => item !== lang)
-                                                    setLearningLanguages(newLearningLanguages)
-                                                    const newLangaugeWithLevel = {
-                                                        ...languageWithLevel
-                                                    }
-                                                    delete newLangaugeWithLevel[lang]
-                                                    setLanguageWithLevel(
-                                                        newLangaugeWithLevel
-                                                    )
-                                                }
-                                            }}
-                                        >{lang}</RadioButton>
-                                    )
-                                }
-                            })}
-                        </div>
-                    </FormItemWrap>
+                    })}
+                </div>
+            </FormItemWrap>
 
-                    <FormItemWrap>
-                        {learningLanguages.map(lang => {
-                            const thisLanguageLevel = languageWithLevel[lang]
-                            if (learningLanguages.includes(lang)) {
-                                return (
-                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                        <LabelText>{lang}</LabelText>
-                                        <div style={{ flex: 1 }} />
-                                        <StyledSelect style={{ width: 'calc(80% - 12px)' }}
-                                            value={thisLanguageLevel} onChange={(e) => {
-                                                const newLangaugeWithLevel = {
-                                                    ...languageWithLevel, [lang]: e.target.value
-                                                }
-                                                setLanguageWithLevel(newLangaugeWithLevel)
-                                            }}>
-                                            <option disabled selected>Proficiency Level</option>
-                                            {[1, 2, 3, 4, 5, 6].map(level => {
-                                                return (
-                                                    <option>{level}</option>
-                                                )
-                                            })}
-                                        </StyledSelect>
-                                    </div>
-                                )
-                            }
-                        })}
-                    </FormItemWrap>
-
-                    <FormItemWrap>
-                        <LabelText>Choose Your Interests <span>(up to 5 interests)</span></LabelText>
-                        <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                            {interests.map(item => {
-                                return (
-                                    <RadioButton $cliked={selectedInterests.includes(item)}
-                                        onClick={() => {
-                                            if (!selectedInterests.includes(item) && selectedInterests.length < 5) {
-                                                setSelectedInterests([...selectedInterests, item])
-                                            } else {
-                                                const newSelectedInterests = selectedInterests.filter(interest => interest !== item)
-                                                setSelectedInterests(newSelectedInterests)
-                                            }
-                                        }}
-                                    >{item}</RadioButton>
-                                )
-                            })}
+            <FormItemWrap>
+                {learningLanguages.map(lang => {
+                    const thisLanguageLevel = languageWithLevel[lang]?.level || '';
+                    return (
+                        <div key={lang} style={{ display: 'flex', flexDirection: 'row' }}>
+                            <LabelText>{lang}</LabelText>
+                            <div style={{ flex: 1 }} />
+                            <StyledSelect style={{ width: 'calc(80% - 12px)' }}                 //e.target.value는 항상 문자열을 반환한다.
+                                value={thisLanguageLevel} onChange={(e) => handleLevelChange(lang, e.target.value)}> 
+                                <option value="" disabled>Proficiency Level</option>
+                                {[1, 2, 3, 4, 5, 6].map(level => (
+                                    <option key={level} value={level}>{level}</option>
+                                ))}
+                            </StyledSelect>
                         </div>
-                    </FormItemWrap>
+                    )
+
+                })}
+            </FormItemWrap>
+
+            <FormItemWrap>
+                <LabelText>Choose Your Interests <span>(up to 5 interests)</span></LabelText>
+                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                    {interests.map(item => {
+                        return (
+                            <RadioButton $cliked={selectedInterests.hasOwnProperty(item.interestName)} // Object의 경우 includes() 대신 hasOwnProperty()사용
+                                onClick={() => {
+                                    if (!selectedInterests.hasOwnProperty(item.interestName) && Object.keys(selectedInterests).length < 5) {
+                                        setSelectedInterests({...selectedInterests,
+                                            [item.interestName] : {interestId : item.interestId,
+                                                                    interestName : item.interestName
+                                            }})
+                                    } else {
+                                        const newSelectedInterests = {...selectedInterests} //object의 경우 filter()를 사용할 수 없음
+                                        delete newSelectedInterests[item.interestName] //filter()대신 객체의 키값을 delete
+                                        setSelectedInterests(newSelectedInterests)
+                                    }
+                                }}
+                            >{item.interestName}</RadioButton>
+                        )
+                    })}
+                </div>
+            </FormItemWrap>
 
                     <FormItemWrap>
                         <LabelText>Tell me about your-self!</LabelText>

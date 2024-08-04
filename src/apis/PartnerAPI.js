@@ -2,7 +2,6 @@ import axios from "axios";
 
 export const GetPartnerList = async () => {
     const url = `/partners`;
-
     try {
         const response = await axios.get(url);
         console.log('get user list', response.data);
@@ -13,8 +12,8 @@ export const GetPartnerList = async () => {
     }
 };
 
-export const GetRequestPartnerList = async (userId) => {
-    const url = `/partners/${userId}`;
+export const GetRequestPartnerList = async (userCode) => {
+    const url = `/partners/${userCode}`;
 
     try {
         const response = await axios.get(url);
