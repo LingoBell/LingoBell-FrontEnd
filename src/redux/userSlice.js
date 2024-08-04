@@ -73,6 +73,7 @@ const userSlice = createSlice({
             console.log(action)
             const firstLoginResult = action.payload.result
             console.log('fisrstLoginResult : ',firstLoginResult)
+            console.log('유저슬라이스값 : ', firstLoginResult)
             state.isFirstLogin = firstLoginResult.result
         },
         // 유저 로그아웃

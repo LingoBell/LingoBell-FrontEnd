@@ -10,7 +10,7 @@ export const AddUserProfile = async (formData) => {
         }
         )
         console.log('Success:', response.data)
-        window.location.reload();
+        // window.location.reload();
     } catch (error) {
         console.log('Error:', error)
     }
