@@ -168,13 +168,13 @@ export default props => {
             return false
         } else {
             console.log(formData)
-            // AddUserProfile(formData)
-            // .then(() => {
-            //     window.location.reload(); // 성공 시 페이지 새로고침
-            // })
-            // .catch(error => {
-            //     console.error("Error submitting form:", error);
-            // });
+            AddUserProfile(formData)
+            .then(() => {
+                window.location.reload(); // 성공 시 페이지 새로고침
+            })
+            .catch(error => {
+                console.error("Error submitting form:", error);
+            });
         }
     }
     return (
