@@ -207,7 +207,7 @@ function LiveChat() {
                     <StyledChatForm data={messages.map((msg, index) => ({
                         ...msg,
                         translatedMessage: showTranslation ? msg.translatedMessage : ''
-                    }))} />       
+                    }))} />
                 </UserChatWrap>
             </LiveChatWrap>
         </StyledCenteredLayout>
