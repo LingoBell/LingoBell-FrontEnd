@@ -26,3 +26,30 @@ export const UpdateChatRoomStatus = async (chat_room_id) => {
         throw error;
     }
 };
+
+export const CreateRecommendations = async (chat_room_id) => {
+    try{
+        const response = await axios.post(
+            `/chats/${chat_room_id}/recommendations`, chat_room_id);
+        return response.data
+        
+    }catch(error) {
+        console.error('create recommendation error:', error)
+        throw error;
+    }
+    
+}
+
+export const GetRecommendations = async(chat_room_id) => {
+    try{
+        const response = await axios.get(
+            `/chats/${chat_room_id}/recommendations`, chat_room_id);
+        console.log(response.data)
+        console.log(response.data)
+        return response.data
+
+    } catch(error) {
+        console.error('get recommendation error:', error)
+        throw error;
+    }
+}

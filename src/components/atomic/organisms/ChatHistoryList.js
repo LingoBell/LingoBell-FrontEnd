@@ -56,7 +56,10 @@ export default props => {
     const fetchProfiles = async() => {
       try{
         const profile = await GetUserProfile(user.uid)
-        setMyProfile(profile)
+        const newProfile = ({
+          ...profile, age : calculateAge(profile.birthDate)
+        })
+        setMyProfile(newProfile)
       } catch(error) {
         console.log('내 프로필 불러오기 실패:', error)
       }
@@ -89,6 +92,7 @@ export default props => {
         age={age}
         userName={userName}
         />
+        {/* 채팅히스토리데이터 */}
         {
           PROFILE_DATA.map((profile, index) => {
             const {
