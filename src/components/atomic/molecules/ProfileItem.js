@@ -35,7 +35,7 @@ const FlagContainer = styled.div`
   overflow : hidden;
 `
 const RoundFlag = styled(Flag)`
-  width : auto%;
+  width : auto;
   height : auto;
   min-height : 100%;
 `
@@ -47,8 +47,8 @@ const Wrap = styled.div`
   
 `
 const UserName = styled(Title)`
-  font-weight : bold;
-  font-size : 24px;
+  font-weight : 550;
+  font-size : 22px;
   .small & {
     font-size: 16px;
   }
