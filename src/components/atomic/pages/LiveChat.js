@@ -195,7 +195,7 @@ function LiveChat() {
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
                         <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
-                        {/* <임시 테스트용> 아래 토글버튼 디벨롭 예정 / 이진우 */}
+
                         <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
