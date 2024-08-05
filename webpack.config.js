@@ -35,6 +35,7 @@ module.exports = {
     }),
   ],
   devServer: {
+    host: '0.0.0.0',
     static: [
       path.join(__dirname, 'dist'),
       path.join(__dirname, 'public')
@@ -46,12 +47,18 @@ module.exports = {
       overlay: false,
       
     },
+    allowedHosts: ['.ngrok-free.app', 'localhost'],
     proxy: [{
       context: ['/api'],
       target: 'http://localhost:8000/',
       secure: false,
       changeOrigin: true,
       // pathRewrite: { '^/api': '' },
-    }]
+    }, {
+      context: ['/socket.io'],
+      target: 'http://localhost:8080',
+      ws:true
+    }
+    ]
   },
 };
