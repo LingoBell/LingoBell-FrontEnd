@@ -26,3 +26,16 @@ export const GetUserProfile = async (uid) => {
     }
 }
 
+export const UpdateUserProfile = async (uid, formData) => {
+    try {
+        const response = await axios.put(`/users/${uid}`, formData, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log('Error:', error)
+    }
+}
+
