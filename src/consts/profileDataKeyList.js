@@ -1,8 +1,47 @@
-export const languages = ['English', 'Spanish', 'French', 'German', 'Korean', 'Japanese', 'Chinese']
-export const interests = ['Traveling', 'Reading', 'Cooking', 'Hiking', 'Photography', 'Music', 'Movies', 'Fitness', 'Technology',
-    'Gaming', 'Art', 'Dancing', 'Writing', 'Learning Languages', 'Cycling', 'Yoga', 'Meditation', 'Gardening', 'Fishing', 'Crafting', 'Volunteering', 'Sports',
-    'Fashion', 'Food Tasting', 'History', 'Astronomy', 'Blogging', 'Podcasts', 'Theater',
-    'DIY Projects']
+export const languages = [
+  { langId: 1, language: 'English', langCode: 'en' },
+  { langId: 2, language: 'Spanish', langCode: 'es' },
+  { langId: 3, language: 'French', langCode: 'fr' },
+  { langId: 4, language: 'German', langCode: 'de' },
+  { langId: 5, language: 'Korean', langCode: 'ko' },
+  { langId: 6, language: 'Japanese', langCode: 'ja' },
+  { langId: 7, language: 'Chinese', langCode: 'zh' }
+];
+  
+export const interests = [
+    { interestId: 1, interestName: 'Traveling' },
+    { interestId: 2, interestName: 'Reading' },
+    { interestId: 3, interestName: 'Cooking' },
+    { interestId: 4, interestName: 'Hiking' },
+    { interestId: 5, interestName: 'Photography' },
+    { interestId: 6, interestName: 'Music' },
+    { interestId: 7, interestName: 'Movies' },
+    { interestId: 8, interestName: 'Fitness' },
+    { interestId: 9, interestName: 'Technology' },
+    { interestId: 10, interestName: 'Gaming' },
+    { interestId: 11, interestName: 'Art' },
+    { interestId: 12, interestName: 'Dancing' },
+    { interestId: 13, interestName: 'Writing' },
+    { interestId: 14, interestName: 'Learning Languages' },
+    { interestId: 15, interestName: 'Cycling' },
+    { interestId: 16, interestName: 'Yoga' },
+    { interestId: 17, interestName: 'Meditation' },
+    { interestId: 18, interestName: 'Gardening' },
+    { interestId: 19, interestName: 'Fishing' },
+    { interestId: 20, interestName: 'Crafting' },
+    { interestId: 21, interestName: 'Volunteering' },
+    { interestId: 22, interestName: 'Sports' },
+    { interestId: 23, interestName: 'Fashion' },
+    { interestId: 24, interestName: 'Food Tasting' },
+    { interestId: 25, interestName: 'History' },
+    { interestId: 26, interestName: 'Astronomy' },
+    { interestId: 27, interestName: 'Blogging' },
+    { interestId: 28, interestName: 'Podcasts' },
+    { interestId: 29, interestName: 'Theater' },
+    { interestId: 30, interestName: 'DIY Projects' }
+  ]
+
+  
 export const nations = [
     { name: "Afghanistan", code: "AF" },
     { name: "Albania", code: "AL" },

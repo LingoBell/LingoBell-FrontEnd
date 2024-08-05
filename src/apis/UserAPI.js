@@ -8,10 +8,21 @@ export const AddUserProfile = async (formData) => {
                 'Content-Type': 'application/json',
             }
         }
-        );
+        )
         console.log('Success:', response.data)
+        window.location.reload();
     } catch (error) {
         console.log('Error:', error)
+    }
+}
+
+export const GetUserProfile = async (uid) => {
+    try {
+        const response = await axios.get(`/users/${uid}`)
+        console.log("Successfully get user profile", response);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching GetUserProfile: ${error}`);
     }
 }
 

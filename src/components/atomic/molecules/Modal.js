@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import Button from '../atoms/Button';
 import ProfileItem from './ProfileItem';
+import { interests } from '../../../consts/profileDataKeyList';
 
 const Background = styled.div`
     background-color: rgba(0,0,0,0.4);
@@ -13,6 +14,7 @@ const Background = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index : 2;
 `
 
 const ModalBox = styled.div`
@@ -27,8 +29,8 @@ const ModalBox = styled.div`
 const ModalProfileItem = styled(ProfileItem)`
   padding : 12px 12px;
   margin : 12px 12px;
-  width: 400px;
-`
+  max-width : 500px;
+  `
 
 const ButtonWrap = styled.footer`
     display: flex;
@@ -48,13 +50,11 @@ export default props => {
         onClickButton,
     } = props;
 
-    // console.log('모달에서 확인', selectedProfile.userCode);
-    // console.log('모달에서 확인', selectedProfile.userName);
     return (
         isOpened && (
             <Background onClick={onClickCloseBtn}>
                 <ModalBox onClick={e => e.stopPropagation()} >
-                    <button style={{width: 60, height: 60, position: 'absolute', top: 0, right: 0}}>
+                    <button style={{width: 60, height: 50, position: 'absolute', top: 0, right: 0}}>
                         <span
                             className='material-icons'
                             onClick={onClickCloseBtn}
@@ -66,12 +66,16 @@ export default props => {
                     {props.children}
                     <div>
                         <ModalProfileItem
-                            title={selectedProfile.userName}
-                            // src={selectedProfile.image}
-                            // tags={selectedProfile.language}
-                            // content={selectedProfile.selfIntroduction}
-                            userCode={selectedProfile.userCode}
+                            userName={selectedProfile.userName}
+                            profileImages={selectedProfile.profileImages}
+                            gender = {selectedProfile.gender}
+                            age = {selectedProfile.age}
+                            interests = {selectedProfile.interests}
+                            learningLanguages = {selectedProfile.learningLanguages}
+                            nation = {selectedProfile.nation}
+                            nativeLanguage = {selectedProfile.nativeLanguage}
                             content={selectedProfile.description}
+                            hideContent = {true}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>

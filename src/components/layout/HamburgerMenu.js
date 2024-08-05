@@ -3,7 +3,9 @@ import styled from 'styled-components'
 import Button from '../atomic/atoms/Button'
 import { MENUS } from './Header'
 import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { signOutAll } from '../../redux/userSlice'
 const HamburgerButtonWrap = styled.div`
   @media screen and (min-width: 1024px) {
     display: none;
@@ -68,13 +70,19 @@ const Background = styled.div`
   background-color: rgba(0,0,0,0.4);
 `
 export default props => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+  const dispatch = useDispatch();
   const onClose = () => {
     setIsOpen(false)
   }
 
   const onOpen = () => {
     setIsOpen(true)
+  }
+
+  const trySignout = () => {
+    dispatch(signOutAll());
   }
 
   return (
@@ -86,13 +94,22 @@ export default props => {
           <>
             <HamburgerMenuContainer isOpen={isOpen}>
               <HamburgerHeader>
-                <div>메뉴</div>
+                <div>Menu</div>
                 <button style={{width: 60, height: 60}} onClick={onClose}>
                   <span className='material-icons'>close</span>
                 </button>
               </HamburgerHeader>
               {
                 MENUS.map(menu => {
+                    if(menu.title === 'Logout') {
+                      return(
+                        <HamburgerMenu
+                          key={menu.title}
+                          onClick={trySignout}>
+                          {menu.title}
+                        </HamburgerMenu>
+                      )
+                    }
                   console.log('selected : ', menu.link === location.pathname)
                   return (
                     <HamburgerMenu

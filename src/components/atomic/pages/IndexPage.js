@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { auth, googleProvider } from '../../../firebase/firebase';
 import { onAuthStateChanged, signInWithPopup } from 'firebase/auth';
 import { clearUser, setUser, signInWithGoogle } from '../../../redux/userSlice';
+import { PRIMARY_COLOR } from '../../../consts/color';
 
 
 
@@ -74,10 +75,21 @@ const ButtonWrap = styled.div`
 const StyledButton = styled(Button)`
   height: 40px;
   width: 100%;
-  font-size: 14px;
-  margin-bottom: 12px;
+  font-size: 16px;
+  border : 1px solid ${PRIMARY_COLOR};
+`
+const StyledLogin = styled.div`
+  color : ${PRIMARY_COLOR};
+  font-weight : 500;
 
 `
+const GoogleWrap = styled.div`
+  display : flex;
+  justify-content : center;
+  align-items : center;
+  position : relative;
+  bottom : 7px;
+  `
 // export default props => {
 //   return (
 //     <Container>
@@ -95,14 +107,14 @@ const StyledButton = styled(Button)`
 //           <StyledButton>회원 가입</StyledButton>
 //         </ButtonWrap>
 //       </ContentFullWrap>
-      
+
 //     </Container>
 //   )
 // }
 
 const IndexPage = (props) => {
   const dispatch = useDispatch()
-  const user = useSelector((state)=> {
+  const user = useSelector((state) => {
     console.log('state : ')
     console.log(state)
     return state.user?.user
@@ -137,9 +149,13 @@ const IndexPage = (props) => {
           <StyledParagraph>Your AI assistant for language exchange</StyledParagraph>
         </ContentWrap>
         <ButtonWrap>
-          <StyledButton $type='bordered' onClick={trySigninWithGoogle}>구글 계정으로 로그인</StyledButton>
-          <StyledButton $type='black'>이메일로 로그인하기</StyledButton>
-          <StyledButton>회원 가입</StyledButton>
+          <StyledButton $type='bordered' onClick={trySigninWithGoogle}>
+            <GoogleWrap>
+              <img width='30px' src='/googleLogo.png'
+              style={{paddingRight : '6px'}} />
+              <StyledLogin>Sign in with Google</StyledLogin>
+            </GoogleWrap>
+          </StyledButton>
         </ButtonWrap>
       </ContentFullWrap>
     </Container>

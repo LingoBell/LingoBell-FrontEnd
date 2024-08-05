@@ -23,7 +23,13 @@ export const signInWithGoogle = createAsyncThunk(
             })
         if (verificationResult.status == 200) {
             console.log('hihi',verificationResult.data)
-            thunkAPI.dispatch(setUser(result.user))
+            // thunkAPI.dispatch(setUser(result.user))
+            const user = {
+                uid: result.user.uid,
+                accessToken: result.user.accessToken
+            };
+            thunkAPI.dispatch(setUser(user));
+
         }
         
         thunkAPI.dispatch(setProcessFinished())
@@ -33,12 +39,8 @@ export const signInWithGoogle = createAsyncThunk(
 export const checkFirstLogin = createAsyncThunk(
     'user/checkFirstLogin',
     async (_, thunkAPI) => {
-        // 로그인 요청
-
-        // 해당 api 만들어야함
         const response = await axios.get('/users/check')
         const result = response.data
-        
         thunkAPI.dispatch(setFirstLogin({ result }))
     }
 )

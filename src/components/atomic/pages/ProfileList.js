@@ -75,19 +75,42 @@ export default props => {
   const [chatRequests, setChatRequests] = useState([]);
 
   const user = useSelector((state) => state.user.user);
-  console.log('user의 uid : ', user.uid);
+
+  const calculateAge = (birthday) => {
+    if (!birthday) {
+      return 20;
+    }
+
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
 
   useEffect(() => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
         const userList = await GetPartnerList();
-        setProfiles(userList);
+        const newUserList = userList.map(profile =>({
+          ...profile, age: calculateAge(profile.birthday)
+        }))
+        setProfiles(newUserList);
+        console.log('profile-info', profiles)
 
       } catch (error) {
         console.log('유저 리스트 불러오기 실패 : ', error);
       }
     };
+
+    // const fetchUserLearningLanguages = async () => {
+    //   try 
+    // }
 
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {
@@ -175,6 +198,7 @@ export default props => {
     }
   }
 
+
   return (
     <CenteredMainLayout>
       <PartnersTab>
@@ -186,7 +210,7 @@ export default props => {
           <Modal
             isOpened={isOpened}
             onClickCloseBtn={() => handleCloseModal()}
-            bttnTxt="대화 요청"
+            bttnTxt="Request Language Exchange"
             selectedProfile={selectedProfile}
             onClickButton={() => onClickRequestModalButton(selectedProfile.userId)}
           // userId={user.uid}
@@ -195,23 +219,31 @@ export default props => {
         )}
         {activeTab === 'find' &&
           profiles?.map((profile, index) => {
-            // const {
-            //   name: userName,
-            //   // image: src,
-            //   // language: tags,
-            //   selfIntroduction: description,
-            // } = profile
-            const { userCode, userName, selfIntroduction } = profile;
+
+            const { description,
+              gender,
+              interests,
+              learningLanguages,
+              nation,
+              nativeLanguage,
+              userName,
+              profileImages,
+              age,
+            } = profile;
 
             return (
               <StyledProfileItem
                 key={index}
-                title={userName}
-                // src={src}
-                // tags={tags}
-                content={selfIntroduction}
-                userCode={userCode}
-
+                userName={userName}
+                nativeLanguage={nativeLanguage}
+                content={description}
+                gender={gender}
+                interests={interests}
+                learningLanguages={learningLanguages}
+                nation={nation}
+                profileImages={profileImages}
+                hideContent={false}
+                age={age}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })
@@ -220,7 +252,7 @@ export default props => {
           <Modal
             isOpened={isOpened}
             onClickCloseBtn={() => handleCloseModal()}
-            bttnTxt="채팅방 입장"
+            bttnTxt="Enter Chat Room"
             selectedProfile={selectedChatRoom}
             onClickButton={() => onClickResponseModalButton(selectedChatRoom.chatRoomId)}
           />

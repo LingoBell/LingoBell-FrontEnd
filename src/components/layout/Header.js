@@ -9,6 +9,7 @@ import HamburgerMenu from './HamburgerMenu'
 import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
 
 const HeaderContainer = styled.header`
+  z-index : 10;
   position: fixed;
   top: 0;
   left: 0;
@@ -64,7 +65,7 @@ const Wrap = styled.div`
 
 export const MENUS = [
   { title: "Home", link: '/' },
-  { title: "Profile", link: '/' },
+  { title: "Profile", link: '/profile' },
   { title: "Partner", link: '/partners' },
   { title: "History", link: '/chat-history' },
   { title: "Logout", link: '/' },
@@ -103,7 +104,7 @@ export default props => {
                     if(isFirstLogin == 3 && menu.title != 'Logout') {
                       return null
                     }
-                    
+                     
                     if (menu.title == 'Logout') {
                       return (
                         <MenuTab
