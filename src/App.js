@@ -81,7 +81,7 @@ export default () => {
     )
   }
   const renderRoutes = () => {
-    console.log('test',isFirstLogin)
+    console.log('앱FirstLogin값 : ',isFirstLogin)
     if (isFirstLogin == 3) {
       return (
         <Route path='*' element={<ProfilePage/>}/>
@@ -107,6 +107,7 @@ export default () => {
       </>
     )
     }
+    return null; //비정상적으로 isFirstLogin()값이 업데이트 안될 경우 처리하기 위함
 }
   
 
