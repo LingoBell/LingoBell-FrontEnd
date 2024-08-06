@@ -18,17 +18,22 @@ export const AddUserProfile = async (formData) => {
 
 export const GetUserProfile = async (uid) => {
     try {
-        const response = await axios.get(`/users/${uid}`)
-        console.log("Successfully get user profile", response.data);
+        const response = await axios.get(`/users/${uid}}`)
+        console.log("Successfully get user profile", response);
         return response.data;
     } catch (error) {
         console.error(`Error fetching GetUserProfile: ${error}`);
     }
 }
 
-export const UpdateUserProfile = async (uid, formData) => {
+export const getMyProfile = async () => {
+    return axios.get('/users')
+        .then(res => res.data)
+}
+
+export const UpdateUserProfile = async (formData) => {
     try {
-        const response = await axios.put(`/users/${uid}`, formData, {
+        const response = await axios.put(`/users/my-profile`, formData, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -38,4 +43,3 @@ export const UpdateUserProfile = async (uid, formData) => {
         console.log('Error:', error)
     }
 }
-

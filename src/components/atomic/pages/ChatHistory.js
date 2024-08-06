@@ -52,10 +52,15 @@ export default props => {
   const [chatHistoryList, setChatHistoryList] = useState([])
 
   const fetchChatHistory = async () => {
-    const result = await getChatRooms()
-    console.log('result?')
-    console.log(result)
-    setChatHistoryList(result)
+    try {
+      const result = await getChatRooms()
+      
+      console.log('result?')
+      console.log(result)
+      setChatHistoryList(result)
+    } catch (e) {
+      console.log(e)
+    }
 
   }
 

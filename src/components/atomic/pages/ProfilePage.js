@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
-import { AddUserProfile, GetUserProfile, UpdateUserProfile } from '../../../apis/UserAPI'
+import { AddUserProfile, getMyProfile, UpdateUserProfile } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -212,7 +212,7 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            UpdateUserProfile(user.uid, formData)
+            UpdateUserProfile(formData)
                 .then(() => {
                     navigate('/')
                 })
@@ -224,7 +224,7 @@ export default props => {
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const userProfile = await GetUserProfile(user.uid);
+            const userProfile = await getMyProfile();
             if (userProfile) {
                 setName(userProfile.userName);
                 setMainLanguage(userProfile.nativeLanguage);
