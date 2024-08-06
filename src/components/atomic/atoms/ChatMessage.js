@@ -24,6 +24,11 @@ const CHAT_MESSAGE_STYLE = {
         background-color: ${AI_MESSAGE};
         color: black;
         padding-bottom: 20px;
+    `,
+    'quiz':`
+        background-color: ${AI_MESSAGE};
+        color: black;
+        padding-bottom: 20px;
     `
 }
 export const ChatMessage = styled.div`
@@ -47,6 +52,8 @@ export const ChatMessage = styled.div`
         } else if (props.type === 'ai') {
             return CHAT_MESSAGE_STYLE['ai']
         
+        } else if(props.type === 'quiz') {
+            return CHAT_MESSAGE_STYLE['quiz']
         } else {
             return null
         }

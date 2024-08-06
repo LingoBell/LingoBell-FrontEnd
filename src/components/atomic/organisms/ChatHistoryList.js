@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import ProfileItem from '../molecules/ProfileItem'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { GetUserProfile } from '../../../apis/UserAPI'
 const ProfileWrap = styled.aside`
   /* max-height: 100%; */
   /* max-height: 100px; */
@@ -32,51 +34,79 @@ export default props => {
   const {
     chatHistoryList
   } = props
-  const firstProfile = PROFILE_DATA[0]
-  const {
-    name: ftitle,
-    image: fsrc,
-    language: ftags,
-    selfIntroduction: fcontent
-  } = firstProfile
+
+  const[myProfile, setMyProfile] = useState({});
+
+  const user = useSelector((state)=>state.user.user);
+
+  const calculateAge = (birthday) => {
+    if (!birthday) {
+      return 20;
+    }
+
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  useEffect(()=>{
+
+    const fetchProfiles = async() => {
+      try{
+        const profile = await GetUserProfile(user.uid)
+        const newProfile = ({
+          ...profile, age : calculateAge(profile.birthday)
+        })
+        setMyProfile(newProfile)
+      } catch(error) {
+        console.log('내 프로필 불러오기 실패:', error)
+      }
+    }
+
+    fetchProfiles();
+  },[user.uid])
+
   const navigate = useNavigate()
   
 
   const onClickProfileItem = (id) => {
     navigate('/chat-history/'+id)
   }
+
+  const { gender,
+          nation,
+          age,
+          userName,
+          userId,
+
+  } = myProfile;
+  console.log('myProfile',myProfile)
   return (
     <ProfileWrap className={props.className}>
-        <MyProfileItem 
-          size='small'
-          title={ftitle}
-          src={fsrc}
-          tags={ftags}
-          content={fcontent}
-          hideContent
-        
+        <MyProfileItem //마이프로필
+        isSmall='small'
+        className = 'small'
+        key={userId}
+        gender={gender}
+        nation={nation}
+        age={age}
+        userName={userName}
         />
+        {/* 채팅히스토리데이터 */}
         {
           chatHistoryList.map((profile, index) => {
-            // const {
-            //   chatRoomId, 
-            //   userName: title,
-            //   profileImages: src,
-            //   language: tags,
-            //   selfIntroduction: content
-            // } = profile
-            // console.log(profile)
+
             return (
               <StyledProfileItem
                 size='small'
                 {...profile}
                 key={index}
-                birthday={profile.birthday}
-                // userName={userName}
-                
-                // tags={tags}
-                // content={content}
-                textEllipsis
                 onClick={() => onClickProfileItem(profile.chatRoomId)}
               />
 

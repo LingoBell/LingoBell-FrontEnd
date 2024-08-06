@@ -51,7 +51,7 @@ export const PROFILE_DATA = [
   {
     id: '1',
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
-    'name': 'Sungwoo Cho',
+    userName: 'Sungwoo Cho',
     'language': ['Language Learner', 'Korean', 'English'],
     'selfIntroduction': 'Update your profile information'
   },
@@ -60,7 +60,7 @@ export const PROFILE_DATA = [
     'image': 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/080/507/961/80507961_1652683146939_14_200x200.JPG/dims/resize/Q_80,0',
     'name': 'Tom',
     'language': ['Language Learner', 'Korean', 'English'],
-    'selfIntroduction': 'Update your profile information'
+    'selfIntroduction': 'pdate your profile information'
   },
   {
     id: '3',

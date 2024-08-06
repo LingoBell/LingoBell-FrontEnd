@@ -4,12 +4,10 @@ import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
 import { useNavigate } from 'react-router-dom'
-import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
 import { CreateChat, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
 import { GetPartnerList, GetRequestPartnerList } from '../../../apis/PartnerAPI'
 
-// const profiles = PROFILE_DATA
 
 const Container = styled.div`
   display: flex;
@@ -101,7 +99,10 @@ export default props => {
     const fetchRequestProfiles = async () => {
       try {
         const requestUserList = await GetRequestPartnerList(user.uid);
-        setChatRequests(requestUserList);
+        const newChatRequest = requestUserList.map(request => ({
+          ...request, age : calculateAge(request.birthday)
+        }))
+        setChatRequests(newChatRequest);
 
       } catch (error) {
         console.log('요청 유저 리스트 불러오기 실패 : ', error);
@@ -244,14 +245,30 @@ export default props => {
         )}
         {activeTab === 'requests' &&
           chatRequests?.map((request, index) => {
-            const { userCode, userName, description } = request;
+            const { description,
+              gender,
+              interests,
+              learningLanguages,
+              nation,
+              nativeLanguage,
+              userName,
+              profileImages,
+              age,
+            } = request
 
             return (
               <StyledProfileItem
-                key={index}
-                title={userName}
-                content={description}
-                userCode={userCode}
+              key={index}
+              userName={userName}
+              nativeLanguage={nativeLanguage}
+              content={description}
+              gender={gender}
+              interests={interests}
+              learningLanguages={learningLanguages}
+              nation={nation}
+              profileImages={profileImages}
+              hideContent={false}
+              age={age}
                 onClick={() => handleOpenResponseModal(request)}
               />
             )

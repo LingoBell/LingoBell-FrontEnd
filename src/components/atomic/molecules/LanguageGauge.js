@@ -42,23 +42,32 @@ const Arrow = styled.span`
 `;
 
 export default props => {
-  const { nativeLanguage, learningLanguages = [] } = props;
+  const { nativeLanguage, learningLanguages  } = props;
+  console.log('Native',nativeLanguage)
+  console.log('Learning, : ', learningLanguages)
 
   const getGaugeWidth = (level) => {
     return (level / 6) * 100 + '%';
   };
-
+  if(!nativeLanguage && !learningLanguages) {
+    return null
+  }
   return (
     <LanguageContainer>
-      <Language style={{marginRight : '0px'}}>
+      {nativeLanguage && (
+        <>
+        <Language style={{marginRight : '0px'}}>
         <LanguageName>{nativeLanguage}</LanguageName>
         <Gauge>
           <GaugeFill style={{ width: '100%', backgroundColor: '#4caf50' }} />
         </Gauge>
       </Language>
       <Arrow>&gt;</Arrow>
+      </>
+      )}
+
       <div style={{display : 'flex', flexWrap : 'wrap'}}>
-      {learningLanguages.map((lang, index) => (
+      {learningLanguages?.map((lang, index) => (
         <Language key={index}>
           <LanguageName>{lang.language}</LanguageName>
           <Gauge>

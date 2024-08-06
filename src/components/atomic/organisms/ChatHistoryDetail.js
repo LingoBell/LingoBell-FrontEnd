@@ -71,27 +71,23 @@ export default props => {
   const secondProfile = PROFILE_DATA[0]
 
   const {
-    name: stitle,
-    image: ssrc,
-    language: stags,
-    selfIntroduction: scontent
+    // userName,
+    // image: ssrc,
+    // language: stags,
+    // selfIntroduction: scontent
   } = secondProfile
+
   return (
     <HistorySection>
           
-      <StyledChatCard className='small'>
+      <StyledChatCard>
         <ProfileItem
           
-          title={stitle}
-          src={ssrc}
-          tags={stags}
-          content={scontent}
-          textEllipsis
-          
-          
-          
-          
-        
+          // userName={userName}
+          // src={ssrc}
+          // tags={stags}
+          // content={scontent}
+          // textEllipsis
         />
       </StyledChatCard>
       <ChatWrap>
