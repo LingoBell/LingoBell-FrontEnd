@@ -87,7 +87,7 @@ export default props => {
       <TopBar>
         <LogoContainer as={Link} to='/'>
           
-          <Logo src='./lingobellLogo.png' />
+          <Logo src = 'https://storage.googleapis.com/lingobellstorage/user_37_lingobellLogo.png'/>
           <LogoName>LingoBell</LogoName>
           
         </LogoContainer>
