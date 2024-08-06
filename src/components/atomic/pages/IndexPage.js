@@ -141,7 +141,7 @@ const IndexPage = (props) => {
   return (
     <Container>
       <ImageWrap>
-        <img width='80%' src='/indexImage.png' alt="Welcome" />
+        <img width='80%' src='https://storage.googleapis.com/lingobellstorage/indexImage.png' alt="Welcome" />
       </ImageWrap>
       <ContentFullWrap>
         <ContentWrap>
@@ -151,7 +151,7 @@ const IndexPage = (props) => {
         <ButtonWrap>
           <StyledButton $type='bordered' onClick={trySigninWithGoogle}>
             <GoogleWrap>
-              <img width='30px' src='/googleLogo.png'
+              <img width='30px' src='https://storage.googleapis.com/lingobellstorage/googleLogo.png'
               style={{paddingRight : '6px'}} />
               <StyledLogin>Sign in with Google</StyledLogin>
             </GoogleWrap>
