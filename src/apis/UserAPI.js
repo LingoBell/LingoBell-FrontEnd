@@ -43,3 +43,25 @@ export const UpdateUserProfile = async (formData) => {
         console.log('Error:', error)
     }
 }
+
+export const uploadImage = async (image) => {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+        const response = await axios.post('/users/image-upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        console.log('dddd', response)
+        return response.data
+
+    } catch (error) {
+        if (error.response) {
+            return { success: false, message: error.response.data.detail || 'Image upload failed!' };
+        } else {
+            return { success: false, message: error.message };
+        }
+    }
+}

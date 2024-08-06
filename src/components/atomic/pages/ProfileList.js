@@ -211,7 +211,7 @@ export default props => {
               nativeLanguage,
               userName,
               profileImages,
-              age,
+              birthday,
             } = profile;
 
             return (
@@ -226,7 +226,7 @@ export default props => {
                 nation={nation}
                 profileImages={profileImages}
                 hideContent={false}
-                age={age}
+                birthday={birthday}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })
@@ -250,7 +250,7 @@ export default props => {
               nativeLanguage,
               userName,
               profileImages,
-              age,
+              birthday,
             } = request
 
             return (
@@ -265,7 +265,7 @@ export default props => {
               nation={nation}
               profileImages={profileImages}
               hideContent={false}
-              age={age}
+              birthday={birthday}
                 onClick={() => handleOpenResponseModal(request)}
               />
             )

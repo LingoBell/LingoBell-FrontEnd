@@ -144,7 +144,8 @@ export default props => {
 
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
-      <ProfileImage src ={props.profileImages}>
+      <ProfileImage src ={props.profileImages ? props.profileImages
+         : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
         <FlagContainer $isSmall={props.isSmall}>
           <RoundFlag code={props.nation}/>
         </FlagContainer>
