@@ -65,6 +65,7 @@ export default props => {
           birthday,
           userName,
           userId,
+          profileImages
 
   } = myProfile;
   console.log('myProfile',myProfile)
@@ -78,6 +79,7 @@ export default props => {
         nation={nation}
         birthday={birthday}
         userName={userName}
+        profileImages={profileImages}
         
         />
         {/* 채팅히스토리데이터 */}
