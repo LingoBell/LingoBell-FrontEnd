@@ -30,7 +30,6 @@ const FlagContainer = styled.div`
   border-radius : 50%;
   display : flex;
   justify-content : center;
-  background-color : red;
   align-items : center;
   overflow : hidden;
 
