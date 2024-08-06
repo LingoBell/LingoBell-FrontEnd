@@ -3,9 +3,7 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components'
 import io from "socket.io-client";
 
-// const socket = io('https://629e-59-10-8-230.ngrok-free.app')
-const socket = io('http://localhost:8080')
-// const socket = io()
+const socket = io('')
 let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ProfileItem from '../molecules/ProfileItem'
 
@@ -8,6 +8,7 @@ import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/
 import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
 import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
+import { getChatRooms } from '../../../apis/ChatAPI'
 
 
 const Container = styled.div`
@@ -48,33 +49,28 @@ export default props => {
     chatId
   } = useParams()
 
-// <<<<<<< Updated upstream
-// =======
-//   const testAxiox = async() => {
-//     try{
-//       const result = await axios.get('http://localhost:8000/test-user-token', {
-//         headers: {
-//           Authorization: window.accessToken
-//         }
-//       })
-//       const userData = result.data
-//       console.log(userData)
-//     }catch(error){
-//       console.error('Error:',error)
-//     }
-//   }
+  const [chatHistoryList, setChatHistoryList] = useState([])
 
-//   useEffect(()=>{
-//     testAxiox()
-//   },[])
+  const fetchChatHistory = async () => {
+    try {
+      const result = await getChatRooms()
+      
+      console.log('result?')
+      console.log(result)
+      setChatHistoryList(result)
+    } catch (e) {
+      console.log(e)
+    }
 
+  }
 
-
-// >>>>>>> Stashed changes
+  useEffect(() => {
+    fetchChatHistory()
+  }, [])
   const isChatDetailOpen = !!chatId
   return (
     <Container>
-      <ChatHistoryList />
+      <ChatHistoryList chatHistoryList={chatHistoryList} />
       <HistorySectionContainer 
         isOpen={isChatDetailOpen}
       >

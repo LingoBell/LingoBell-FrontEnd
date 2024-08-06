@@ -31,7 +31,11 @@ const MyProfileItem = styled(StyledProfileItem)`
   background-color: rgba(0,0,0,0.05);
 `
 export default props => {
-  const[myProfile, setMyProfile] = useState([]);
+  const {
+    chatHistoryList
+  } = props
+
+  const[myProfile, setMyProfile] = useState({});
 
   const user = useSelector((state)=>state.user.user);
 
@@ -96,20 +100,14 @@ export default props => {
         />
         {/* 채팅히스토리데이터 */}
         {
-          PROFILE_DATA.map((profile, index) => {
-            const {
-              image: src,
-              language: tags,
-              selfIntroduction: content
-            } = profile
+          chatHistoryList.map((profile, index) => {
+
             return (
               <StyledProfileItem
                 size='small'
+                {...profile}
                 key={index}
-                src={src}
-                content={content}
-                textEllipsis
-                onClick={() => onClickProfileItem('id-' + (index + 1))}
+                onClick={() => onClickProfileItem(profile.chatRoomId)}
               />
 
             )
