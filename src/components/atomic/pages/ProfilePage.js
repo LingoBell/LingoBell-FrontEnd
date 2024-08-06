@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
-import { AddUserProfile, GetUserProfile } from '../../../apis/UserAPI'
+import { AddUserProfile, GetUserProfile, UpdateUserProfile } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -78,11 +78,13 @@ const RadioButton = styled.div`
         color : white;
     `}
 `
+
 const Title = styled.div`
     font-weight : bold;
     font-size : 32px;
     padding-bottom : 12px;
 `
+
 const StyledTextArea = styled.textarea`
     resize : none;
     padding-top : 12px;
@@ -90,6 +92,7 @@ const StyledTextArea = styled.textarea`
     border : 1.5px solid #eee;
     border-radius : 6px;
 `
+
 const HintButton = styled.div`
     background-color : #eee;
     width : 24px;
@@ -103,6 +106,7 @@ const HintButton = styled.div`
     margin-top : 4px;
     margin-left : 10px;
 `
+
 const HintBox = styled.div`
     border : 1px solid #eee;
     border-radius : 6px;
@@ -116,8 +120,6 @@ const HintBox = styled.div`
     p {
         margin-left : 12px;
     }
-    
-    
 `
 export default props => {
     const [selectedInterests, setSelectedInterests] = useState({})
@@ -137,12 +139,11 @@ export default props => {
             isFirstLogin: state?.user.isFirstLogin
         }
     })
-    console.log("user info", user);
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const handleChange = (nation) => {
         setNation(nation)
-    }
+    };
 
     const handleLevelChange = (lang, level) => {
         setLanguageWithLevel({
@@ -178,7 +179,7 @@ export default props => {
             console.log(formData)
             AddUserProfile(formData)
                 .then(() => {
-                    window.location.reload(); // 성공 시 페이지 새로고침
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
@@ -186,22 +187,69 @@ export default props => {
         }
     }
 
-    // GetUserProfile();
+    const handleEditSubmit = (e) => {
+        e.preventDefault();
+
+        const formData = {
+            selectedInterests,
+            gender,
+            name,
+            mainLanguage,
+            learningLanguages,
+            languageWithLevel,
+            userIntroduce,
+            nation,
+            birthday,
+            nativeLanguageCode
+        };
+
+        if (Object.keys(selectedInterests).length === 0 ||
+            !gender || name === '' || mainLanguage === '' ||
+            learningLanguages.length === 0 || Object.keys(languageWithLevel).length === 0
+            || nation === '' || birthday === ''
+        ) {
+            alert("All fields required")
+            return false
+        } else {
+            UpdateUserProfile(user.uid, formData)
+                .then(() => {
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error("Error submitting form:", error);
+                });
+        };
+    };
+
     useEffect(() => {
         const fetchUserProfile = async () => {
             const userProfile = await GetUserProfile(user.uid);
             if (userProfile) {
                 setName(userProfile.userName);
                 setMainLanguage(userProfile.nativeLanguage);
-                setNation(userProfile.nation);
+                const nationOption = options.find(option => option.value === userProfile.nation);
+                setNation(nationOption);
                 setGender(userProfile.gender);
                 setBirthday(userProfile.birthday);
                 setUserIntroduce(userProfile.description);
                 setNativeLanguageCode(userProfile.nativeLanguageCode);
+                setSelectedInterests(userProfile.interests.reduce((acc, interestId) => {
+                    const interest = interests.find(i => i.interestId === interestId);
+                    if (interest) {
+                        acc[interest.interestName] = interest;
+                    }
+                    return acc;
+                }, {}));
+                setLearningLanguages(userProfile.learningLanguages.map(lang => lang.language));
+                setLanguageWithLevel(userProfile.learningLanguages.reduce((acc, lang) => {
+                    acc[lang.language] = { langId: lang.langId, language: lang.language, level: lang.langLevel };
+                    return acc;
+                }, {}));
             }
         };
         fetchUserProfile();
     }, [user.uid]);
+
     return (
         <>
             {isFirstLogin === 2 ?
@@ -230,14 +278,12 @@ export default props => {
                                         <option value={lang.language}>{lang.language}</option>
                                     )
                                 })}
-                                {/* value = '' 는 기본값을 맞추기 위해서, disabled된 경우 첫번째 option 이 선택되어있지 않게 됨 */}
-
                             </StyledSelect>
                         </FormItemWrap>
                         <div style={{ flex: 1 }} />
                         <FormItemWrap style={{ width: '49%' }}>
                             <LabelText>Nation</LabelText>
-                            <Select         //react-select
+                            <Select
                                 value={nation}
                                 onChange={handleChange}
                                 options={options}
@@ -245,7 +291,6 @@ export default props => {
                                 isClearable />
                         </FormItemWrap>
                     </div>
-
 
                     <FormItemWrap style={{ flexDirection: 'row' }}>
                         <LabelText>Gender</LabelText>
@@ -268,7 +313,6 @@ export default props => {
                             }}
                         />
                     </FormItemWrap>
-
 
                     <FormItemWrap>
                         <div style={{ display: 'flex' }}>
@@ -319,7 +363,9 @@ export default props => {
                                                     )
                                                 }
                                             }}
-                                        >{lang.language}</RadioButton>
+                                        >
+                                            {lang.language}
+                                        </RadioButton>
                                     )
                                 }
                             })}
@@ -329,6 +375,7 @@ export default props => {
                     <FormItemWrap>
                         {learningLanguages.map(lang => {
                             const thisLanguageLevel = languageWithLevel[lang]?.level || '';
+
                             return (
                                 <div key={lang} style={{ display: 'flex', flexDirection: 'row' }}>
                                     <LabelText>{lang}</LabelText>
@@ -342,7 +389,6 @@ export default props => {
                                     </StyledSelect>
                                 </div>
                             )
-
                         })}
                     </FormItemWrap>
 
@@ -367,23 +413,25 @@ export default props => {
                                                 setSelectedInterests(newSelectedInterests)
                                             }
                                         }}
-                                    >{item.interestName}</RadioButton>
+                                    >
+                                        {item.interestName}
+                                    </RadioButton>
                                 )
                             })}
                         </div>
                     </FormItemWrap>
 
                     <FormItemWrap>
-                        <LabelText>Tell me about your-self!</LabelText>
-                        <StyledTextArea placeholder='Introduce your self'
-                            value={userIntroduce} onChange={(event) => {
-                                setUserIntroduce(event.target.value)
-                            }} />
+                        <LabelText>Tell us about yourself!</LabelText>
+                        <StyledTextArea 
+                            placeholder='Introduce yourself'
+                            value={userIntroduce}
+                            onChange={(event) => {setUserIntroduce(event.target.value)}} 
+                        />
                     </FormItemWrap>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                        <Button onClick={handleSubmit}>submit</Button>
+                        <Button onClick={handleEditSubmit}>Edit</Button>
                     </div>
-
                 </Wrap>
                 :
                 <Wrap>
