@@ -159,7 +159,7 @@ export default props => {
         });
     };
 
-    const handleSubmit =  async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const response = await uploadImage(image)
@@ -175,7 +175,7 @@ export default props => {
             nation,
             birthday,
             nativeLanguageCode,
-            image : response.url
+            image: response.url
         }
         if (Object.keys(selectedInterests).length === 0 ||
             !gender || name === '' || mainLanguage.language === '' ||
@@ -184,8 +184,8 @@ export default props => {
         ) {
             alert("All fields required")
             return false
-        } else{
-           await AddUserProfile(formData)
+        } else {
+            await AddUserProfile(formData)
                 .then(() => {
                     window.location.reload();
                     navigate('/')
@@ -198,8 +198,8 @@ export default props => {
 
 
 
-        
-    
+
+
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
@@ -214,7 +214,7 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
-            nativeLanguageCode
+            nativeLanguageCode,
         };
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -260,10 +260,10 @@ export default props => {
                     return acc;
                 }, {}));
             }
+
         };
         fetchUserProfile();
     }, [user.uid]);
-
     return (
         <>
             {isFirstLogin === 2 ?
@@ -275,8 +275,8 @@ export default props => {
                             setName(e.target.value)
                         }} />
                     </FormItemWrap>
-
-
+                    <FormItemWrap>
+                    </FormItemWrap>
                     <div style={{ display: 'flex' }}>
                         <FormItemWrap style={{ width: '49%' }}>
                             <LabelText>Native Language</LabelText>
@@ -459,12 +459,12 @@ export default props => {
                     </FormItemWrap>
                     <FormItemWrap>
                         <ImageWrap>
-                        <LabelText>Upload profile image</LabelText>
-                        <input type="file" accept="image/*" required
-                            onChange={(e)=>{
-                                setImage(e.target.files[0])
-                            }}
-                        />
+                            <LabelText>Upload profile image</LabelText>
+                            <input type="file" accept="image/*" required
+                                onChange={(e) => {
+                                    setImage(e.target.files[0])
+                                }}
+                            />
                         </ImageWrap>
                     </FormItemWrap>
 
