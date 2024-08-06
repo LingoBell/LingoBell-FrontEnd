@@ -1,4 +1,4 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useState } from "react";
 import styled from "styled-components";
 import { ChatMessage } from "../atoms/ChatMessage";
 import { ORIGINAL_PARTNER_MESSAGE } from "../atoms/Color";
@@ -32,8 +32,11 @@ const AiMessageWrapper = styled.div`
     display: flex;
 `;
 
+
+
 function ChatForm(props, ref) {
     const { data, className, id } = props
+
 
     return (
         <StyledChatCard className={className} ref={ref}>
@@ -59,12 +62,11 @@ function ChatForm(props, ref) {
                             </ChatMessageWrapper>
                         )}
                         {message.type === 'ai' && (
-                            <AiMessageWrapper>      
+                            <AiMessageWrapper>
                                 <ChatMessage
                                     type={message?.type}
-                                    aiMessageType={message?.aiMessageType}
                                 >
-                                    <pre style={{whiteSpace : 'pre-line'}}>{message?.aiRecommendation}</pre>
+                                    <pre style={{ whiteSpace: 'pre-line' }}>{message?.aiRecommendation}</pre>
                                 </ChatMessage>
                             </AiMessageWrapper>
                         )}

@@ -44,12 +44,34 @@ export const GetRecommendations = async(chat_room_id) => {
     try{
         const response = await axios.get(
             `/chats/${chat_room_id}/recommendations`, chat_room_id);
-        console.log(response.data)
-        console.log(response.data)
         return response.data
 
     } catch(error) {
         console.error('get recommendation error:', error)
+        throw error;
+    }
+}
+
+export const CreateQuizzes = async(chat_room_id) => {
+    try{
+        const response = await axios.post(
+            `/chats/${chat_room_id}/quizzes`, chat_room_id);
+        console.log(response.data)
+        return response.data
+    } catch(error) {
+        console.error('create quizzes error', error);
+        throw error;
+    }
+}
+
+export const GetQuizzez = async (chat_room_id) => {
+    try{
+        const response = await axios.get(
+            `/chats/${chat_room_id}/quizzes`, chat_room_id);
+        console.log(response.data)
+        return response.data
+    } catch(error) {
+        console.error('get quizzes error', error)
         throw error;
     }
 }

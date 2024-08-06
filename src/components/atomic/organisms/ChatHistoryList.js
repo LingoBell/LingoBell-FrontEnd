@@ -86,6 +86,8 @@ export default props => {
   return (
     <ProfileWrap className={props.className}>
         <MyProfileItem //마이프로필
+        isSmall='small'
+        className = 'small'
         key={userId}
         gender={gender}
         nation={nation}
@@ -105,7 +107,6 @@ export default props => {
                 size='small'
                 key={index}
                 src={src}
-                tags={tags}
                 content={content}
                 textEllipsis
                 onClick={() => onClickProfileItem('id-' + (index + 1))}

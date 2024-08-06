@@ -6,8 +6,9 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useParams } from "react-router-dom";
-import { CreateRecommendations, GetRecommendations } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzez, GetRecommendations } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
+import QuizForm from "../molecules/QuizForm";
 
 
 const MainStyle = createGlobalStyle`
@@ -112,6 +113,9 @@ const StyledChatForm = styled(ChatForm)`
     }
 `
 
+const StyledQuizForm = styled(QuizForm)`
+`
+
 const ButtonWrap = styled.div`
     position: fixed;
     bottom: 0;
@@ -195,6 +199,42 @@ const Loader = styled.div`
     animation: ${spin} 2s linear infinite;
 `;
 
+//퀴즈모달
+const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+`;
+
+const QuizModal = styled.div`
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+    z-index: 1001;
+`;
+
+const CloseButton = styled.button`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+`;
+
+
+
 
 function LiveChat() {
     const [openedTab, setOpenedTab] = useState('AI')
@@ -203,6 +243,8 @@ function LiveChat() {
     const { chatId: chatRoomId } = useParams()
     const timestamp = new Date().toISOString();
     const [recommendation, setRecommendation] = useState([])
+    const [quiz, setQuiz] = useState([])
+    const [quizModal, setQuizModal] = useState(false)
     const [loading, setLoading] = useState(false)
     const aiChatWrapRef = useRef(null)
 
@@ -224,7 +266,7 @@ function LiveChat() {
             } catch (err) {
                 console.error('Error fetching transcription', err);
             }
-        }, 3000);
+        }, 9999999999999999);
         return () => clearInterval(interval);
     }, [chatRoomId]);
 
@@ -233,12 +275,23 @@ function LiveChat() {
         const newRecommendData = recommendData.map(item => ({
             ...item, type: 'ai'
         }))
-        console.log('11111', newRecommendData)
+        console.log('newRecommendData:', newRecommendData)
         setRecommendation(newRecommendData)
+    }
+
+    const fetchAiQuizzes = async () => {
+        const quizData = await GetQuizzez(chatRoomId);
+        const newQuizData = quizData.map(item => ({
+            ...item, type : 'quiz'
+        }))
+        console.log('newQuizData:',newQuizData)
+        setQuiz(newQuizData)
     }
 
     useEffect(() => {
         fetchAiRecommendations()
+        fetchAiQuizzes()
+
     }, [chatRoomId])
 
     const requestRecommendations = async () => {
@@ -258,6 +311,20 @@ function LiveChat() {
                 }) 
             }, 300)
             
+        }
+    }
+
+    const requestQuizzes = async () => {
+        setQuizModal(true);
+        setLoading(true);
+        try{
+            const result = await CreateQuizzes(chatRoomId)
+            console.log('ququququ', result)
+            await fetchAiQuizzes()
+        } catch(error) {
+            console.error('Error getting quizzes', error)
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -294,7 +361,9 @@ function LiveChat() {
                         <AiButton
                             onClick={requestRecommendations}
                         >Topic genereate</AiButton>
-                        <AiButton>Quiz genereate</AiButton>
+                        <AiButton
+                            onClick={requestQuizzes}
+                        >Quiz genereate</AiButton>
                     </AiButtonWrap>
                     <StyledChatForm ref={aiChatWrapRef} // id={'aiChatList'}
                         data={recommendation}>
@@ -307,6 +376,16 @@ function LiveChat() {
                     }))} />
                 </UserChatWrap>
             </LiveChatWrap>
+            {!loading && quizModal && (
+                <ModalOverlay>
+                    <QuizModal>
+                        <CloseButton onClick={()=>{
+                            setQuizModal(false)
+                        }}>x</CloseButton>
+                        <StyledQuizForm data={quiz.slice(-5)}/>
+                    </QuizModal>
+                </ModalOverlay>
+            )}
         </StyledCenteredLayout>
     );
 };
