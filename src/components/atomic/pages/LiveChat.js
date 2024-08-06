@@ -266,7 +266,7 @@ function LiveChat() {
             } catch (err) {
                 console.error('Error fetching transcription', err);
             }
-        }, 9999999999999999);
+        }, 3000);
         return () => clearInterval(interval);
     }, [chatRoomId]);
 
