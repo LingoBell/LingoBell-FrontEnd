@@ -50,7 +50,7 @@ module.exports = {
     allowedHosts: ['.ngrok-free.app', 'localhost'],
     proxy: [{
       context: ['/api'],
-      target: 'http://localhost:8000/',
+      target: 'http://localhost:8000',
       secure: false,
       changeOrigin: true,
       // pathRewrite: { '^/api': '' },

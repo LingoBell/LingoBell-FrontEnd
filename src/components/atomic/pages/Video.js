@@ -1,17 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components'
 import io from "socket.io-client";
 
-const socket = io('https://629e-59-10-8-230.ngrok-free.app')
+// const socket = io('https://629e-59-10-8-230.ngrok-free.app')
+const socket = io('http://localhost:8080')
+// const socket = io()
 let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
-export default props => {
+const Video = forwardRef((props, ref) => {
     const params = useParams()
     const {
-        notifyDiscon
-        
+        notifyDiscon,
+        onAudioStatusChange, 
+        onVideoStatusChange
     } = props
     const {
         roomName,
@@ -21,14 +24,23 @@ export default props => {
     const [localStream, setLocalStream] = useState(null)
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     
     const init = async () => {
         console.log('init start')
         const stream = await navigator.mediaDevices.getUserMedia({
-            video: true
+            video: true,
+            // audio: true,
         })
         localVideoRef.current.srcObject = stream
+        stream.getAudioTracks().enabled = isAudioEnabled;
+        stream.getVideoTracks().enabled = isVideoEnabled;
         setLocalStream(stream)
+
+        // console.log('스트림 ',stream);
+        // console.log('비디오', stream.getVideoTracks())
+        // console.log('오디오', stream.getAudioTracks())
 
         pc = new RTCPeerConnection()
         console.log('pc done')
@@ -114,10 +126,36 @@ export default props => {
         }
     }, [])
 
+    useEffect(() => {
+        onAudioStatusChange(isAudioEnabled);
+    }, [isAudioEnabled]);
+
+    useEffect(() => {
+        onVideoStatusChange(isVideoEnabled);
+    }, [isVideoEnabled]);
+
+    useImperativeHandle(ref, () => ({
+        turnAudio() {
+            if (localStream) {
+                const enabled = !isAudioEnabled;
+                localStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
+                setIsAudioEnabled(enabled);
+            }
+        },
+        turnVideo() {
+            if (localStream) {
+                const enabled = !isVideoEnabled;
+                localStream.getVideoTracks().forEach(track => (track.enabled = !track.enabled));
+                setIsVideoEnabled(enabled);
+            }
+        },
+    }))
+
     return (
         <>
             <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
             <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
         </>
     );
-}
+});
+export default Video;
