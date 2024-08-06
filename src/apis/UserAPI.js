@@ -27,7 +27,7 @@ export const GetUserProfile = async (uid) => {
 }
 
 export const getMyProfile = async () => {
-    return axios.get('/users')
+    return axios.get('/users/my-profile')
         .then(res => res.data)
 }
 
