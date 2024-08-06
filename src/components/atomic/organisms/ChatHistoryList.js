@@ -4,7 +4,7 @@ import { PROFILE_DATA } from '../../../consts/sampleData'
 import ProfileItem from '../molecules/ProfileItem'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { GetUserProfile } from '../../../apis/UserAPI'
+import { getMyProfile, GetUserProfile } from '../../../apis/UserAPI'
 const ProfileWrap = styled.aside`
   /* max-height: 100%; */
   /* max-height: 100px; */
@@ -59,7 +59,7 @@ export default props => {
 
     const fetchProfiles = async() => {
       try{
-        const profile = await GetUserProfile(user.uid)
+        const profile = await getMyProfile()
         const newProfile = ({
           ...profile, age : calculateAge(profile.birthday)
         })
