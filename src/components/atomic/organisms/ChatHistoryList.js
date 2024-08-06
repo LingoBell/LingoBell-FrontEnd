@@ -57,7 +57,7 @@ export default props => {
       try{
         const profile = await GetUserProfile(user.uid)
         const newProfile = ({
-          ...profile, age : calculateAge(profile.birthDate)
+          ...profile, age : calculateAge(profile.birthday)
         })
         setMyProfile(newProfile)
       } catch(error) {
@@ -82,7 +82,7 @@ export default props => {
           userId,
 
   } = myProfile;
-  console.log(myProfile)
+  console.log('myProfile',myProfile)
   return (
     <ProfileWrap className={props.className}>
         <MyProfileItem //마이프로필

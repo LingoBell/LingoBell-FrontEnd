@@ -133,7 +133,7 @@ export default props => {
     const [hintModal, setHintModal] = useState(false)
     const [birthday, setBirthday] = useState('')
     const [nativeLanguageCode, setNativeLanguageCode] = useState('')
-    const { user, isFirstLogin } = useSelector((state) => {
+        const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
             isFirstLogin: state?.user.isFirstLogin
@@ -180,6 +180,7 @@ export default props => {
             AddUserProfile(formData)
                 .then(() => {
                     window.location.reload();
+                    navigate('/')
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
@@ -213,7 +214,7 @@ export default props => {
         } else {
             UpdateUserProfile(user.uid, formData)
                 .then(() => {
-                    window.location.reload();
+                    navigate('/')
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
