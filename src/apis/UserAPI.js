@@ -19,7 +19,7 @@ export const AddUserProfile = async (formData) => {
 export const GetUserProfile = async (uid) => {
     try {
         const response = await axios.get(`/users/${uid}`)
-        console.log("Successfully get user profile", response);
+        console.log("Successfully get user profile", response.data);
         return response.data;
     } catch (error) {
         console.error(`Error fetching GetUserProfile: ${error}`);
