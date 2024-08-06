@@ -76,31 +76,16 @@ export default props => {
 
   const user = useSelector((state) => state.user.user);
 
-  const calculateAge = (birthday) => {
-    if (!birthday) {
-      return 20;
-    }
-
-    const today = new Date();
-    const birthDate = new Date(birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
+  
   useEffect(() => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
         const userList = await GetPartnerList();
-        const newUserList = userList.map(profile =>({
-          ...profile, age: calculateAge(profile.birthday)
-        }))
-        setProfiles(newUserList);
+        // const newUserList = userList.map(profile =>({
+        //   ...profile
+        // }))
+        setProfiles(userList);
         console.log('profile-info', profiles)
 
       } catch (error) {

@@ -26,3 +26,8 @@ export const UpdateChatRoomStatus = async (chat_room_id) => {
         throw error;
     }
 };
+
+export const getChatRooms = () => {
+    return axios.get('/chats')
+        .then(res => res.data)
+}

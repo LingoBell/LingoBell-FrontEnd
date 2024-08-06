@@ -165,17 +165,17 @@ function LiveChat() {
     }
 
     useEffect(() => {
-        const interval = setInterval(async () => {
-            try {
-                const response = await axios.get(`/chats/${chatRoomId}/stt`, {
-                    params: { timestamp }
-                });
-                setMessages(response.data.messages);
-            } catch (err) {
-                console.error('Error fetching transcription', err);
-            }
-        }, 3000);
-        return () => clearInterval(interval);
+        // const interval = setInterval(async () => {
+        //     try {
+        //         const response = await axios.get(`/chats/${chatRoomId}/stt`, {
+        //             params: { timestamp }
+        //         });
+        //         setMessages(response.data.messages);
+        //     } catch (err) {
+        //         console.error('Error fetching transcription', err);
+        //     }
+        // }, 3000);
+        // return () => clearInterval(interval);
     }, [chatRoomId]);
 
     const toggleTranslation = () => {

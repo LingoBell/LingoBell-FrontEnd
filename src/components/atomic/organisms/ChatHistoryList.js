@@ -29,6 +29,9 @@ const MyProfileItem = styled(StyledProfileItem)`
   background-color: rgba(0,0,0,0.05);
 `
 export default props => {
+  const {
+    chatHistoryList
+  } = props
   const firstProfile = PROFILE_DATA[0]
   const {
     name: ftitle,
@@ -54,23 +57,27 @@ export default props => {
         
         />
         {
-          PROFILE_DATA.map((profile, index) => {
-            const {
-              name: title,
-              image: src,
-              language: tags,
-              selfIntroduction: content
-            } = profile
+          chatHistoryList.map((profile, index) => {
+            // const {
+            //   chatRoomId, 
+            //   userName: title,
+            //   profileImages: src,
+            //   language: tags,
+            //   selfIntroduction: content
+            // } = profile
+            // console.log(profile)
             return (
               <StyledProfileItem
                 size='small'
+                {...profile}
                 key={index}
-                title={title}
-                src={src}
-                tags={tags}
-                content={content}
+                birthday={profile.birthday}
+                // userName={userName}
+                
+                // tags={tags}
+                // content={content}
                 textEllipsis
-                onClick={() => onClickProfileItem('id-' + (index + 1))}
+                onClick={() => onClickProfileItem(profile.chatRoomId)}
               />
 
             )
