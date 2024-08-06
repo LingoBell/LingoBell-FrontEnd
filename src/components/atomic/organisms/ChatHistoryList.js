@@ -62,7 +62,7 @@ export default props => {
 
   const { gender,
           nation,
-          age,
+          birthday,
           userName,
           userId,
 
@@ -76,8 +76,9 @@ export default props => {
         key={userId}
         gender={gender}
         nation={nation}
-        age={age}
+        birthday={birthday}
         userName={userName}
+        
         />
         {/* 채팅히스토리데이터 */}
         {
