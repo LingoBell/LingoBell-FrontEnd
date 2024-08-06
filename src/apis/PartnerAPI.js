@@ -13,7 +13,7 @@ export const GetPartnerList = async () => {
 };
 
 export const GetRequestPartnerList = async (userCode) => {
-    const url = `/partners/${userCode}`;
+    const url = `/partners/requests`;
 
     try {
         const response = await axios.get(url);

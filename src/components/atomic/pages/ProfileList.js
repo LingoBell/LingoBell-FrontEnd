@@ -99,10 +99,7 @@ export default props => {
     const fetchRequestProfiles = async () => {
       try {
         const requestUserList = await GetRequestPartnerList(user.uid);
-        const newChatRequest = requestUserList.map(request => ({
-          ...request, age : calculateAge(request.birthday)
-        }))
-        setChatRequests(newChatRequest);
+        setChatRequests(requestUserList);
 
       } catch (error) {
         console.log('요청 유저 리스트 불러오기 실패 : ', error);

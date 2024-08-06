@@ -39,31 +39,12 @@ export default props => {
 
   const user = useSelector((state)=>state.user.user);
 
-  const calculateAge = (birthday) => {
-    if (!birthday) {
-      return 20;
-    }
-
-    const today = new Date();
-    const birthDate = new Date(birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
   useEffect(()=>{
 
     const fetchProfiles = async() => {
       try{
         const profile = await getMyProfile()
-        const newProfile = ({
-          ...profile, age : calculateAge(profile.birthday)
-        })
-        setMyProfile(newProfile)
+        setMyProfile(profile)
       } catch(error) {
         console.log('내 프로필 불러오기 실패:', error)
       }
