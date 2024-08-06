@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChatForm from "../molecules/ChatForm";
 import styled, { createGlobalStyle } from "styled-components";
 import { AI_SAMPLE_DATA, USER_SAMPLE_DATA } from "../../../consts/sampleData";
@@ -155,6 +155,10 @@ function LiveChat() {
     const [showTranslation, setShowTranslation] = useState(true);
     const chatRoomId = 10;
     const timestamp = new Date().toISOString();
+    const audioRef = useRef(null);
+    const videoRef = useRef(null);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
     const startTranscription = async () => {
         try {
@@ -182,15 +186,47 @@ function LiveChat() {
         setShowTranslation(!showTranslation);
     };
 
+    const handleAudioClick = () => {
+        if (videoRef.current) {
+            videoRef.current.turnAudio();
+        }
+    }
+
+    const handleVideoClick = () => {
+        if (videoRef.current) {
+            videoRef.current.turnVideo();
+        }
+    }
+
+    const handleAudioStatusChange = (status) => {
+        setIsAudioEnabled(status);
+    }
+
+    const handleVideoStatusChange = (status) => {
+        setIsVideoEnabled(status);
+    }
+
     return (
         <StyledCenteredLayout>
             <MainStyle />
             <LiveChatWrap>
                 <VideoWrap>
-                    <Video />
+                    <Video
+                        ref={videoRef}
+                        onAudioStatusChange={handleAudioStatusChange}
+                        onVideoStatusChange={handleVideoStatusChange}
+                    />
                     <ButtonWrap>
-                        <CallButton><span className='material-icons'>mic</span></CallButton>
-                        <CallButton><span className='material-icons'>videocam</span></CallButton>
+                        <CallButton onClick={handleAudioClick}>
+                            <span className='material-icons'>
+                                {isAudioEnabled ? 'mic' : 'mic_off'}
+                            </span>
+                        </CallButton>
+                        <CallButton onClick={handleVideoClick}>
+                            <span className='material-icons'>
+                                {isVideoEnabled ? 'videocam' : 'videocam_off'}
+                            </span>
+                        </CallButton>
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
