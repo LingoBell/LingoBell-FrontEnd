@@ -4,6 +4,7 @@ import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
 import LanguageGauge from './LanguageGauge'
 import Flag from 'react-world-flags'
+import { calculateAge } from '../../../consts/calculateAge'
 
 const Container = styled.div`
   min-widht : 400px;
@@ -125,21 +126,6 @@ export default props => {
     hideContent,
     
   } = props;
-  const calculateAge = (birthday) => {
-    if (!birthday) {
-      return 20;
-    }
-
-    const today = new Date();
-    const birthDate = new Date(birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
 
 
   return (

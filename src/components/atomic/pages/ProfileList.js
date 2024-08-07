@@ -98,7 +98,7 @@ export default props => {
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {
       try {
-        const requestUserList = await GetRequestPartnerList(user.uid);
+        const requestUserList = await GetRequestPartnerList();
         setChatRequests(requestUserList);
 
       } catch (error) {
@@ -150,6 +150,11 @@ export default props => {
     setIsOpened(false);
     setSelectedProfile(null);
   };
+
+  const handleCloseResponseModal =() => {
+    setIsOpened(false)
+    setSelectedChatRoom(null)
+  }
 
   const onClickRequestModalButton = async (userId) => {
 
@@ -234,7 +239,7 @@ export default props => {
         {selectedChatRoom && (
           <Modal
             isOpened={isOpened}
-            onClickCloseBtn={() => handleCloseModal()}
+            onClickCloseBtn={() => handleCloseResponseModal()}
             bttnTxt="Enter Chat Room"
             selectedProfile={selectedChatRoom}
             onClickButton={() => onClickResponseModalButton(selectedChatRoom.chatRoomId)}
