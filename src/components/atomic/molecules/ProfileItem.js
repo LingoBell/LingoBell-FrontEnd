@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
@@ -118,7 +118,7 @@ const Age = styled.div`
 
 `
 
-export default props => {
+export default React.forwardRef((props,ref) => {
   const { 
     onClick, 
     handleClick, 
@@ -129,7 +129,7 @@ export default props => {
 
 
   return (
-    <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
+    <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick} ref={ref}>
       <ProfileImage src ={props.profileImages ? props.profileImages
          : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
         <FlagContainer $isSmall={props.isSmall}>
@@ -171,4 +171,4 @@ export default props => {
       </Wrap>
     </Container>
   )
-}
+})

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import ProfileItem from '../molecules/ProfileItem'
@@ -36,8 +36,8 @@ export default props => {
   } = props
 
   const[myProfile, setMyProfile] = useState({});
-
   const user = useSelector((state)=>state.user.user);
+  const historyRef = useRef(null)
 
   useEffect(()=>{
 
@@ -52,6 +52,12 @@ export default props => {
 
     fetchProfiles();
   },[user.uid])
+
+  useEffect(()=>{
+    if(historyRef.current){
+      historyRef.current.click()
+    }
+  },[chatHistoryList])
 
   const navigate = useNavigate()
   
@@ -94,6 +100,7 @@ export default props => {
             } = profile
             return (
               <StyledProfileItem
+                ref={index === 0 ? historyRef : null}
                 size='small'
                 birthday = {birthday}
                 gender = {gender}
