@@ -23,7 +23,6 @@ axios.defaults.baseURL = mainDomain + "/api" //api엔드포인트 defualtUrl설�
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
-
 window.accessToken = null
 
 export default () => {
