@@ -85,11 +85,21 @@ export default props => {
         {/* 채팅히스토리데이터 */}
         {
           chatHistoryList.map((profile, index) => {
-
+            const {
+              birthday,
+              gender,
+              userName,
+              profileImages,
+              nation
+            } = profile
             return (
               <StyledProfileItem
                 size='small'
-                {...profile}
+                birthday = {birthday}
+                gender = {gender}
+                userName = {userName}
+                profileImages = {profileImages}
+                nation={nation}
                 key={index}
                 onClick={() => onClickProfileItem(profile.chatRoomId)}
               />

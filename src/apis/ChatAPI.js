@@ -32,6 +32,12 @@ export const getChatRooms = () => {
         .then(res => res.data)
 }
 
+export const getChatRoomsById = async (chat_room_id) => {
+        const response = await axios.get(
+            `/chats/${chat_room_id}`)
+            return response.data
+}
+
 export const CreateRecommendations = async (chat_room_id) => {
     try{
         const response = await axios.post(

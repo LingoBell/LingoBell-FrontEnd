@@ -48,14 +48,7 @@ export default () => {
 
         console.log(accessToken)
         dispatch(checkFirstLogin())
-        /**
-         *  1. 누군가가 구글 로그인(프론트)
-         *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
-         *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
-         * 
-         * */ 
         
-
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
 
       } else {

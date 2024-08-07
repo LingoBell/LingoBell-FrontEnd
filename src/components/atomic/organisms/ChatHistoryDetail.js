@@ -1,19 +1,19 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/sampleData'
 import ChatCard from '../templates/ChatSectionCard'
 import ChatForm from '../molecules/ChatForm'
 import ProfileItem from '../molecules/ProfileItem'
+import { useParams } from 'react-router-dom'
+import { getChatRoomsById, GetRecommendations } from '../../../apis/ChatAPI'
 const HistorySection = styled.div`
   height: 100%;
-    
   display: flex;
   flex-direction: column;
   @media screen and (min-width: 1024px) {
     background-color: white;
     margin-left: auto;
     margin-right: auto;
-    
     padding: 24px;
     max-width: 950px;
     
@@ -50,6 +50,7 @@ const ChatWrap = styled.div`
 `
 
 const UserChatForm = styled(ChatForm)`
+  height : 450px;
   @media screen and (max-width: 599px) {
     border: 0;
     border-radius: 0;
@@ -63,36 +64,66 @@ const UserChatForm = styled(ChatForm)`
   @media screen and (min-width: 1024px) {
   }
 `
+const HistoryProfileItem = styled(ProfileItem)`
+  justify-content : center;
+  scale : 1.1;
+`
 
 const AIChatForm = styled(UserChatForm)`
+  height : 450px;
 `
 
 export default props => {
-  const secondProfile = PROFILE_DATA[0]
+  const { chatId: chatRoomId } = useParams()
+  const [data, setData] = useState();
+  const [recommendation, setRecommendation] = useState([])
 
-  const {
-    // userName,
-    // image: ssrc,
-    // language: stags,
-    // selfIntroduction: scontent
-  } = secondProfile
+  const fetchAiRecommendations = async () => {
+    const recommendData = await GetRecommendations(chatRoomId);
+    const newRecommendData = recommendData.map(item => ({
+        ...item, type: 'ai'
+    }))
+    console.log('newRecommendData:', newRecommendData)
+    setRecommendation(newRecommendData)
+}
+
+
+  const fetchChatDataById = async (chatRoomId) => {
+    try{
+      const result = await getChatRoomsById(chatRoomId)
+      console.log('hihihi', result)
+      setData(result)
+    } catch(error){
+      console.log('Error: ', error)
+    }
+  }
+
+  useEffect(()=>{
+    if(chatRoomId){
+      fetchChatDataById(chatRoomId)
+    }
+
+  },[chatRoomId])
+
+  useEffect(()=>{
+    if(chatRoomId){
+      fetchAiRecommendations(chatRoomId)
+    }
+  },[chatRoomId])
+
+  console.log(recommendation)
 
   return (
     <HistorySection>
           
       <StyledChatCard>
-        <ProfileItem
-          
-          // userName={userName}
-          // src={ssrc}
-          // tags={stags}
-          // content={scontent}
-          // textEllipsis
-        />
+        <HistoryProfileItem
+          {...data}
+          />
       </StyledChatCard>
       <ChatWrap>
+        <AIChatForm data={recommendation} />
         <UserChatForm data={USER_SAMPLE_DATA} />
-        <AIChatForm data={AI_SAMPLE_DATA} />
       </ChatWrap>
     </HistorySection>
   )
