@@ -156,13 +156,24 @@ function LiveChat() {
     const chatRoomId = 10;
     const timestamp = new Date().toISOString();
 
-    const startTranscription = async () => {
+    const startTranscription = async (file) => {
         try {
-            await axios.post(`/chats/${chatRoomId}/stt`);
+            const formData = new FormData();
+            formData.append("file", file);
+            await axios.post(`/chats/${chatRoomId}/stt`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
         } catch (err) {
             console.error('Error starting transcription', err);
         }
     }
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        startTranscription(file);
+    };
 
     useEffect(() => {
         const interval = setInterval(async () => {
@@ -194,6 +205,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
+                        <input type="file" onChange={handleFileChange} />
                         <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
 
                         <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
