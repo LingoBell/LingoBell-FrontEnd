@@ -34,23 +34,10 @@ const AiMessageWrapper = styled.div`
 
 
 
-
 function ChatForm(props, ref) {
     const { data, className, id } = props
 
-    const removeInitialNewline = (text) => {
-        // 문자열을 줄 단위로 나눕니다.
-        const lines = text.split('\n');
     
-        // 첫 번째 줄이 비어있는 경우 이를 제거합니다.
-        if (lines[0].trim() === '') {
-            lines.shift();
-        }
-        // 다시 줄바꿈 문자를 사용하여 문자열을 합칩니다.
-        return lines.join('\n');
-    };
-    
-
 
     return (
         <StyledChatCard className={className} ref={ref}>
@@ -80,7 +67,7 @@ function ChatForm(props, ref) {
                                 <ChatMessage
                                     type={message?.type}
                                 >
-                                    <pre style={{ whiteSpace: 'pre-wrap' }}>{removeInitialNewline(message?.aiRecommendation)}</pre>
+                                    <pre style={{ whiteSpace: 'pre-wrap' }}>{message?.aiRecommendation?.trim()}</pre>
                                 </ChatMessage>
                             </AiMessageWrapper>
                         )}
