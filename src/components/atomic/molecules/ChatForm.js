@@ -37,6 +37,7 @@ const AiMessageWrapper = styled.div`
 function ChatForm(props, ref) {
     const { data, className, id } = props
 
+    
 
     return (
         <StyledChatCard className={className} ref={ref}>
@@ -66,7 +67,7 @@ function ChatForm(props, ref) {
                                 <ChatMessage
                                     type={message?.type}
                                 >
-                                    <pre style={{ whiteSpace: 'pre-line' }}>{message?.aiRecommendation}</pre>
+                                    <pre style={{ whiteSpace: 'pre-wrap' }}>{message?.aiRecommendation?.trim()}</pre>
                                 </ChatMessage>
                             </AiMessageWrapper>
                         )}

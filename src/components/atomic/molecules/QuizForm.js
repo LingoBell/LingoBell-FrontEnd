@@ -172,9 +172,6 @@ function QuizForm(props) {
                 )}
 
             </QuizWrap>
-
-
-
         </StyledChatCard>
 
     )

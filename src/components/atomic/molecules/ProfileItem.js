@@ -133,19 +133,19 @@ export default props => {
       <ProfileImage src ={props.profileImages ? props.profileImages
          : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
         <FlagContainer $isSmall={props.isSmall}>
-          <RoundFlag code={props.nation}/>
+          <RoundFlag code={props?.nation}/>
         </FlagContainer>
       </ProfileImage>
       <Wrap>
         <NameWarp>
-        <UserName>{props.userName}</UserName>
+        <UserName>{props?.userName}</UserName>
         <AgeBox $gender ={props.gender}
                 $isSmall={props.isSmall}>
         <Gender>
-          {props.gender == 'Male' ? '♂' : '♀'}
+          {props?.gender == 'Male' ? '♂' : '♀'}
         </Gender>
         <Age>
-          {calculateAge(props.birthday)}
+          {calculateAge(props?.birthday)}
         </Age>
         </AgeBox>
         </NameWarp>
