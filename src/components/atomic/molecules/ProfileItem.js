@@ -30,12 +30,16 @@ const FlagContainer = styled.div`
   border-radius : 50%;
   display : flex;
   justify-content : center;
-  background-color : red;
   align-items : center;
   overflow : hidden;
+
+  ${props => props.$isSmall =='small' &&`
+      width : 26px;
+      height : 26px;
+    `}
 `
 const RoundFlag = styled(Flag)`
-  width : auto%;
+  width : auto;
   height : auto;
   min-height : 100%;
 `
@@ -47,8 +51,8 @@ const Wrap = styled.div`
   
 `
 const UserName = styled(Title)`
-  font-weight : bold;
-  font-size : 24px;
+  font-weight : 550;
+  font-size : 22px;
   .small & {
     font-size: 16px;
   }
@@ -87,8 +91,11 @@ const AgeBox = styled.div`
   align-items : center;
   padding : 0 8px 0 8px;
   font-size : 16px;
-  margin-left : 14px;
+  margin-left : 10px;
   height : 24px;
+  ${props => props.$isSmall == 'small' && `
+    scale : 0.8;
+    `}
 
   ${props => props.$gender == 'Male' && `
     background-color : #7086F3;
@@ -116,24 +123,43 @@ export default props => {
     handleClick, 
     size,
     hideContent,
+    
   } = props;
-  
+  const calculateAge = (birthday) => {
+    if (!birthday) {
+      return 20;
+    }
+
+    const today = new Date();
+    const birthDate = new Date(birthday);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
-      <ProfileImage src ={props.profileImages}>
-        <FlagContainer>
+      <ProfileImage src ={props.profileImages ? props.profileImages
+         : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
+        <FlagContainer $isSmall={props.isSmall}>
           <RoundFlag code={props.nation}/>
         </FlagContainer>
       </ProfileImage>
       <Wrap>
         <NameWarp>
         <UserName>{props.userName}</UserName>
-        <AgeBox $gender ={props.gender}>
+        <AgeBox $gender ={props.gender}
+                $isSmall={props.isSmall}>
         <Gender>
           {props.gender == 'Male' ? '♂' : '♀'}
         </Gender>
         <Age>
-          {props.age}
+          {calculateAge(props.birthday)}
         </Age>
         </AgeBox>
         </NameWarp>

@@ -18,7 +18,7 @@ export const AddUserProfile = async (formData) => {
 
 export const GetUserProfile = async (uid) => {
     try {
-        const response = await axios.get(`/users/${uid}`)
+        const response = await axios.get(`/users/${uid}}`)
         console.log("Successfully get user profile", response);
         return response.data;
     } catch (error) {
@@ -26,9 +26,14 @@ export const GetUserProfile = async (uid) => {
     }
 }
 
-export const UpdateUserProfile = async (uid, formData) => {
+export const getMyProfile = async () => {
+    return axios.get('/users/my-profile')
+        .then(res => res.data)
+}
+
+export const UpdateUserProfile = async (formData) => {
     try {
-        const response = await axios.put(`/users/${uid}`, formData, {
+        const response = await axios.put(`/users/my-profile`, formData, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -39,3 +44,24 @@ export const UpdateUserProfile = async (uid, formData) => {
     }
 }
 
+export const uploadImage = async (image) => {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+        const response = await axios.post('/users/image-upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        })
+        console.log('dddd', response)
+        return response.data
+
+    } catch (error) {
+        if (error.response) {
+            return { success: false, message: error.response.data.detail || 'Image upload failed!' };
+        } else {
+            return { success: false, message: error.message };
+        }
+    }
+}

@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import ProfileItem from '../molecules/ProfileItem'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { getMyProfile, GetUserProfile } from '../../../apis/UserAPI'
 const ProfileWrap = styled.aside`
   /* max-height: 100%; */
   /* max-height: 100px; */
@@ -29,48 +31,67 @@ const MyProfileItem = styled(StyledProfileItem)`
   background-color: rgba(0,0,0,0.05);
 `
 export default props => {
-  const firstProfile = PROFILE_DATA[0]
   const {
-    name: ftitle,
-    image: fsrc,
-    language: ftags,
-    selfIntroduction: fcontent
-  } = firstProfile
+    chatHistoryList
+  } = props
+
+  const[myProfile, setMyProfile] = useState({});
+
+  const user = useSelector((state)=>state.user.user);
+
+  useEffect(()=>{
+
+    const fetchProfiles = async() => {
+      try{
+        const profile = await getMyProfile()
+        setMyProfile(profile)
+      } catch(error) {
+        console.log('내 프로필 불러오기 실패:', error)
+      }
+    }
+
+    fetchProfiles();
+  },[user.uid])
+
   const navigate = useNavigate()
   
 
   const onClickProfileItem = (id) => {
     navigate('/chat-history/'+id)
   }
+
+  const { gender,
+          nation,
+          birthday,
+          userName,
+          userId,
+          profileImages
+
+  } = myProfile;
+  console.log('myProfile',myProfile)
   return (
     <ProfileWrap className={props.className}>
-        <MyProfileItem 
-          size='small'
-          title={ftitle}
-          src={fsrc}
-          tags={ftags}
-          content={fcontent}
-          hideContent
+        <MyProfileItem //마이프로필
+        isSmall='small'
+        className = 'small'
+        key={userId}
+        gender={gender}
+        nation={nation}
+        birthday={birthday}
+        userName={userName}
+        profileImages={profileImages}
         
         />
+        {/* 채팅히스토리데이터 */}
         {
-          PROFILE_DATA.map((profile, index) => {
-            const {
-              name: title,
-              image: src,
-              language: tags,
-              selfIntroduction: content
-            } = profile
+          chatHistoryList.map((profile, index) => {
+
             return (
               <StyledProfileItem
                 size='small'
+                {...profile}
                 key={index}
-                title={title}
-                src={src}
-                tags={tags}
-                content={content}
-                textEllipsis
-                onClick={() => onClickProfileItem('id-' + (index + 1))}
+                onClick={() => onClickProfileItem(profile.chatRoomId)}
               />
 
             )

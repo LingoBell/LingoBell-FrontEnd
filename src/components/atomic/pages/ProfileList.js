@@ -4,12 +4,10 @@ import CenteredMainLayout from '../templates/CenteredMainLayout'
 import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
 import { useNavigate } from 'react-router-dom'
-import { PROFILE_DATA } from '../../../consts/sampleData'
 import { useSelector } from 'react-redux'
 import { CreateChat, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
 import { GetPartnerList, GetRequestPartnerList } from '../../../apis/PartnerAPI'
 
-// const profiles = PROFILE_DATA
 
 const Container = styled.div`
   display: flex;
@@ -76,31 +74,16 @@ export default props => {
 
   const user = useSelector((state) => state.user.user);
 
-  const calculateAge = (birthday) => {
-    if (!birthday) {
-      return 20;
-    }
-
-    const today = new Date();
-    const birthDate = new Date(birthday);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-
-    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
-
+  
   useEffect(() => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
         const userList = await GetPartnerList();
-        const newUserList = userList.map(profile =>({
-          ...profile, age: calculateAge(profile.birthday)
-        }))
-        setProfiles(newUserList);
+        // const newUserList = userList.map(profile =>({
+        //   ...profile
+        // }))
+        setProfiles(userList);
         console.log('profile-info', profiles)
 
       } catch (error) {
@@ -228,7 +211,7 @@ export default props => {
               nativeLanguage,
               userName,
               profileImages,
-              age,
+              birthday,
             } = profile;
 
             return (
@@ -243,7 +226,7 @@ export default props => {
                 nation={nation}
                 profileImages={profileImages}
                 hideContent={false}
-                age={age}
+                birthday={birthday}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })
@@ -259,14 +242,30 @@ export default props => {
         )}
         {activeTab === 'requests' &&
           chatRequests?.map((request, index) => {
-            const { userCode, userName, description } = request;
+            const { description,
+              gender,
+              interests,
+              learningLanguages,
+              nation,
+              nativeLanguage,
+              userName,
+              profileImages,
+              birthday,
+            } = request
 
             return (
               <StyledProfileItem
-                key={index}
-                title={userName}
-                content={description}
-                userCode={userCode}
+              key={index}
+              userName={userName}
+              nativeLanguage={nativeLanguage}
+              content={description}
+              gender={gender}
+              interests={interests}
+              learningLanguages={learningLanguages}
+              nation={nation}
+              profileImages={profileImages}
+              hideContent={false}
+              birthday={birthday}
                 onClick={() => handleOpenResponseModal(request)}
               />
             )

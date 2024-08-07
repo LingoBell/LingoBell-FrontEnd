@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
-import { AddUserProfile, GetUserProfile, UpdateUserProfile } from '../../../apis/UserAPI'
+import { AddUserProfile, getMyProfile, UpdateUserProfile, uploadImage } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -121,6 +121,12 @@ const HintBox = styled.div`
         margin-left : 12px;
     }
 `
+
+const ImageWrap = styled.div`
+    display : flex;
+    justify-content : space-between;
+    align-items : center;
+`
 export default props => {
     const [selectedInterests, setSelectedInterests] = useState({})
     const [nation, setNation] = useState('')
@@ -133,6 +139,7 @@ export default props => {
     const [hintModal, setHintModal] = useState(false)
     const [birthday, setBirthday] = useState('')
     const [nativeLanguageCode, setNativeLanguageCode] = useState('')
+    const [image, setImage] = useState(null)
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
@@ -152,8 +159,10 @@ export default props => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const response = await uploadImage(image)
 
         const formData = {
             selectedInterests,
@@ -165,9 +174,9 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
-            nativeLanguageCode
+            nativeLanguageCode,
+            image: response.url
         }
-
         if (Object.keys(selectedInterests).length === 0 ||
             !gender || name === '' || mainLanguage.language === '' ||
             Object.keys(learningLanguages).length === 0 || Object.keys(languageWithLevel).length === 0
@@ -176,16 +185,21 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            console.log(formData)
-            AddUserProfile(formData)
+            await AddUserProfile(formData)
                 .then(() => {
                     window.location.reload();
+                    navigate('/')
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
                 });
         }
     }
+
+
+
+
+
 
     const handleEditSubmit = (e) => {
         e.preventDefault();
@@ -200,7 +214,7 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
-            nativeLanguageCode
+            nativeLanguageCode,
         };
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -211,9 +225,9 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            UpdateUserProfile(user.uid, formData)
+            UpdateUserProfile(formData)
                 .then(() => {
-                    window.location.reload();
+                    navigate('/')
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
@@ -223,7 +237,7 @@ export default props => {
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            const userProfile = await GetUserProfile(user.uid);
+            const userProfile = await getMyProfile();
             if (userProfile) {
                 setName(userProfile.userName);
                 setMainLanguage(userProfile.nativeLanguage);
@@ -246,10 +260,10 @@ export default props => {
                     return acc;
                 }, {}));
             }
+
         };
         fetchUserProfile();
     }, [user.uid]);
-
     return (
         <>
             {isFirstLogin === 2 ?
@@ -261,7 +275,8 @@ export default props => {
                             setName(e.target.value)
                         }} />
                     </FormItemWrap>
-
+                    <FormItemWrap>
+                    </FormItemWrap>
                     <div style={{ display: 'flex' }}>
                         <FormItemWrap style={{ width: '49%' }}>
                             <LabelText>Native Language</LabelText>
@@ -423,10 +438,10 @@ export default props => {
 
                     <FormItemWrap>
                         <LabelText>Tell us about yourself!</LabelText>
-                        <StyledTextArea 
+                        <StyledTextArea
                             placeholder='Introduce yourself'
                             value={userIntroduce}
-                            onChange={(event) => {setUserIntroduce(event.target.value)}} 
+                            onChange={(event) => { setUserIntroduce(event.target.value) }}
                         />
                     </FormItemWrap>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -441,6 +456,16 @@ export default props => {
                         <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
                             setName(e.target.value)
                         }} />
+                    </FormItemWrap>
+                    <FormItemWrap>
+                        <ImageWrap>
+                            <LabelText>Upload profile image</LabelText>
+                            <input type="file" accept="image/*" required
+                                onChange={(e) => {
+                                    setImage(e.target.files[0])
+                                }}
+                            />
+                        </ImageWrap>
                     </FormItemWrap>
 
                     <div style={{ display: 'flex' }}>

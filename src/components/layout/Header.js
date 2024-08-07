@@ -25,16 +25,13 @@ const LogoContainer = styled.div`
   
 
 `
-const Logo = styled(BaseImage)`
-  width : 40px;
-  height : 40px;
-  margin-left : 16px;
-  background-image: url("./logoIcon.png");
+const Logo = styled.img`
+  width : 45px;
+  height : 45px;
+  margin-left : 14px;
 `
 const LogoName = styled.div`
   font-size : 28px;
-  // margin-top : 8px;
-  margin-left : 12px;
 
 `
 const MenuTab = styled.div`
@@ -90,7 +87,7 @@ export default props => {
       <TopBar>
         <LogoContainer as={Link} to='/'>
           
-          <Logo />
+          <Logo src = 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'/>
           <LogoName>LingoBell</LogoName>
           
         </LogoContainer>
