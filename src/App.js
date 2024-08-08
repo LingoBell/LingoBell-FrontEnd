@@ -8,7 +8,7 @@ import IndexPage from "./components/atomic/pages/IndexPage";
 import ProfileList from "./components/atomic/pages/ProfileList";
 import Header from "./components/layout/Header";
 import LiveChat from "./components/atomic/pages/LiveChat";
-import { auth, googleProvider } from './firebase/firebase'; //파이어베이스 구글인증
+import { auth, googleProvider, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
@@ -37,18 +37,21 @@ export default () => {
   })
 
   React.useEffect(()=>{
-    const unsubscribe = onAuthStateChanged(auth, (user)=>{
+    const unsubscribe = onAuthStateChanged(auth, async(user)=>{
       if(user){
-
+        // google로그인
         const accessToken  = user.accessToken
-        
         const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
         axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
-//         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
         console.log(accessToken)
-        dispatch(checkFirstLogin())
         
+        // // FCM
+        // const token = await requestPermission();
+        // if(token) {
+        //   await axios.post('/save-token', {token, uid : user.uid})
+        // }
+
+        dispatch(checkFirstLogin())
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
 
       } else {
