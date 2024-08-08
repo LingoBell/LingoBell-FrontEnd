@@ -2,7 +2,26 @@ import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } f
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components'
 import io from "socket.io-client";
-
+const Wrap = styled.div`
+    display: flex;
+    align-items: center;
+    background-color: #666;
+    > video {
+        width: 50%;
+        height: 50vh;
+        object-fit: contain;
+        border-radius: 8px;
+    }
+    @media screen and (min-width: 1024px) {
+        flex-direction: column;
+        background-color: transparent;
+        flex: 1;
+        > video {
+            width: 100%;
+            height: 50%;
+        }
+    }
+`
 const socket = io('')
 let pc1 = new RTCPeerConnection()
 let pc = null
@@ -150,10 +169,10 @@ const Video = forwardRef((props, ref) => {
     }))
 
     return (
-        <>
-            <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
-            <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
-        </>
+        <Wrap>
+            <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
+            <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
+        </Wrap>
     );
 });
 export default Video;
