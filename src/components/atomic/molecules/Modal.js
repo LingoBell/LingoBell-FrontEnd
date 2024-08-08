@@ -18,6 +18,7 @@ const Background = styled.div`
 `
 
 const ModalBox = styled.div`
+    min-width : 400px;
     position: relative;
     background-color: white;
     padding-bottom : 24px;

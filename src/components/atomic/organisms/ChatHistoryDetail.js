@@ -66,7 +66,6 @@ const UserChatForm = styled(ChatForm)`
 `
 const HistoryProfileItem = styled(ProfileItem)`
   justify-content : center;
-  scale : 1.1;
 `
 
 const AIChatForm = styled(UserChatForm)`
@@ -119,11 +118,12 @@ export default props => {
       <StyledChatCard>
         <HistoryProfileItem
           {...data}
+          enterChatRoom = 'true'
           />
       </StyledChatCard>
       <ChatWrap>
         <AIChatForm data={recommendation} />
-        <UserChatForm data={USER_SAMPLE_DATA} />
+        <UserChatForm />
       </ChatWrap>
     </HistorySection>
   )

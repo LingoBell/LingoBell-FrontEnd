@@ -5,11 +5,14 @@ import { Paragraph, Title } from '../atoms/Typograpy'
 import LanguageGauge from './LanguageGauge'
 import Flag from 'react-world-flags'
 import { calculateAge } from '../../../consts/calculateAge'
+import Button from '../atoms/Button'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const Container = styled.div`
   min-widht : 400px;
   display : flex;
   align-items: center;
+  justify-content : space-between;
 `
 const ProfileImage = styled(BaseImage)`
   position : relative;
@@ -95,7 +98,7 @@ const AgeBox = styled.div`
   margin-left : 10px;
   height : 24px;
   ${props => props.$isSmall == 'small' && `
-    scale : 0.8;
+    scale : 0.9;
     `}
 
   ${props => props.$gender == 'Male' && `
@@ -117,19 +120,29 @@ const Age = styled.div`
   padding-left : 2px;
 
 `
+const ProfileWrap = styled.div`
+  display : flex;
+`
+const StyledButton = styled(Button)`
+  margin-left : 12px;
+`
 
 export default React.forwardRef((props,ref) => {
+  const navigate = useNavigate()
+  const chatId = useParams()
+
   const { 
     onClick, 
     handleClick, 
     size,
     hideContent,
-    
+    enterChatRoom,
   } = props;
 
 
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick} ref={ref}>
+      <ProfileWrap>
       <ProfileImage src ={props.profileImages ? props.profileImages
          : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
         <FlagContainer $isSmall={props.isSmall}>
@@ -139,8 +152,8 @@ export default React.forwardRef((props,ref) => {
       <Wrap>
         <NameWarp>
         <UserName>{props?.userName}</UserName>
-        <AgeBox $gender ={props.gender}
-                $isSmall={props.isSmall}>
+        <AgeBox $gender ={props?.gender}
+                $isSmall={props?.isSmall}>
         <Gender>
           {props?.gender == 'Male' ? '♂' : '♀'}
         </Gender>
@@ -150,8 +163,8 @@ export default React.forwardRef((props,ref) => {
         </AgeBox>
         </NameWarp>
         <LanguageGauge //언어 + 레벨 게이지 컴포넌트
-          nativeLanguage = {props.nativeLanguage}
-          learningLanguages = {props.learningLanguages}
+          nativeLanguage = {props?.nativeLanguage}
+          learningLanguages = {props?.learningLanguages}
           />
 
           <TagWrap>
@@ -169,6 +182,15 @@ export default React.forwardRef((props,ref) => {
           )
         }
       </Wrap>
+      </ProfileWrap>
+      {enterChatRoom == 'true' && (
+        <StyledButton $type = 'bordered-filled'
+          onClick={()=>{
+            navigate(`/live-chat/${chatId.chatId}`)
+          }}
+        >Enter Chat Room</StyledButton>
+      )}
     </Container>
+
   )
 })

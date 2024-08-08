@@ -68,7 +68,7 @@ export default props => {
   const isChatDetailOpen = !!chatId
   return (
     <Container>
-      <ChatHistoryList chatHistoryList={chatHistoryList} />
+      <ChatHistoryList chatHistoryList={chatHistoryList}/>
       <HistorySectionContainer 
         isOpen={isChatDetailOpen}
       >
