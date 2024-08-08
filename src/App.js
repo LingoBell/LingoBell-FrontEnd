@@ -35,6 +35,7 @@ export default () => {
       isFirstLogin: state.user.isFirstLogin
     }
   })
+  
 
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, async(user)=>{
