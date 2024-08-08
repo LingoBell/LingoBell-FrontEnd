@@ -36,37 +36,40 @@ export default () => {
       isFirstLogin: state.user.isFirstLogin
     }
   })
-
-  React.useEffect(()=>{
-    const unsubscribe = onAuthStateChanged(auth, (user)=>{
-      if(user){
-
-        const accessToken  = user.accessToken
-        
-        const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
-        axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
-//         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
-        console.log(accessToken)
-        dispatch(checkFirstLogin())
-        /**
-         *  1. 누군가가 구글 로그인(프론트)
-         *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
-         *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
-         * 
-         * */ 
-        
-
-        dispatch(setUser(JSON.parse(JSON.stringify(user))))
-
-      } else {
-        dispatch(clearUser ());
-      }
-      dispatch(setProcessFinished())
-    });
-    return()=> unsubscribe();
-  }, [dispatch]);
   
+
+//   React.useEffect(()=>{
+//     const unsubscribe = onAuthStateChanged(auth, (user)=>{
+//       if(user){
+
+//         const accessToken  = user.accessToken
+        
+//         const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
+//         axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
+// //         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+
+//         console.log(accessToken)
+//         dispatch(checkFirstLogin())
+//         /**
+//          *  1. 누군가가 구글 로그인(프론트)
+//          *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
+//          *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
+//          * 
+//          * */ 
+        
+
+//         dispatch(setUser(JSON.parse(JSON.stringify(user))))
+
+//       } else {
+//         dispatch(clearUser ());
+//       }
+//       dispatch(setProcessFinished())
+//     });
+//     return()=> unsubscribe();
+//   }, [dispatch]);
+  return (
+    <LiveChat />
+  )
 
   if (!processFinished) {
     return null
@@ -84,7 +87,10 @@ export default () => {
     console.log('앱FirstLogin값 : ',isFirstLogin)
     if (isFirstLogin == 3) {
       return (
-        <Route path='*' element={<ProfilePage/>}/>
+        <>
+          
+          <Route path='*' element={<ProfilePage/>}/>
+        </>
       )
     }
     if(isFirstLogin == 2){

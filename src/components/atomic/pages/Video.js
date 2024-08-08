@@ -7,6 +7,8 @@ const socket = io('')
 let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
+let mediaRecorder
+let audioStream
 const Video = forwardRef((props, ref) => {
     const params = useParams()
     const {
@@ -29,8 +31,37 @@ const Video = forwardRef((props, ref) => {
         console.log('init start')
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
-            // audio: true,
+            audio: true,
         })
+        audioStream = new MediaStream()
+        stream.getAudioTracks().forEach(track => {
+            audioStream.addTrack(track)
+        })
+
+        mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' })
+
+        mediaRecorder.ondataavailable = event => {
+            if (event.data.size > 0 && socket.connected) {
+                const reader = new FileReader();
+                reader.readAsDataURL(event.data);
+                reader.onloadend = () => {
+                    // const base64data = reader.result;
+                    console.log(reader.result)
+                    const base64data = reader.result.split(',')[1]
+                    
+                    // console.log(base64data)
+                    console.log('emit')
+                    socket.emit('audio', base64data);
+                };
+            }
+        }
+
+        socket.on('transcription', data => {
+            console.log(data)
+        })
+
+        mediaRecorder.start(1000)
+
         localVideoRef.current.srcObject = stream
         stream.getAudioTracks().enabled = isAudioEnabled;
         stream.getVideoTracks().enabled = isVideoEnabled;
@@ -99,6 +130,7 @@ const Video = forwardRef((props, ref) => {
                 pc.close()
                 pc = null
             }
+
             init()
 
             // notifyDiscon()
@@ -119,6 +151,9 @@ const Video = forwardRef((props, ref) => {
                 // pc.setRemoteDescription(null)
                 pc.close()
                 pc = null
+            }
+            if (mediaRecorder) {
+                mediaRecorder.close()
             }
             
         }
