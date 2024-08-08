@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
@@ -7,6 +7,7 @@ import Flag from 'react-world-flags'
 import { calculateAge } from '../../../consts/calculateAge'
 import Button from '../atoms/Button'
 import { useNavigate, useParams } from 'react-router-dom'
+import Modal from './Modal'
 
 const Container = styled.div`
   min-widht : 400px;
@@ -37,7 +38,7 @@ const FlagContainer = styled.div`
   align-items : center;
   overflow : hidden;
 
-  ${props => props.$isSmall =='small' &&`
+  ${props => props.$isSmall == 'small' && `
       width : 26px;
       height : 26px;
     `}
@@ -127,68 +128,92 @@ const StyledButton = styled(Button)`
   margin-left : 12px;
 `
 
-export default React.forwardRef((props,ref) => {
+
+export default React.forwardRef((props, ref) => {
+  const [historyModal, setHistoryModal] = useState(false)
+  const [selectedProfile, setSelectedProfile] = useState()
   const navigate = useNavigate()
   const chatId = useParams()
 
-  const { 
-    onClick, 
-    handleClick, 
+  const handleCloseModal = () => {
+    setHistoryModal(false);
+
+  };
+
+  const {
+    onClick,
+    handleClick,
     size,
     hideContent,
     enterChatRoom,
   } = props;
 
+  useEffect(()=>{
+    setSelectedProfile(props)
+  },[props])
+  console.log('dd',selectedProfile)
 
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick} ref={ref}>
+      {historyModal && (
+        <Modal
+          isOpened={historyModal}
+          onClickCloseBtn={() => handleCloseModal()}
+          bttnTxt="Enter Chat Room"
+          selectedProfile={selectedProfile}
+          onClickButton={() => {
+            navigate(`/live-chat/${chatId.chatId}`)
+
+          }}
+        />
+      )}
       <ProfileWrap>
-      <ProfileImage src ={props.profileImages ? props.profileImages
-         : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
-        <FlagContainer $isSmall={props.isSmall}>
-          <RoundFlag code={props?.nation}/>
-        </FlagContainer>
-      </ProfileImage>
-      <Wrap>
-        <NameWarp>
-        <UserName>{props?.userName}</UserName>
-        <AgeBox $gender ={props?.gender}
-                $isSmall={props?.isSmall}>
-        <Gender>
-          {props?.gender == 'Male' ? '♂' : '♀'}
-        </Gender>
-        <Age>
-          {calculateAge(props?.birthday)}
-        </Age>
-        </AgeBox>
-        </NameWarp>
-        <LanguageGauge //언어 + 레벨 게이지 컴포넌트
-          nativeLanguage = {props?.nativeLanguage}
-          learningLanguages = {props?.learningLanguages}
+        <ProfileImage src={props.profileImages ? props.profileImages
+          : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
+          <FlagContainer $isSmall={props.isSmall}>
+            <RoundFlag code={props?.nation} />
+          </FlagContainer>
+        </ProfileImage>
+        <Wrap>
+          <NameWarp>
+            <UserName>{props?.userName}</UserName>
+            <AgeBox $gender={props?.gender}
+              $isSmall={props?.isSmall}>
+              <Gender>
+                {props?.gender == 'Male' ? '♂' : '♀'}
+              </Gender>
+              <Age>
+                {calculateAge(props?.birthday)}
+              </Age>
+            </AgeBox>
+          </NameWarp>
+          <LanguageGauge //언어 + 레벨 게이지 컴포넌트
+            nativeLanguage={props?.nativeLanguage}
+            learningLanguages={props?.learningLanguages}
           />
 
           <TagWrap>
-          {props.interests?.map(interest =>   // tags라는 데이터
-            <StyledTag>{interest}</StyledTag>
-          )}
+            {props.interests?.map(interest =>   // tags라는 데이터
+              <StyledTag>{interest}</StyledTag>
+            )}
           </TagWrap>
 
-        {
-          hideContent && (
-            <>
-              <StyledParagraph>{props.content}</StyledParagraph>
-              {props.children}
-            </>
-          )
-        }
-      </Wrap>
+          {
+            hideContent && (
+              <>
+                <StyledParagraph>{props.content}</StyledParagraph>
+                {props.children}
+              </>
+            )
+          }
+        </Wrap>
       </ProfileWrap>
       {enterChatRoom == 'true' && (
-        <StyledButton $type = 'bordered-filled'
-          onClick={()=>{
-            navigate(`/live-chat/${chatId.chatId}`)
+        <StyledButton $type='bordered-filled'
+          onClick={() => {
+            setHistoryModal(true)
           }}
-        >Enter Chat Room</StyledButton>
+        >Show Detail</StyledButton>
       )}
     </Container>
 

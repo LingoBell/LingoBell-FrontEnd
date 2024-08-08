@@ -16,6 +16,8 @@ const HistorySection = styled.div`
     margin-right: auto;
     padding: 24px;
     max-width: 950px;
+    overflow-y : hidden;
+
     
   }
   
@@ -112,11 +114,14 @@ export default props => {
 
   console.log(recommendation)
 
+
+
   return (
     <HistorySection>
           
       <StyledChatCard>
         <HistoryProfileItem
+      
           {...data}
           enterChatRoom = 'true'
           />
