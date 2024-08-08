@@ -5,7 +5,7 @@ import ProfileItem from '../molecules/ProfileItem'
 import Modal from '../molecules/Modal'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { CreateChat, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
+import { CreateChat, getChatRooms, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
 import { GetPartnerList, GetRequestPartnerList } from '../../../apis/PartnerAPI'
 
 
@@ -90,10 +90,6 @@ export default props => {
         console.log('유저 리스트 불러오기 실패 : ', error);
       }
     };
-
-    // const fetchUserLearningLanguages = async () => {
-    //   try 
-    // }
 
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {

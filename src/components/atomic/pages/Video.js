@@ -1,8 +1,11 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import styled from 'styled-components'
+import styled from 'styled-components';
 import io from "socket.io-client";
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import { Canvas } from '@react-three/fiber';
+import ThreeScene from '../../../3Dmask/Model';
+import { createFaceLandmark } from '../../../apis/FaceAPI';
 
 const socket = io('')
 let pc1 = new RTCPeerConnection()
@@ -14,12 +17,12 @@ const VideoContainer = styled.div`
   display: inline-block;
 `;
 
-const Canvas = styled.canvas`
+const CanvasStyled = styled.canvas`
   position: absolute;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: 10;
+  z-index: 5;
 `;
 
 const Video = forwardRef((props, ref) => {
@@ -40,7 +43,7 @@ const Video = forwardRef((props, ref) => {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [faceLandmarker, setFaceLandmarker] = useState(null);
-    // const [webcamRunning, setWebcamRunning] = useState(false);
+    const [faceData, setFaceData] = useState(null);
     const canvasRef = useRef(null);
 
     const initFaceLandmarker = async () => {
@@ -60,16 +63,16 @@ const Video = forwardRef((props, ref) => {
     }
 
     const init = async () => {
-        console.log('init start')
+        console.log('init start');
         await initFaceLandmarker();
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             // audio: true,
         })
-        localVideoRef.current.srcObject = stream
+        localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
         stream.getVideoTracks().enabled = isVideoEnabled;
-        setLocalStream(stream)
+        setLocalStream(stream);
 
         // console.log('스트림 ',stream);
         // console.log('비디오', stream.getVideoTracks())
@@ -188,7 +191,7 @@ const Video = forwardRef((props, ref) => {
     useEffect(() => {
         if (faceLandmarker && localVideoRef.current) {
             const video = localVideoRef.current;
-    
+
             video.addEventListener('loadedmetadata', () => {
                 // const canvasElement = document.createElement('canvas');
                 // canvasElement.width = video.videoWidth;
@@ -201,82 +204,127 @@ const Video = forwardRef((props, ref) => {
                 const canvas = canvasRef.current;
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-    
+
                 const canvasCtx = canvas.getContext('2d');
                 const drawingUtils = new DrawingUtils(canvasCtx);
-    
+
                 const predictWebcam = async () => {
                     if (!video.videoWidth || !video.videoHeight) {
                         return;
                     }
-    
-                    const results = await faceLandmarker.detectForVideo(video, performance.now());
 
-                    console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results);
-    
-                    if (results.faceLandmarks) {
-                        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-                        for (const landmarks of results.faceLandmarks) {
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_TESSELATION,
-                                { color: "#C0C0C070", lineWidth: 1 }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE,
-                                { color: "#FF3030" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW,
-                                { color: "#FF3030" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_LEFT_EYE,
-                                { color: "#30FF30" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW,
-                                { color: "#30FF30" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
-                                { color: "#E0E0E0" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_LIPS,
-                                { color: "#E0E0E0" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS,
-                                { color: "#FF3030" }
-                            );
-                            drawingUtils.drawConnectors(
-                                landmarks,
-                                FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS,
-                                { color: "#30FF30" }
-                            );
+                        const results = await faceLandmarker.detectForVideo(video, performance.now());
+
+                        setFaceData(results.faceLandmarks[0]);
+                        console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
+                        // await createFaceLandmark(results.faceLandmarks[0]);
+
+                        if (results.faceLandmarks) {
+                            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                            for (const landmarks of results.faceLandmarks) {
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_TESSELATION,
+                                    { color: "#C0C0C070", lineWidth: 1 }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE,
+                                    { color: "#FF3030" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW,
+                                    { color: "#FF3030" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_LEFT_EYE,
+                                    { color: "#30FF30" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW,
+                                    { color: "#30FF30" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
+                                    { color: "#E0E0E0" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_LIPS,
+                                    { color: "#E0E0E0" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS,
+                                    { color: "#FF3030" }
+                                );
+                                drawingUtils.drawConnectors(
+                                    landmarks,
+                                    FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS,
+                                    { color: "#30FF30" }
+                                );
+                            }
                         }
-                    }
-                    requestAnimationFrame(predictWebcam);
-                };
-    
+                        requestAnimationFrame(predictWebcam);
+                    };
+
+                    // if (faceLandmarker) {
+                    //     const results = await faceLandmarker.detectForVideo(localVideoRef.current, performance.now());
+
+                    //     // if (results.faceLandmarks.length > 0) {
+                    //     //     socket.emit('LANDMARKS_DATA', results.faceLandmarks[0]);
+
+                    //     //     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                    //     //     results.faceLandmarks.forEach(landmarks => {
+                    //     //         drawingUtils.drawConnectors(
+                    //     //             landmarks,
+                    //     //             FaceLandmarker.FACE_LANDMARKS_TESSELATION,
+                    //     //             { color: '#C0C0C070', lineWidth: 1 }
+                    //     //         );
+                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE, { color: '#FF3030' });
+                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE, { color: '#30FF30' });
+                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL, { color: '#E0E0E0' });
+                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, { color: '#E0E0E0' });
+                    //     //     });
+                    //     // }
+
+                    //     if (results.faceLandmarks.length > 0) {
+                    //         const faceData = results.faceLandmarks[0];
+                    //         try {
+                    //           const overlayImage = await createFaceLandmark(faceData);
+                    //           console.log('백에서 받음', overlayImage);
+
+                    //           const image = new Image();
+                    //           image.src = `data:image/jpeg;base64,${overlayImage}`;
+                    //           image.onload = () => {
+                    //             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                    //             canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    //           };
+                    //         } catch (error) {
+                    //           console.error('Error in creating face landmark:', error);
+                    //         }
+                    //       }
+                    // }
+                //     requestAnimationFrame(predictWebcam);
+                // };
+
                 predictWebcam();
             });
         }
     }, [faceLandmarker]);
 
+    // console.log('ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ', faceData);
+
     return (
         <VideoContainer>
             <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
-            <Canvas ref={canvasRef} />
+            <CanvasStyled ref={canvasRef} />
             <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
+            {/* <ThreeScene /> */}
         </VideoContainer>
     );
 });

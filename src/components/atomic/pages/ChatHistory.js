@@ -56,7 +56,7 @@ export default props => {
       const result = await getChatRooms()
       
       console.log('result?')
-      console.log(result)
+      console.log('dddddddddddddddddddddddddddddddddddd',result)
       setChatHistoryList(result)
     } catch (e) {
       console.log(e)

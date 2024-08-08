@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@mediapipe/tasks-vision": "^0.10.14",
+    "@react-three/fiber": "^8.16.8",
     "@reduxjs/toolkit": "^2.2.6",
     "axios": "^1.7.2",
     "firebase": "^10.12.3",
