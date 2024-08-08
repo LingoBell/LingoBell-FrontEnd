@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
 import Select from 'react-select'
-import { AddUserProfile, getMyProfile, UpdateUserProfile } from '../../../apis/UserAPI'
+import { AddUserProfile, getMyProfile, UpdateUserProfile, uploadImage } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import BaseImage from '../atoms/BaseImage'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -121,6 +122,21 @@ const HintBox = styled.div`
         margin-left : 12px;
     }
 `
+
+const ImageWrap = styled.div`
+    display : flex;
+    align-items : center;
+`
+
+const ImagePreview = styled(BaseImage)`
+    margin-left : 12px;
+    width : 50px;
+    height : 50px;
+`
+const StyledImg = styled.input`
+    display : none;
+
+`
 export default props => {
     const [selectedInterests, setSelectedInterests] = useState({})
     const [nation, setNation] = useState('')
@@ -133,13 +149,15 @@ export default props => {
     const [hintModal, setHintModal] = useState(false)
     const [birthday, setBirthday] = useState('')
     const [nativeLanguageCode, setNativeLanguageCode] = useState('')
-        const { user, isFirstLogin } = useSelector((state) => {
+    const [image, setImage] = useState(null)
+    const [preview, setPreview] = useState(null)
+    const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
             isFirstLogin: state?.user.isFirstLogin
         }
     })
-
+    const imgRef = useRef(null)
     const navigate = useNavigate();
     const handleChange = (nation) => {
         setNation(nation)
@@ -152,8 +170,10 @@ export default props => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const response = await uploadImage(image)
 
         const formData = {
             selectedInterests,
@@ -165,7 +185,8 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
-            nativeLanguageCode
+            nativeLanguageCode,
+            image: response.url
         }
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -176,8 +197,7 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            console.log(formData)
-            AddUserProfile(formData)
+            await AddUserProfile(formData)
                 .then(() => {
                     window.location.reload();
                     navigate('/')
@@ -188,8 +208,15 @@ export default props => {
         }
     }
 
-    const handleEditSubmit = (e) => {
+
+
+
+
+
+    const handleEditSubmit = async (e) => {
         e.preventDefault();
+
+        const response = await uploadImage(image)
 
         const formData = {
             selectedInterests,
@@ -201,7 +228,8 @@ export default props => {
             userIntroduce,
             nation,
             birthday,
-            nativeLanguageCode
+            nativeLanguageCode,
+            image : response.url
         };
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -212,7 +240,7 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            UpdateUserProfile(formData)
+            await UpdateUserProfile(formData)
                 .then(() => {
                     navigate('/')
                 })
@@ -233,6 +261,7 @@ export default props => {
                 setGender(userProfile.gender);
                 setBirthday(userProfile.birthday);
                 setUserIntroduce(userProfile.description);
+                setPreview(userProfile.profileImages);
                 setNativeLanguageCode(userProfile.nativeLanguageCode);
                 setSelectedInterests(userProfile.interests.reduce((acc, interestId) => {
                     const interest = interests.find(i => i.interestId === interestId);
@@ -247,9 +276,22 @@ export default props => {
                     return acc;
                 }, {}));
             }
+
         };
         fetchUserProfile();
     }, [user.uid]);
+
+    useEffect(()=>{
+        if(image instanceof Blob) {
+            const reader = new FileReader();
+            reader.onloadend =() => {
+                setPreview(reader.result)
+            };
+            reader.readAsDataURL(image)
+        } else {
+            setPreview(null)
+        }
+    }, [image])
 
     return (
         <>
@@ -261,6 +303,25 @@ export default props => {
                         <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
                             setName(e.target.value)
                         }} />
+                    </FormItemWrap>
+
+                    <FormItemWrap>
+                        <ImageWrap>
+                            <LabelText>Upload profile image</LabelText>
+                            <StyledImg ref={imgRef} type="file" accept="image/*" required
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if(file){
+                                        setImage(file)
+                                    }
+                                }}
+                            />
+                            <ImagePreview onClick={()=>{
+                                imgRef.current.click();
+                            }} src={
+                                preview ? preview : 
+                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
+                        </ImageWrap>
                     </FormItemWrap>
 
                     <div style={{ display: 'flex' }}>
@@ -424,10 +485,10 @@ export default props => {
 
                     <FormItemWrap>
                         <LabelText>Tell us about yourself!</LabelText>
-                        <StyledTextArea 
+                        <StyledTextArea
                             placeholder='Introduce yourself'
                             value={userIntroduce}
-                            onChange={(event) => {setUserIntroduce(event.target.value)}} 
+                            onChange={(event) => { setUserIntroduce(event.target.value) }}
                         />
                     </FormItemWrap>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -442,6 +503,24 @@ export default props => {
                         <Input placeholder='Enter Your Name' value={name} onChange={(e) => {
                             setName(e.target.value)
                         }} />
+                    </FormItemWrap>
+                    <FormItemWrap>
+                        <ImageWrap>
+                            <LabelText>Upload profile image</LabelText>
+                            <StyledImg ref={imgRef} type="file" accept="image/*" required
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if(file){
+                                        setImage(file)
+                                    }
+                                }}
+                            />
+                            <ImagePreview onClick={()=>{
+                                imgRef.current.click();
+                            }} src={
+                                preview ? preview : 
+                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
+                        </ImageWrap>
                     </FormItemWrap>
 
                     <div style={{ display: 'flex' }}>

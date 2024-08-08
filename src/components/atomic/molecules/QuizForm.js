@@ -102,6 +102,10 @@ function QuizForm(props) {
         console.log(answer)
         console.log('score', score)
     })
+    if (!data || data.length === 0) {
+        return <div>No quiz data available</div>;
+      }
+    
     return (
         <StyledChatCard className={className} >
             <QuizWrap>
@@ -172,9 +176,6 @@ function QuizForm(props) {
                 )}
 
             </QuizWrap>
-
-
-
         </StyledChatCard>
 
     )

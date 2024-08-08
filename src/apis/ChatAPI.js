@@ -33,6 +33,12 @@ export const getChatRooms = () => {
         .then(res => res.data)
 };
 
+export const getChatRoomsById = async (chat_room_id) => {
+        const response = await axios.get(
+            `/chats/${chat_room_id}`)
+            return response.data
+}
+
 export const CreateRecommendations = async (chat_room_id) => {
     try{
         const response = await axios.post(
@@ -70,7 +76,7 @@ export const CreateQuizzes = async(chat_room_id) => {
     }
 }
 
-export const GetQuizzez = async (chat_room_id) => {
+export const GetQuizzes = async (chat_room_id) => {
     try{
         const response = await axios.get(
             `/chats/${chat_room_id}/quizzes`, chat_room_id);
@@ -81,3 +87,12 @@ export const GetQuizzez = async (chat_room_id) => {
         throw error;
     }
 }
+
+// export const getChatRoomStatus = async (chat_room_id) => {
+//     try{
+//         const response = await axios.get(`/chats/${chat_room_id}/status`)
+//         return response.data
+//     } catch(error) {
+
+//     }
+// }
