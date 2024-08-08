@@ -16,6 +16,8 @@ const HistorySection = styled.div`
     margin-right: auto;
     padding: 24px;
     max-width: 950px;
+    overflow-y : hidden;
+
     
   }
   
@@ -66,7 +68,6 @@ const UserChatForm = styled(ChatForm)`
 `
 const HistoryProfileItem = styled(ProfileItem)`
   justify-content : center;
-  scale : 1.1;
 `
 
 const AIChatForm = styled(UserChatForm)`
@@ -113,17 +114,21 @@ export default props => {
 
   console.log(recommendation)
 
+
+
   return (
     <HistorySection>
           
       <StyledChatCard>
         <HistoryProfileItem
+      
           {...data}
+          enterChatRoom = 'true'
           />
       </StyledChatCard>
       <ChatWrap>
         <AIChatForm data={recommendation} />
-        <UserChatForm data={USER_SAMPLE_DATA} />
+        <UserChatForm />
       </ChatWrap>
     </HistorySection>
   )

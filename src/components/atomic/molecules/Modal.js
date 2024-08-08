@@ -6,8 +6,8 @@ import { interests } from '../../../consts/profileDataKeyList';
 
 const Background = styled.div`
     background-color: rgba(0,0,0,0.4);
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     position: fixed;
     left: 0;
     top: 0;
@@ -18,6 +18,7 @@ const Background = styled.div`
 `
 
 const ModalBox = styled.div`
+    min-width : 400px;
     position: relative;
     background-color: white;
     padding-bottom : 24px;
