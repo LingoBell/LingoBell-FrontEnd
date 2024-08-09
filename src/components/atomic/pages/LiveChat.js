@@ -260,19 +260,19 @@ function LiveChat() {
         }
     }
 
-    useEffect(() => {
-        // const interval = setInterval(async () => {
-        //     try {
-        //         const response = await axios.get(`/chats/${chatRoomId}/stt`, {
-        //             params: { timestamp }
-        //         });
-        //         setMessages(response.data.messages);
-        //     } catch (err) {
-        //         console.error('Error fetching transcription', err);
-        //     }
-        // }, 3000);
-        // return () => clearInterval(interval);
-    }, [chatRoomId]);
+
+    // const send_notification = async () => {
+    //     try {
+    //         const result = await axios.get(`/chats/${chatRoomId}/info`)
+    //         console.log('ddd', result)
+    //     } catch (error) {
+    //         console.error('Error creating recommendations', err)
+    //     }
+    // }
+        
+    // useEffect(() => {
+    //     send_notification(chatRoomId)
+    // }, [chatRoomId]);
 
     // useEffect(()=>{
 

@@ -68,6 +68,10 @@ export default props => {
     navigate('/chat-history/' + id)
   }
 
+  const onClickHome = () => {
+    navigate('/')
+  }
+
   const { gender,
     nation,
     birthday,
@@ -88,6 +92,7 @@ export default props => {
         birthday={birthday}
         userName={userName}
         profileImages={profileImages}
+        onClick={() => onClickHome()}
 
       />
       {/* 채팅히스토리데이터 */}
@@ -103,7 +108,7 @@ export default props => {
           return (
             <StyledProfileItem
               isSmall='small'
-              ref={index === 0 ? historyRef : null}
+              // ref={index === 0 ? historyRef : null}
               size='small'
               birthday={birthday}
               gender={gender}
