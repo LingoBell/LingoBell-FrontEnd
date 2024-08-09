@@ -97,3 +97,15 @@ export const GetQuizzes = async (chat_room_id) => {
 //     }
 // }
 
+export const getSttMessages = async (chat_room_id) => {
+    const url = `/chats/${chat_room_id}/stt`;
+
+    try {
+        const response = await axios.get(url, {chat_room_id});
+        console.log('Successfuly get stt messages', response.data);
+        return response.data;
+    } catch (error) {
+        console.log("Error fetching STT messages", error);
+        throw error;
+    }
+};

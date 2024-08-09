@@ -6,7 +6,7 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useParams } from "react-router-dom";
-import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 
@@ -252,17 +252,17 @@ function LiveChat() {
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
     useEffect(() => {
-        const interval = setInterval(async () => {
+        const fetchMessages = async () => {
             try {
-                const response = await axios.get(`/chats/${chatRoomId}/stt`, {
-                    params: { timestamp }
-                });
-                setMessages(response.data.messages);
+                const data = await getSttMessages(chatRoomId);
+                setMessages(data.messages);
             } catch (err) {
-                console.error('Error fetching transcription', err);
+                console.error('Error fetching STT messages on LiveChat useEffect', err);
             }
-        }, 3000);
-        return () => clearInterval(interval);
+        };
+
+        const intervalId = setInterval(fetchMessages, 1000);
+        return () => clearInterval(intervalId);
     }, [chatRoomId]);
 
 
@@ -426,7 +426,7 @@ function LiveChat() {
                     </StyledChatForm>
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm data={messages.map((msg, index) => ({
+                    <StyledChatForm data={messages.map((msg) => ({
                         ...msg,
                         translatedMessage: showTranslation ? msg.translatedMessage : ''
                     }))} />

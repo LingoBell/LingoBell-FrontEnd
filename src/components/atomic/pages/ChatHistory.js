@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import ProfileItem from '../molecules/ProfileItem'
-
 import ChatCard from '../templates/ChatSectionCard'
 import ChatForm from '../molecules/ChatForm'
 import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
@@ -10,13 +9,10 @@ import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
 import { getChatRooms } from '../../../apis/ChatAPI'
 import { PRIMARY_COLOR } from '../../../consts/color'
 
-
 const Container = styled.div`
   display: flex;
   height: 100%;
 `
-
-
 
 const HistorySectionContainer = styled.main`
   position: fixed;
@@ -58,10 +54,7 @@ const ChatLogo = styled.div`
     margin-top : 80px;
     color : ${PRIMARY_COLOR};
     }
-
-    `
-
-
+`
 
 export default props => {
   const {
@@ -80,13 +73,14 @@ export default props => {
     } catch (e) {
       console.log(e)
     }
-
   }
 
   useEffect(() => {
     fetchChatHistory()
   }, [])
+
   const isChatDetailOpen = !!chatId
+
   return (
     <Container>
       <ChatHistoryList chatHistoryList={chatHistoryList}/>

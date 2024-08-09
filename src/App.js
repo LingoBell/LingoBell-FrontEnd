@@ -151,17 +151,13 @@ export default () => {
     return null; //비정상적으로 isFirstLogin()값이 업데이트 안될 경우 처리하기 위함
   }
 
-
-
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
           {renderRoutes()}
-
         </Route>
       </Routes>
-
     </BrowserRouter>
   )
 }
