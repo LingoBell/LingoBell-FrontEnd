@@ -8,6 +8,7 @@ import { useLocation, useHistory, useNavigate, useParams } from 'react-router-do
 import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
 import { getChatRooms } from '../../../apis/ChatAPI'
+import { PRIMARY_COLOR } from '../../../consts/color'
 
 
 const Container = styled.div`
@@ -25,20 +26,40 @@ const HistorySectionContainer = styled.main`
   height: 100%;
   transform: translateX(200%);
   background-color: white;
+  background-repeat : no-repeat;
   transition: transform 0.3s;
   ${props => props.isOpen && `
     transform: translateX(0);
   `}
   @media screen and (min-width: 1024px) {
-    display: none;
     transform: translateX(0);
     position: static;
     flex: 1;
     width: auto;
     height: auto;
+    min-height: calc(100vh - 60px);
     ${props => props.isOpen && 'display: block;'}
   }
 `
+
+const ChatLogo = styled.div`
+    display : flex;
+    justify-content : center;
+    flex-direction : column;
+    align-items : center;
+    height : 100%;
+    img {
+      width : 250px;
+      opacity : 1;
+    }
+    
+    div { 
+    font-size : 34px;
+    margin-top : 80px;
+    color : ${PRIMARY_COLOR};
+    }
+
+    `
 
 
 
@@ -71,8 +92,20 @@ export default props => {
       <ChatHistoryList chatHistoryList={chatHistoryList}/>
       <HistorySectionContainer 
         isOpen={isChatDetailOpen}
+        // style={isChatDetailOpen ? {} : { backgroundImage: 'url("https://storage.googleapis.com/lingobellstorage/chat-logo.png")'}}
       >
-        <ChatHistoryDetail />
+        {
+          isChatDetailOpen ? (
+            <ChatHistoryDetail />
+          ) : (
+            <>
+            <ChatLogo>
+            <img src='https://storage.googleapis.com/lingobellstorage/chat-logo.png'/>
+            <div>No chats selected</div>
+            </ChatLogo>
+            </>
+          )
+        }
       </HistorySectionContainer>
     </Container>
   )

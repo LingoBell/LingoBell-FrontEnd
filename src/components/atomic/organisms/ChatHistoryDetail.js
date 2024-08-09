@@ -10,6 +10,8 @@ const HistorySection = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-top: 70px;
+  padding-bottom: 24px;
   @media screen and (min-width: 1024px) {
     background-color: white;
     margin-left: auto;
@@ -17,7 +19,7 @@ const HistorySection = styled.div`
     padding: 24px;
     max-width: 950px;
     overflow-y : hidden;
-
+    height: calc(100vh - 60px);
     
   }
   
@@ -48,6 +50,7 @@ const ChatWrap = styled.div`
     padding-right: 12px;
     align-items: center;
     flex: 1;
+    overflow : hidden;
   }
 `
 
@@ -71,7 +74,7 @@ const HistoryProfileItem = styled(ProfileItem)`
 `
 
 const AIChatForm = styled(UserChatForm)`
-  height : 450px;
+  // height : 450px;
 `
 
 export default props => {
