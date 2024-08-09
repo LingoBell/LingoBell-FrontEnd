@@ -1,7 +1,7 @@
-// src/firebase.js
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { registerFcm } from '../apis/UserAPI';
 
 const firebaseConfig = {
     'apiKey': "AIzaSyAfXBd6KqRqNPGkk3vdq71IRC_aJGJxYbw",
@@ -15,46 +15,24 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-
-
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-export const messaging = async () => await isSupported() && getMessaging(app)
+export const messaging = getMessaging(app)
 
-export const requestPermission = async () => {
-    try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-            const messagingInstance = await messaging();
-            const token = await getToken(messagingInstance, { vapidKey: 'BMhXcBGgHNqR-5tATwB7zEOwmVjw8Bi-vZGUoYvUwJJJvG406y_0OWEtEaiIEeaASuqlBEscwViVlBGJP-sIi_A' });
-            console.log('FCM Token:', token);
-            onMessage(messagingInstance, (payload) => {
-                console.log('Message received', payload);
-                // 여기서 알림 커스터마이징
-                if (payload.notification) {
-                    const notificationTitle = payload.notification.title;
-                    const notificationOptions = {
-                        body: payload.notification.body,
-                    };
-                    console.log('Creating notification:', notificationTitle, notificationOptions);
-                    // Check if Notifications are supported and display the notification
-                    if ('Notification' in window) {
-                        console.log('hihi')
-                        new Notification(notificationTitle, notificationOptions);
-                    } else {
-                        console.log('Notifications not supported in this browser.');
-                    }
-                } else {
-                    console.log('No notification payload found in the message.');
-                }
-            });
-        } else {
-            console.log('Notification permission denied');
-        }
-    } catch (error) {
-        console.log('Error getting permission for notifications', error);
-    }
-};
+export const generateToken = async () => {
+   const permission =  await Notification.requestPermission()
+   console.log(permission)
+   if(permission === 'granted'){
 
-requestPermission();
+       const token = await getToken(messaging, {
+        vapidKey : 'BMhXcBGgHNqR-5tATwB7zEOwmVjw8Bi-vZGUoYvUwJJJvG406y_0OWEtEaiIEeaASuqlBEscwViVlBGJP-sIi_A'
+       })
+       console.log(token)
+       registerFcm(token) // db에 토큰 저장
+       
+   } else if(permission == 'denied') {
+    alert('Notification permission is denied. please activate notification setting to get chat request alarm ');
+}
+}
+
 

@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import io from "socket.io-client";
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import axios from "axios";
 import { Canvas } from '@react-three/fiber';
 import ThreeScene from '../../../3Dmask/Model';
 import { createFaceLandmark } from '../../../apis/FaceAPI';
+import { send_notification } from '../../../apis/UserAPI';
 
 const Wrap = styled.div`
     display: flex;
@@ -53,7 +55,8 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange
     } = props
     const {
-        chatId: roomName,
+        roomName,
+        chatId
     } = params
 
     const localVideoRef = useRef(null);
@@ -66,6 +69,8 @@ const Video = forwardRef((props, ref) => {
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const canvasRef = useRef(null);
+
+
 
     const initFaceLandmarker = async () => {
         const filesetResolver = await FilesetResolver.forVisionTasks(
@@ -116,6 +121,7 @@ const Video = forwardRef((props, ref) => {
         socket.on('CREATED', async () => {
             console.log('CREATED')
             isCaller = true
+            send_notification(chatId) // 상대방에게 notification pop up
         })
         socket.on('JOINED', async () => {
             console.log('JOINED')
@@ -238,7 +244,7 @@ const Video = forwardRef((props, ref) => {
                         const results = await faceLandmarker.detectForVideo(video, performance.now());
 
                         setFaceData(results.faceLandmarks[0]);
-                        console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
+                        // console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
                         // await createFaceLandmark(results.faceLandmarks[0]);
 
                         if (results.faceLandmarks) {
@@ -341,18 +347,19 @@ const Video = forwardRef((props, ref) => {
 
     // console.log('ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ', faceData);
 
-    return (<>
-        <VideoContainer>
-            <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
-            <CanvasStyled ref={canvasRef} />
-            <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
-            {/* <ThreeScene /> */}
-        </VideoContainer>
+    return (
+        // <VideoContainer>
+        //     <video 
+        //     ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
+        //     <CanvasStyled ref={canvasRef} />
+        //     <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
+        //     {/* <ThreeScene /> */}
+        // </VideoContainer>
         <Wrap>
             <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
             <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
         </Wrap>
-        </>
     );
 });
+
 export default Video;

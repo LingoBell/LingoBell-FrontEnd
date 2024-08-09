@@ -10,7 +10,6 @@ import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecomm
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 
-
 const MainStyle = createGlobalStyle`
     #root > main {
         height: 100vh;
@@ -265,6 +264,21 @@ function LiveChat() {
         const intervalId = setInterval(fetchMessages, 1000);
         return () => clearInterval(intervalId);
     }, [chatRoomId]);
+
+
+    // const send_notification = async () => {
+    //     try {
+    //         const result = await axios.get(`/chats/${chatRoomId}/info`)
+    //         console.log('ddd', result)
+    //     } catch (error) {
+    //         console.error('Error creating recommendations', err)
+    //     }
+    // }
+        
+    // useEffect(() => {
+    //     send_notification(chatRoomId)
+    // }, [chatRoomId]);
+
 
     // useEffect(()=>{
 

@@ -40,10 +40,6 @@ function ChatForm(props, ref) {
         return { user: state.user?.user}
       })
 
-    console.log("ChatForm안에 들어있는 data", data);
-    console.log("ChatForm에서 확인할 수 있는 user", user);
-    console.log("그렇다면 uid는?", user.uid);
-
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
