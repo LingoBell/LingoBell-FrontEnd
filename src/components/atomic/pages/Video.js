@@ -53,8 +53,9 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange
     } = props
     const {
-        roomName,
+        chatId: roomName,
     } = params
+
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const [localStream, setLocalStream] = useState(null)
@@ -102,7 +103,7 @@ const Video = forwardRef((props, ref) => {
         console.log('pc done')
         pc.onicecandidate = event => {
             if (event.candidate) {
-                socket.emit('CANDIDATE', event.candidate)
+                socket.emit('CANDIDATE', { candidate: event.candidate, roomName })
             }
         }
         pc.ontrack = (event) => {
@@ -126,7 +127,7 @@ const Video = forwardRef((props, ref) => {
                 console.log('A. creating OFFER')
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(new RTCSessionDescription(offer));
-                socket.emit('OFFER', offer);
+                socket.emit('OFFER', { roomName, offer });
             }
         })
         socket.on('ANSWER_RECEIVED', async (answer) => {
@@ -140,7 +141,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
-            socket.emit('ANSWER', answer)
+            socket.emit('ANSWER', {roomName, answer})
         })
 
         socket.on('CANDIDATE_RECEIVED', async (candidate) => {
@@ -170,6 +171,7 @@ const Video = forwardRef((props, ref) => {
 
         return () => {
             if (socket) {
+                socket.emit('DISCONNECTED', roomName)
                 socket.close()
             }
             console.log('closing')
