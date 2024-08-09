@@ -65,7 +65,7 @@ function ChatForm(props, ref) {
                                 <ChatMessage
                                     type={message?.type}
                                 >
-                                    <pre style={{ whiteSpace: 'pre-line' }}>{message?.aiRecommendation}</pre>
+                                    <pre style={{ whiteSpace: 'pre-wrap' }}>{message?.aiRecommendation?.trim()}</pre>
                                 </ChatMessage>
                             </AiMessageWrapper>
                         )}

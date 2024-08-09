@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { PROFILE_DATA } from '../../../consts/sampleData'
 import ProfileItem from '../molecules/ProfileItem'
@@ -32,71 +32,91 @@ const MyProfileItem = styled(StyledProfileItem)`
 `
 export default props => {
   const {
-    chatHistoryList
+    chatHistoryList,
   } = props
 
-  const[myProfile, setMyProfile] = useState({});
+  console.log('THTIS', chatHistoryList)
 
-  const user = useSelector((state)=>state.user.user);
+  const [myProfile, setMyProfile] = useState({});
+  const user = useSelector((state) => state.user.user);
+  const historyRef = useRef(null)
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const fetchProfiles = async() => {
-      try{
+    const fetchProfiles = async () => {
+      try {
         const profile = await getMyProfile()
         setMyProfile(profile)
-      } catch(error) {
+      } catch (error) {
         console.log('내 프로필 불러오기 실패:', error)
       }
     }
 
     fetchProfiles();
-  },[user.uid])
+  }, [user.uid])
+
+  useEffect(() => {
+    if (historyRef.current) {
+      historyRef.current.click()
+    }
+  }, [chatHistoryList])
 
   const navigate = useNavigate()
-  
 
-  const onClickProfileItem = (id) => {
-    navigate('/chat-history/'+id)
+
+  const onClickProfileItem = (id,) => {
+    navigate('/chat-history/' + id)
   }
 
   const { gender,
-          nation,
-          birthday,
-          userName,
-          userId,
-          profileImages
+    nation,
+    birthday,
+    userName,
+    userId,
+    profileImages
 
   } = myProfile;
-  console.log('myProfile',myProfile)
+  console.log('myProfile', myProfile)
   return (
     <ProfileWrap className={props.className}>
-        <MyProfileItem //마이프로필
+      <MyProfileItem //마이프로필
         isSmall='small'
-        className = 'small'
+        className='small'
         key={userId}
         gender={gender}
         nation={nation}
         birthday={birthday}
         userName={userName}
         profileImages={profileImages}
-        
-        />
-        {/* 채팅히스토리데이터 */}
-        {
-          chatHistoryList.map((profile, index) => {
 
-            return (
-              <StyledProfileItem
-                size='small'
-                {...profile}
-                key={index}
-                onClick={() => onClickProfileItem(profile.chatRoomId)}
-              />
+      />
+      {/* 채팅히스토리데이터 */}
+      {
+        chatHistoryList.map((profile, index) => {
+          const {
+            birthday,
+            gender,
+            userName,
+            profileImages,
+            nation
+          } = profile
+          return (
+            <StyledProfileItem
+              isSmall='small'
+              ref={index === 0 ? historyRef : null}
+              size='small'
+              birthday={birthday}
+              gender={gender}
+              userName={userName}
+              profileImages={profileImages}
+              nation={nation}
+              key={index}
+              onClick={() => onClickProfileItem(profile.chatRoomId)}
+            />
 
-            )
-          })
-        }
-      </ProfileWrap>
+          )
+        })
+      }
+    </ProfileWrap>
   )
 }

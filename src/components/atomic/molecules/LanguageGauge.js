@@ -43,8 +43,6 @@ const Arrow = styled.span`
 
 export default props => {
   const { nativeLanguage, learningLanguages  } = props;
-  console.log('Native',nativeLanguage)
-  console.log('Learning, : ', learningLanguages)
 
   const getGaugeWidth = (level) => {
     return (level / 6) * 100 + '%';
