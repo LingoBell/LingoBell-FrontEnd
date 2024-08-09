@@ -131,6 +131,7 @@ const Video = forwardRef((props, ref) => {
 
         return () => {
             if (socket) {
+                socket.emit('DISCONNECTED', roomName)
                 socket.close()
             }
             console.log('closing')
