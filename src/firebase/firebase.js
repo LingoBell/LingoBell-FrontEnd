@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { registerFcm } from '../apis/UserAPI';
 
 const firebaseConfig = {
     'apiKey': "AIzaSyAfXBd6KqRqNPGkk3vdq71IRC_aJGJxYbw",
@@ -27,7 +28,11 @@ export const generateToken = async () => {
         vapidKey : 'BMhXcBGgHNqR-5tATwB7zEOwmVjw8Bi-vZGUoYvUwJJJvG406y_0OWEtEaiIEeaASuqlBEscwViVlBGJP-sIi_A'
        })
        console.log(token)
-   }
+       registerFcm(token) // db에 토큰 저장
+       
+   } else if(permission == 'denied') {
+    alert('Notification permission is denied. please activate notification setting to get chat request alarm ');
+}
 }
 
 

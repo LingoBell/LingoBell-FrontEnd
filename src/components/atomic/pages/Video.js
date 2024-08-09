@@ -3,9 +3,11 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import io from "socket.io-client";
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import axios from "axios";
 import { Canvas } from '@react-three/fiber';
 import ThreeScene from '../../../3Dmask/Model';
 import { createFaceLandmark } from '../../../apis/FaceAPI';
+import { send_notification } from '../../../apis/UserAPI';
 
 const Wrap = styled.div`
     display: flex;
@@ -54,6 +56,7 @@ const Video = forwardRef((props, ref) => {
     } = props
     const {
         roomName,
+        chatId
     } = params
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
@@ -65,6 +68,8 @@ const Video = forwardRef((props, ref) => {
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const canvasRef = useRef(null);
+
+
 
     const initFaceLandmarker = async () => {
         const filesetResolver = await FilesetResolver.forVisionTasks(
@@ -115,6 +120,7 @@ const Video = forwardRef((props, ref) => {
         socket.on('CREATED', async () => {
             console.log('CREATED')
             isCaller = true
+            send_notification(chatId) // 상대방에게 notification pop up
         })
         socket.on('JOINED', async () => {
             console.log('JOINED')

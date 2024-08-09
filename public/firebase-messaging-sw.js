@@ -12,6 +12,7 @@ firebase.initializeApp({
 });
 const messaging = firebase.messaging();
 
+// 백그라운드일때 receive
 messaging.onBackgroundMessage((payload) => {
   console.log(
     '[firebase-messaging-sw.js] Received background message ',
@@ -22,7 +23,21 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: payload.notification.body,
     icon: payload.notification.image,
+    data: payload.data
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
+
+self.addEventListener('notificationclick', function(event){
+  const notification = event.notification;
+  const link = notification.data.link;
+
+  event.notification.close();
+
+  if(link) {
+    event.waitUntil(
+      clients.openWindow(link)
+    )
+  }
+})
