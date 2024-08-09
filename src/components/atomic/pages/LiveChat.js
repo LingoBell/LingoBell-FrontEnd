@@ -252,37 +252,18 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
-    const startTranscription = async (file) => {
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-            await axios.post(`/chats/${chatRoomId}/stt`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-        } catch (err) {
-            console.error('Error starting transcription', err);
-        }
-    }
-
-    const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        startTranscription(file);
-    };
-
     useEffect(() => {
-        // const interval = setInterval(async () => {
-        //     try {
-        //         const response = await axios.get(`/chats/${chatRoomId}/stt`, {
-        //             params: { timestamp }
-        //         });
-        //         setMessages(response.data.messages);
-        //     } catch (err) {
-        //         console.error('Error fetching transcription', err);
-        //     }
-        // }, 3000);
-        // return () => clearInterval(interval);
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get(`/chats/${chatRoomId}/stt`, {
+                    params: { timestamp }
+                });
+                setMessages(response.data.messages);
+            } catch (err) {
+                console.error('Error fetching transcription', err);
+            }
+        }, 3000);
+        return () => clearInterval(interval);
     }, [chatRoomId]);
 
     const fetchAiRecommendations = async () => {
@@ -392,10 +373,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <input type="file" onChange={handleFileChange} />
-                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
-
-                        <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
+                        <CallButton onClick={toggleTranslation}><span className='material-icons'>translate</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
