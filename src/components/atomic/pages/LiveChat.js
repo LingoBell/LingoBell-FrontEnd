@@ -6,7 +6,7 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useParams } from "react-router-dom";
-import { CreateQuizzes, CreateRecommendations, GetQuizzez, GetRecommendations } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 
@@ -266,6 +266,19 @@ function LiveChat() {
         return () => clearInterval(interval);
     }, [chatRoomId]);
 
+    // useEffect(()=>{
+
+    //     const fetchChatRoomStatus = async() => {
+    //         try {
+    //             const joinStatus = await getChatRoomStatus(chatRoomId)
+    //             console.log('iiiii',joinStatus)
+    //         } catch(error) {
+    //             console.log(error)
+    //         }
+    //     }
+    //     fetchChatRoomStatus()
+    // },[]) 이거하던부분
+
     const fetchAiRecommendations = async () => {
         const recommendData = await GetRecommendations(chatRoomId);
         const newRecommendData = recommendData.map(item => ({
@@ -276,7 +289,9 @@ function LiveChat() {
     }
 
     const fetchAiQuizzes = async () => {
-        const quizData = await GetQuizzez(chatRoomId);
+        console.log('Fetching AI Quizzes'); // 로그 추가
+
+        const quizData = await GetQuizzes(chatRoomId);
         const newQuizData = quizData.map(item => ({
             ...item, type : 'quiz'
         }))
@@ -324,6 +339,7 @@ function LiveChat() {
         }
     }
 
+    console.log('wwww',quiz)
 
     const toggleTranslation = () => {
         setShowTranslation(!showTranslation);
@@ -408,7 +424,8 @@ function LiveChat() {
                         <CloseButton onClick={()=>{
                             setQuizModal(false)
                         }}>x</CloseButton>
-                        <StyledQuizForm data={quiz.slice(-5)}/>
+                        <StyledQuizForm data={quiz?.slice(-5)}/>
+                        {console.log('Quiz data passed to QuizForm:', quiz.slice(-5))}
                     </QuizModal>
                 </ModalOverlay>
             )}

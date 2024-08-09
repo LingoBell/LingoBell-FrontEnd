@@ -4,7 +4,6 @@ import ProfileItem from '../molecules/ProfileItem'
 
 import ChatCard from '../templates/ChatSectionCard'
 import ChatForm from '../molecules/ChatForm'
-import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/sampleData'
 import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
 import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
@@ -41,7 +40,6 @@ const HistorySectionContainer = styled.main`
   }
 `
 
-const profiles = PROFILE_DATA
 
 
 export default props => {
@@ -56,7 +54,7 @@ export default props => {
       const result = await getChatRooms()
       
       console.log('result?')
-      console.log(result)
+      console.log('dddddddddddddddddddddddddddddddddddd',result)
       setChatHistoryList(result)
     } catch (e) {
       console.log(e)
@@ -70,7 +68,7 @@ export default props => {
   const isChatDetailOpen = !!chatId
   return (
     <Container>
-      <ChatHistoryList chatHistoryList={chatHistoryList} />
+      <ChatHistoryList chatHistoryList={chatHistoryList}/>
       <HistorySectionContainer 
         isOpen={isChatDetailOpen}
       >

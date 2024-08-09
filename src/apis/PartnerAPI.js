@@ -12,7 +12,7 @@ export const GetPartnerList = async () => {
     }
 };
 
-export const GetRequestPartnerList = async (userCode) => {
+export const GetRequestPartnerList = async () => {
     const url = `/partners/requests`;
 
     try {

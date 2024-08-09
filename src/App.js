@@ -8,7 +8,7 @@ import IndexPage from "./components/atomic/pages/IndexPage";
 import ProfileList from "./components/atomic/pages/ProfileList";
 import Header from "./components/layout/Header";
 import LiveChat from "./components/atomic/pages/LiveChat";
-import { auth, googleProvider } from './firebase/firebase'; //파이어베이스 구글인증
+import { auth, googleProvider, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
@@ -23,7 +23,6 @@ axios.defaults.baseURL = mainDomain + "/api" //api엔드포인트 defualtUrl설�
 axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
-
 window.accessToken = null
 
 export default () => {
@@ -36,27 +35,24 @@ export default () => {
       isFirstLogin: state.user.isFirstLogin
     }
   })
+  
 
   React.useEffect(()=>{
-    const unsubscribe = onAuthStateChanged(auth, (user)=>{
+    const unsubscribe = onAuthStateChanged(auth, async(user)=>{
       if(user){
-
+        // google로그인
         const accessToken  = user.accessToken
-        
         const STORAGE_TOKEN = window.localStorage.getItem('AUTH_USER')
         axios.defaults.headers.common.Authorization = STORAGE_TOKEN || 'Bearer ' + user.accessToken
-//         axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-
         console.log(accessToken)
-        dispatch(checkFirstLogin())
-        /**
-         *  1. 누군가가 구글 로그인(프론트)
-         *  2. 최초 접속인지 여부 판단(서버: user 테이블에 정보가 있는지를 기준으로, userslice에 작성 checkFirstLogin)
-         *  3. 최초 접속인 경우 프로필 페이지만 보여준다(ProfilePage 작성 필요)
-         * 
-         * */ 
         
+        // // FCM
+        // const token = await requestPermission();
+        // if(token) {
+        //   await axios.post('/save-token', {token, uid : user.uid})
+        // }
 
+        dispatch(checkFirstLogin())
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
 
       } else {

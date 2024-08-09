@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import Button from '../atoms/Button'
 import { languages, interests, nations } from '../../../consts/profileDataKeyList'
@@ -6,6 +6,7 @@ import Select from 'react-select'
 import { AddUserProfile, getMyProfile, UpdateUserProfile, uploadImage } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import BaseImage from '../atoms/BaseImage'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -124,8 +125,17 @@ const HintBox = styled.div`
 
 const ImageWrap = styled.div`
     display : flex;
-    justify-content : space-between;
     align-items : center;
+`
+
+const ImagePreview = styled(BaseImage)`
+    margin-left : 12px;
+    width : 50px;
+    height : 50px;
+`
+const StyledImg = styled.input`
+    display : none;
+
 `
 export default props => {
     const [selectedInterests, setSelectedInterests] = useState({})
@@ -140,13 +150,14 @@ export default props => {
     const [birthday, setBirthday] = useState('')
     const [nativeLanguageCode, setNativeLanguageCode] = useState('')
     const [image, setImage] = useState(null)
+    const [preview, setPreview] = useState(null)
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
             isFirstLogin: state?.user.isFirstLogin
         }
     })
-
+    const imgRef = useRef(null)
     const navigate = useNavigate();
     const handleChange = (nation) => {
         setNation(nation)
@@ -177,6 +188,7 @@ export default props => {
             nativeLanguageCode,
             image: response.url
         }
+
         if (Object.keys(selectedInterests).length === 0 ||
             !gender || name === '' || mainLanguage.language === '' ||
             Object.keys(learningLanguages).length === 0 || Object.keys(languageWithLevel).length === 0
@@ -201,8 +213,10 @@ export default props => {
 
 
 
-    const handleEditSubmit = (e) => {
+    const handleEditSubmit = async (e) => {
         e.preventDefault();
+
+        const response = await uploadImage(image)
 
         const formData = {
             selectedInterests,
@@ -215,6 +229,7 @@ export default props => {
             nation,
             birthday,
             nativeLanguageCode,
+            image : response.url
         };
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -225,7 +240,7 @@ export default props => {
             alert("All fields required")
             return false
         } else {
-            UpdateUserProfile(formData)
+            await UpdateUserProfile(formData)
                 .then(() => {
                     navigate('/')
                 })
@@ -246,6 +261,7 @@ export default props => {
                 setGender(userProfile.gender);
                 setBirthday(userProfile.birthday);
                 setUserIntroduce(userProfile.description);
+                setPreview(userProfile.profileImages);
                 setNativeLanguageCode(userProfile.nativeLanguageCode);
                 setSelectedInterests(userProfile.interests.reduce((acc, interestId) => {
                     const interest = interests.find(i => i.interestId === interestId);
@@ -264,6 +280,19 @@ export default props => {
         };
         fetchUserProfile();
     }, [user.uid]);
+
+    useEffect(()=>{
+        if(image instanceof Blob) {
+            const reader = new FileReader();
+            reader.onloadend =() => {
+                setPreview(reader.result)
+            };
+            reader.readAsDataURL(image)
+        } else {
+            setPreview(null)
+        }
+    }, [image])
+
     return (
         <>
             {isFirstLogin === 2 ?
@@ -275,8 +304,26 @@ export default props => {
                             setName(e.target.value)
                         }} />
                     </FormItemWrap>
+
                     <FormItemWrap>
+                        <ImageWrap>
+                            <LabelText>Upload profile image</LabelText>
+                            <StyledImg ref={imgRef} type="file" accept="image/*" required
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if(file){
+                                        setImage(file)
+                                    }
+                                }}
+                            />
+                            <ImagePreview onClick={()=>{
+                                imgRef.current.click();
+                            }} src={
+                                preview ? preview : 
+                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
+                        </ImageWrap>
                     </FormItemWrap>
+
                     <div style={{ display: 'flex' }}>
                         <FormItemWrap style={{ width: '49%' }}>
                             <LabelText>Native Language</LabelText>
@@ -460,11 +507,19 @@ export default props => {
                     <FormItemWrap>
                         <ImageWrap>
                             <LabelText>Upload profile image</LabelText>
-                            <input type="file" accept="image/*" required
+                            <StyledImg ref={imgRef} type="file" accept="image/*" required
                                 onChange={(e) => {
-                                    setImage(e.target.files[0])
+                                    const file = e.target.files[0];
+                                    if(file){
+                                        setImage(file)
+                                    }
                                 }}
                             />
+                            <ImagePreview onClick={()=>{
+                                imgRef.current.click();
+                            }} src={
+                                preview ? preview : 
+                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
                         </ImageWrap>
                     </FormItemWrap>
 
