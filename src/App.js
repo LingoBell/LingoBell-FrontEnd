@@ -18,6 +18,7 @@ import Video from "./components/atomic/pages/Video";
 import ProfilePage from "./components/atomic/pages/ProfilePage";
 import { onMessage } from "firebase/messaging";
 import { registerFcm } from "./apis/UserAPI";
+import { UpdateChatRoomStatus } from "./apis/ChatAPI";
 
 
 export let mainDomain = 'http://localhost:8000'
@@ -60,12 +61,31 @@ export default () => {
       };
       const notification = new Notification(notificationTitle, notificationOptions)
 
-      notification.onclick = (event) => {
+      notification.onclick = async (event) => {
         event.preventDefault();
-        window.open(payload.data.link, '_blank')
-      }
-    })
-  }, [])
+        try {
+          if (notificationOptions.data.chat_room_id) {
+            // 주어진 UpdateChatRoomStatus 함수를 사용하여 API 호출
+            const data = await UpdateChatRoomStatus(notificationOptions.data.chat_room_id);
+            console.log('Chat room status updated:', data);
+          }
+  
+          // API 호출 후 링크로 이동
+          if (notificationOptions.data.link) {
+            window.open(notificationOptions.data.link, '_blank');
+          }
+        } catch (error) {
+          console.error('Error during API call or navigation:', error);
+  
+          // 오류가 발생해도 링크로 이동
+          if (notificationOptions.data.link) {
+            window.open(notificationOptions.data.link, '_blank');
+          }
+        }
+      };
+    });
+  }, []);
+
 
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {

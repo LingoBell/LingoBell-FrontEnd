@@ -112,13 +112,12 @@ export default props => {
     }
   },[chatRoomId])
 
-  console.log(recommendation)
+  console.log('dwdwdd',recommendation)
 
 
 
   return (
-    <HistorySection>
-          
+    <HistorySection>          
       <StyledChatCard>
         <HistoryProfileItem
       

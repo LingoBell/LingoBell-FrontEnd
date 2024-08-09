@@ -35,7 +35,7 @@ self.addEventListener('notificationclick', function(event){
 
   event.notification.close();
 
-  if(link) {
+  if(link){
     event.waitUntil(
       clients.openWindow(link)
     )
