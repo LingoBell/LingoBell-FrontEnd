@@ -236,7 +236,7 @@ const Video = forwardRef((props, ref) => {
                         const results = await faceLandmarker.detectForVideo(video, performance.now());
 
                         setFaceData(results.faceLandmarks[0]);
-                        console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
+                        // console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
                         // await createFaceLandmark(results.faceLandmarks[0]);
 
                         if (results.faceLandmarks) {
@@ -340,12 +340,13 @@ const Video = forwardRef((props, ref) => {
     // console.log('ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ', faceData);
 
     return (
-        <VideoContainer>
-            <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
-            <CanvasStyled ref={canvasRef} />
-            <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
-            {/* <ThreeScene /> */}
-        </VideoContainer>
+        // <VideoContainer>
+        //     <video 
+        //     ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
+        //     <CanvasStyled ref={canvasRef} />
+        //     <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
+        //     {/* <ThreeScene /> */}
+        // </VideoContainer>
         <Wrap>
             <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
             <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>

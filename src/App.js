@@ -8,7 +8,7 @@ import IndexPage from "./components/atomic/pages/IndexPage";
 import ProfileList from "./components/atomic/pages/ProfileList";
 import Header from "./components/layout/Header";
 import LiveChat from "./components/atomic/pages/LiveChat";
-import { auth, googleProvider, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
+import { auth, generateToken, googleProvider, messaging, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
@@ -16,6 +16,7 @@ import useAuth from "./useAuth";
 import ChatHistory from "./components/atomic/pages/ChatHistory";
 import Video from "./components/atomic/pages/Video";
 import ProfilePage from "./components/atomic/pages/ProfilePage";
+import { onMessage } from "firebase/messaging";
 
 
 export let mainDomain = 'http://localhost:8000'
@@ -24,6 +25,16 @@ axios.defaults.withCredentials = true;
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
 window.accessToken = null
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  .then((registration) => {
+      console.log('Service Worker registered with scope:', registration.scope);
+  }).catch((err) => {
+      console.log('Service Worker registration failed:', err);
+  });
+}
+
 
 export default () => {
   const dispatch = useDispatch();
@@ -36,6 +47,14 @@ export default () => {
     }
   })
   
+
+  React.useEffect(()=>{
+    generateToken();
+    onMessage(messaging, (payload) => {
+      console.log('payload',payload)
+      new Notification('hihi')
+    })
+  },[])
 
   React.useEffect(()=>{
     const unsubscribe = onAuthStateChanged(auth, async(user)=>{
