@@ -341,7 +341,7 @@ const Video = forwardRef((props, ref) => {
 
     // console.log('ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ', faceData);
 
-    return (
+    return (<>
         <VideoContainer>
             <video ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
             <CanvasStyled ref={canvasRef} />
@@ -352,6 +352,7 @@ const Video = forwardRef((props, ref) => {
             <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
             <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
         </Wrap>
+        </>
     );
 });
 export default Video;

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { ChatMessage } from "../atoms/ChatMessage";
 import { ORIGINAL_PARTNER_MESSAGE } from "../atoms/Color";
 import ChatCard from "../templates/ChatSectionCard";
+import { useSelector } from "react-redux";
 const StyledChatCard = styled(ChatCard)`
     /* width: 450px; */
     /* height: 600px; */
@@ -34,17 +35,25 @@ const AiMessageWrapper = styled.div`
 
 function ChatForm(props, ref) {
     const { data, className, id } = props
-    const uid = useSelector((state) => state.user.user.uid);
+
+    const { user } = useSelector((state) => {
+        return { user: state.user?.user}
+      })
+
+    console.log("ChatForm안에 들어있는 data", data);
+    console.log("ChatForm에서 확인할 수 있는 user", user);
+    console.log("그렇다면 uid는?", user.uid);
 
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
-                const messageType = message.messageSenderId === uid ? 'me' : 'partner';
+                const messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
+                console.log("messageTye", messageType);
 
                 return (
                     <React.Fragment key={index}>
-                        {(message.type === 'partner' || message.type === 'me') && (
+                        {(messageType === 'partner' || messageType === 'me') && (
                             <ChatMessageWrapper key={index} type={messageType} isDifferentType={isDifferentType}>
                                 <ChatMessage
                                     type={messageType}
