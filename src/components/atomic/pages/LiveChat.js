@@ -10,7 +10,6 @@ import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecomm
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 
-
 const MainStyle = createGlobalStyle`
     #root > main {
         height: 100vh;
@@ -252,13 +251,19 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
-    const startTranscription = async () => {
-        try {
-            await axios.post(`/chats/${chatRoomId}/stt`);
-        } catch (err) {
-            console.error('Error starting transcription', err);
-        }
-    }
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get(`/chats/${chatRoomId}/stt`, {
+                    params: { timestamp }
+                });
+                setMessages(response.data.messages);
+            } catch (err) {
+                console.error('Error fetching transcription', err);
+            }
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [chatRoomId]);
 
 
     // const send_notification = async () => {
@@ -273,6 +278,7 @@ function LiveChat() {
     // useEffect(() => {
     //     send_notification(chatRoomId)
     // }, [chatRoomId]);
+
 
     // useEffect(()=>{
 
@@ -397,9 +403,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
-
-                        <CallButton onClick={toggleTranslation}><span className='material-icons'>toggle_on</span></CallButton>
+                        <CallButton onClick={toggleTranslation}><span className='material-icons'>translate</span></CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
