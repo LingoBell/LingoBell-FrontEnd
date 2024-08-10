@@ -24,8 +24,13 @@ const HistorySection = styled.div`
 `
 
 const StyledChatCard = styled(ChatCard)`
-  padding: 4px;
-  @media screen and (max-width: 1023px) {
+@media screen and (max-width : 599px) {
+  width : calc(100% - 48px);
+  margin-left : auto;
+  margin-right : auto;
+  }
+@media screen and (min-width: 600px) {
+    padding : 16px;
     margin-left : auto;
     margin-right : auto;
     min-width : calc(100% - 48px);
@@ -40,8 +45,17 @@ const StyledChatCard = styled(ChatCard)`
 `
 
 const ChatWrap = styled.div`
+    display: flex;
+    flex-direction : column;
+    margin-top: 24px;
+    padding-left: 12px;
+    padding-right: 12px;
+    align-items: center;
+    flex: 1;
+    overflow : hidden;
   @media screen and (min-width: 600px) {
     display: flex;
+    flex-direction : row;
     margin-top: 24px;
     padding-left: 12px;
     padding-right: 12px;
@@ -52,10 +66,11 @@ const ChatWrap = styled.div`
 `
 
 const UserChatForm = styled(ChatForm)`
-  height : 450px;
+  height : 100%;
+  width : calc(100% - 24px);
   @media screen and (max-width: 599px) {
-    border: 0;
-    border-radius: 0;
+    // border: 0;
+    border-radius: 6px;
   }
   @media screen and (min-width: 600px) {
     height: 100%;
@@ -69,10 +84,13 @@ const UserChatForm = styled(ChatForm)`
 
 const HistoryProfileItem = styled(ProfileItem)`
   justify-content : center;
+
+  @media screen and (max-width : 600px) {
+    scale : 0.8;
+  }
 `
 
 const AIChatForm = styled(UserChatForm)`
-  // height : 450px;
 `
 
 export default props => {
@@ -84,18 +102,18 @@ export default props => {
   const fetchAiRecommendations = async () => {
     const recommendData = await GetRecommendations(chatRoomId);
     const newRecommendData = recommendData.map(item => ({
-        ...item, type: 'ai'
+      ...item, type: 'ai'
     }))
     console.log('newRecommendData:', newRecommendData)
     setRecommendation(newRecommendData)
-}
+  }
 
   const fetchChatDataById = async (chatRoomId) => {
-    try{
+    try {
       const result = await getChatRoomsById(chatRoomId)
       console.log('hihihi', result)
       setData(result)
-    } catch(error){
+    } catch (error) {
       console.log('Error: ', error)
     }
   }
@@ -110,33 +128,34 @@ export default props => {
     }
   };
 
-  useEffect(()=>{
-    if(chatRoomId) {
+  useEffect(() => {
+    if (chatRoomId) {
       fetchChatDataById(chatRoomId)
       fetchSttMessages(chatRoomId)
     }
-  },[chatRoomId])
+  }, [chatRoomId])
 
-  useEffect(()=>{
-    if(chatRoomId){
+  useEffect(() => {
+    if (chatRoomId) {
       fetchAiRecommendations(chatRoomId)
     }
-  },[chatRoomId])
+  }, [chatRoomId])
 
-  console.log('dwdwdd',recommendation)
+  console.log('dwdwdd', recommendation)
   console.log("messages", messages);
 
   return (
-    <HistorySection>          
+    <HistorySection>
       <StyledChatCard>
         <HistoryProfileItem
-      
+
           {...data}
-          enterChatRoom = 'true'
-          />
+          enterChatRoom='true'
+        />
       </StyledChatCard>
       <ChatWrap>
         <AIChatForm data={recommendation} />
+        <div style={{height : '36px'}}></div>
         <UserChatForm data={messages} />
       </ChatWrap>
     </HistorySection>
