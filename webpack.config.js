@@ -22,7 +22,19 @@ module.exports = {
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
-      }
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              limit: 8192,
+              name: 'images/[name].[hash:8].[ext]'
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {
@@ -56,8 +68,8 @@ module.exports = {
       // pathRewrite: { '^/api': '' },
     }, {
       context: ['/socket.io'],
-      // target: 'http://localhost:8080',
-      target: 'http://192.168.0.245:8080',
+      target: 'http://localhost:8080',
+      // target: 'http://192.168.0.245:8080',
       ws:true
     }
     ]
