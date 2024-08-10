@@ -5,11 +5,13 @@ import ChatCard from '../templates/ChatSectionCard'
 import ChatForm from '../molecules/ChatForm'
 import ProfileItem from '../molecules/ProfileItem'
 import { useParams } from 'react-router-dom'
-import { getChatRoomsById, GetRecommendations } from '../../../apis/ChatAPI'
+import { getChatRoomsById, GetRecommendations, getSttMessages } from '../../../apis/ChatAPI'
 const HistorySection = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  padding-top: 70px;
+  padding-bottom: 24px;
   @media screen and (min-width: 1024px) {
     background-color: white;
     margin-left: auto;
@@ -17,10 +19,8 @@ const HistorySection = styled.div`
     padding: 24px;
     max-width: 950px;
     overflow-y : hidden;
-
-    
+    height: calc(100vh - 60px);
   }
-  
 `
 
 const StyledChatCard = styled(ChatCard)`
@@ -34,12 +34,9 @@ const StyledChatCard = styled(ChatCard)`
     padding: 16px;
     margin-left: 24px;
     margin-right: 24px;
-    
-
-  }
-  
-  
+  }  
 `
+
 const ChatWrap = styled.div`
   @media screen and (min-width: 600px) {
     display: flex;
@@ -48,6 +45,7 @@ const ChatWrap = styled.div`
     padding-right: 12px;
     align-items: center;
     flex: 1;
+    overflow : hidden;
   }
 `
 
@@ -66,18 +64,20 @@ const UserChatForm = styled(ChatForm)`
   @media screen and (min-width: 1024px) {
   }
 `
+
 const HistoryProfileItem = styled(ProfileItem)`
   justify-content : center;
 `
 
 const AIChatForm = styled(UserChatForm)`
-  height : 450px;
+  // height : 450px;
 `
 
 export default props => {
   const { chatId: chatRoomId } = useParams()
   const [data, setData] = useState();
   const [recommendation, setRecommendation] = useState([])
+  const [messages, setMessages] = useState([]);
 
   const fetchAiRecommendations = async () => {
     const recommendData = await GetRecommendations(chatRoomId);
@@ -87,7 +87,6 @@ export default props => {
     console.log('newRecommendData:', newRecommendData)
     setRecommendation(newRecommendData)
 }
-
 
   const fetchChatDataById = async (chatRoomId) => {
     try{
@@ -99,11 +98,21 @@ export default props => {
     }
   }
 
-  useEffect(()=>{
-    if(chatRoomId){
-      fetchChatDataById(chatRoomId)
+  const fetchSttMessages = async (chatRoomId) => {
+    try {
+      const data = await getSttMessages(chatRoomId);
+      console.log("fetchSttMessages result", data);
+      setMessages(data.messages);
+    } catch (error) {
+      console.log("Error occured while fetchSttMessages on ChatHistoryDetail");
     }
+  };
 
+  useEffect(()=>{
+    if(chatRoomId) {
+      fetchChatDataById(chatRoomId)
+      fetchSttMessages(chatRoomId)
+    }
   },[chatRoomId])
 
   useEffect(()=>{
@@ -112,13 +121,11 @@ export default props => {
     }
   },[chatRoomId])
 
-  console.log(recommendation)
-
-
+  console.log('dwdwdd',recommendation)
+  console.log("messages", messages);
 
   return (
-    <HistorySection>
-          
+    <HistorySection>          
       <StyledChatCard>
         <HistoryProfileItem
       
@@ -128,7 +135,7 @@ export default props => {
       </StyledChatCard>
       <ChatWrap>
         <AIChatForm data={recommendation} />
-        <UserChatForm />
+        <UserChatForm data={messages} />
       </ChatWrap>
     </HistorySection>
   )

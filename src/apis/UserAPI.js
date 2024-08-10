@@ -65,3 +65,27 @@ export const uploadImage = async (image) => {
         }
     }
 }
+
+//fcm
+export const registerFcm = async (token) => {
+    try {
+        const response = await axios.post('/users/fcm', {
+            token : token
+        })
+        console.log('user fcm token : ', token)
+        return response.data
+
+    } catch(error) {
+        console.log("Error :", error)
+    }
+}
+
+
+export const send_notification = async (chat_room_id) => {
+    try {
+        const result = await axios.get(`/chats/${chat_room_id}/info`)
+        console.log('ddd', result)
+    } catch (error) {
+        console.error('Error creating notification', error)
+    }
+}

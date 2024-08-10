@@ -129,7 +129,7 @@ const StyledButton = styled(Button)`
 `
 
 
-export default React.forwardRef((props, ref) => {
+export default props => {
   const [historyModal, setHistoryModal] = useState(false)
   const [selectedProfile, setSelectedProfile] = useState()
   const navigate = useNavigate()
@@ -154,7 +154,7 @@ export default React.forwardRef((props, ref) => {
   console.log('dd',selectedProfile)
 
   return (
-    <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick} ref={ref}>
+    <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
       {historyModal && (
         <Modal
           isOpened={historyModal}
@@ -218,4 +218,4 @@ export default React.forwardRef((props, ref) => {
     </Container>
 
   )
-})
+}

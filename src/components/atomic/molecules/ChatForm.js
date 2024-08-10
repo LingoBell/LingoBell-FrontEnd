@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { ChatMessage } from "../atoms/ChatMessage";
 import { ORIGINAL_PARTNER_MESSAGE } from "../atoms/Color";
 import ChatCard from "../templates/ChatSectionCard";
+import { useSelector } from "react-redux";
 const StyledChatCard = styled(ChatCard)`
     /* width: 450px; */
     /* height: 600px; */
@@ -32,30 +33,32 @@ const AiMessageWrapper = styled.div`
     display: flex;
 `;
 
-
-
 function ChatForm(props, ref) {
     const { data, className, id } = props
 
-    
+    const { user } = useSelector((state) => {
+        return { user: state.user?.user}
+      })
 
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
+                const messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
+                console.log("messageTye", messageType);
 
                 return (
                     <React.Fragment key={index}>
-                        {(message.type === 'partner' || message.type === 'me') && (
-                            <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType}>
+                        {(messageType === 'partner' || messageType === 'me') && (
+                            <ChatMessageWrapper key={index} type={messageType} isDifferentType={isDifferentType}>
                                 <ChatMessage
-                                    type={message?.type}
+                                    type={messageType}
                                     isOriginal={true}
                                 >
                                     {message?.originalMessage}
                                 </ChatMessage>
                                 <ChatMessage
-                                    type={message?.type}
+                                    type={messageType}
                                     isOriginal={false}
                                 >
                                     {message?.translatedMessage}

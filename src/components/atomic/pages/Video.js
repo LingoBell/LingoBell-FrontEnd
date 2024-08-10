@@ -6,6 +6,9 @@ import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-
 import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import defaultMaskImage from '../../../assets/images/hamzzi.png'
+import axios from "axios";
+import { createFaceLandmark } from '../../../apis/FaceAPI';
+import { send_notification } from '../../../apis/UserAPI';
 
 const Wrap = styled.div`
     position: relative;
@@ -190,7 +193,9 @@ const Video = forwardRef((props, ref) => {
     } = props
     const {
         roomName,
+        chatId
     } = params
+
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const [localStream, setLocalStream] = useState(null)
@@ -252,16 +257,12 @@ const Video = forwardRef((props, ref) => {
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
         }
-
-        // console.log('스트림 ',stream);
-        // console.log('비디오', stream.getVideoTracks())
-        // console.log('오디오', stream.getAudioTracks())
-
+      
         pc = new RTCPeerConnection()
         console.log('pc done')
         pc.onicecandidate = event => {
             if (event.candidate) {
-                socket.emit('CANDIDATE', event.candidate)
+                socket.emit('CANDIDATE', { candidate: event.candidate, roomName })
             }
         }
         pc.ontrack = (event) => {
@@ -274,6 +275,7 @@ const Video = forwardRef((props, ref) => {
         socket.on('CREATED', async () => {
             console.log('CREATED')
             isCaller = true
+            send_notification(chatId) // 상대방에게 notification pop up
         })
         socket.on('JOINED', async () => {
             console.log('JOINED')
@@ -285,7 +287,7 @@ const Video = forwardRef((props, ref) => {
                 console.log('A. creating OFFER')
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(new RTCSessionDescription(offer));
-                socket.emit('OFFER', offer);
+                socket.emit('OFFER', { roomName, offer });
             }
         })
         socket.on('ANSWER_RECEIVED', async (answer) => {
@@ -299,7 +301,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
-            socket.emit('ANSWER', answer)
+            socket.emit('ANSWER', {roomName, answer})
         })
 
         socket.on('CANDIDATE_RECEIVED', async (candidate) => {
@@ -335,6 +337,7 @@ const Video = forwardRef((props, ref) => {
 
         return () => {
             if (socket) {
+                socket.emit('DISCONNECTED', roomName)
                 socket.close()
             }
             console.log('closing')
@@ -427,14 +430,12 @@ const Video = forwardRef((props, ref) => {
                 }
                 requestAnimationFrame(predictWebcam);
             };
-
             video.addEventListener('loadedmetadata', predictWebcam);
 
             return () => {
                 video.removeEventListener('loadedmetadata', predictWebcam);
             };
         }
-
     }, [faceLandmarker, localStream]);
 
     return (
@@ -494,4 +495,5 @@ const Video = forwardRef((props, ref) => {
         </Wrap>
     );
 });
+
 export default Video;

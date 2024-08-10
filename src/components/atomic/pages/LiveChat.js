@@ -6,10 +6,9 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useParams } from "react-router-dom";
-import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
-
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -253,27 +252,34 @@ function LiveChat() {
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isMaskOn, setIsMaskOn] = useState(true);
 
-    const startTranscription = async () => {
-        try {
-            await axios.post(`/chats/${chatRoomId}/stt`);
-        } catch (err) {
-            console.error('Error starting transcription', err);
-        }
-    }
-
     useEffect(() => {
-        // const interval = setInterval(async () => {
-        //     try {
-        //         const response = await axios.get(`/chats/${chatRoomId}/stt`, {
-        //             params: { timestamp }
-        //         });
-        //         setMessages(response.data.messages);
-        //     } catch (err) {
-        //         console.error('Error fetching transcription', err);
-        //     }
-        // }, 3000);
-        // return () => clearInterval(interval);
+        const fetchMessages = async () => {
+            try {
+                const data = await getSttMessages(chatRoomId);
+                setMessages(data.messages);
+            } catch (err) {
+                console.error('Error fetching STT messages on LiveChat useEffect', err);
+            }
+        };
+
+        const intervalId = setInterval(fetchMessages, 1000);
+        return () => clearInterval(intervalId);
     }, [chatRoomId]);
+
+
+    // const send_notification = async () => {
+    //     try {
+    //         const result = await axios.get(`/chats/${chatRoomId}/info`)
+    //         console.log('ddd', result)
+    //     } catch (error) {
+    //         console.error('Error creating recommendations', err)
+    //     }
+    // }
+        
+    // useEffect(() => {
+    //     send_notification(chatRoomId)
+    // }, [chatRoomId]);
+
 
     // useEffect(()=>{
 
@@ -431,7 +437,7 @@ function LiveChat() {
                     </StyledChatForm>
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm data={messages.map((msg, index) => ({
+                    <StyledChatForm data={messages.map((msg) => ({
                         ...msg,
                         translatedMessage: showTranslation ? msg.translatedMessage : ''
                     }))} />
