@@ -86,7 +86,6 @@ export default props => {
       <ChatHistoryList chatHistoryList={chatHistoryList}/>
       <HistorySectionContainer 
         isOpen={isChatDetailOpen}
-        // style={isChatDetailOpen ? {} : { backgroundImage: 'url("https://storage.googleapis.com/lingobellstorage/chat-logo.png")'}}
       >
         {
           isChatDetailOpen ? (

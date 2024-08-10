@@ -5,7 +5,7 @@ import { USER_SAMPLE_DATA } from "../../../consts/sampleData";
 import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
@@ -251,6 +251,7 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true);
 
+    const navigate = useNavigate()
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -370,6 +371,14 @@ function LiveChat() {
             videoRef.current.turnVideo();
         }
     }
+    
+    const handleEndCall = () => {
+        if(videoRef.current) {
+            videoRef.current.endCall();
+            navigate('/')
+            
+        }
+    }
 
     const handleAudioStatusChange = (status) => {
         setIsAudioEnabled(status);
@@ -400,7 +409,7 @@ function LiveChat() {
                                 {isVideoEnabled ? 'videocam' : 'videocam_off'}
                             </span>
                         </CallButton>
-                        <CallEndButton>
+                        <CallEndButton onClick={handleEndCall}>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
                         <CallButton onClick={toggleTranslation}><span className='material-icons'>translate</span></CallButton>

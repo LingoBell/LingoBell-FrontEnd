@@ -172,6 +172,22 @@ const Video = forwardRef((props, ref) => {
         socket.emit('CREATE_OR_JOIN', roomName)
     }
 
+    const endCall = () => {
+        console.log('Ending call...')
+        if(pc) {
+            pc.close();
+            pc = null;
+        }
+        if(localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            setLocalStream(null)
+        }
+        if(socket) {
+            socket.emit('DISCONNECTED', roomName)
+            socket.close()
+        }
+    }
+
     useEffect(() => {
         init()
 
@@ -214,6 +230,9 @@ const Video = forwardRef((props, ref) => {
                 setIsVideoEnabled(enabled);
             }
         },
+        endCall(){
+            endCall()
+        }
     }));
 
     useEffect(() => {

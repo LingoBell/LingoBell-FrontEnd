@@ -26,8 +26,10 @@ const HistorySection = styled.div`
 const StyledChatCard = styled(ChatCard)`
   padding: 4px;
   @media screen and (max-width: 1023px) {
-    border: 0;
-    border-radius: 0;
+    margin-left : auto;
+    margin-right : auto;
+    min-width : calc(100% - 48px);
+    border-radius: 6px;
     min-height: 68px;
   }
   @media screen and (min-width: 1024px) {
