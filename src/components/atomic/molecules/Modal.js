@@ -77,6 +77,7 @@ export default props => {
                             nativeLanguage = {selectedProfile.nativeLanguage}
                             content={selectedProfile.description}
                             hideContent = {true}
+                            userStatus={selectedProfile.userStatus}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>

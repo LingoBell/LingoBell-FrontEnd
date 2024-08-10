@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { CreateChat, getChatRooms, UpdateChatRoomStatus } from '../../../apis/ChatAPI'
 import { GetPartnerList, GetRequestPartnerList } from '../../../apis/PartnerAPI'
+import { user_online_status } from '../../../firebase/firebase'
 
 
 const Container = styled.div`
@@ -74,17 +75,24 @@ export default props => {
 
   const user = useSelector((state) => state.user.user);
 
-  
+
+
   useEffect(() => {
     /* Find Partners */
     const fetchProfiles = async () => {
       try {
+        const userState = await user_online_status();
         const userList = await GetPartnerList();
-        // const newUserList = userList.map(profile =>({
-        //   ...profile
-        // }))
-        setProfiles(userList);
-        console.log('profile-info', profiles)
+        const newUserList = userList.map(profile => {
+
+          const userStatus = userState[profile.userCode]?.status?.state;
+
+          return {
+            ...profile, userStatus: userStatus
+          }
+        })
+        setProfiles(newUserList);
+        console.log('profile-info', newUserList)
 
       } catch (error) {
         console.log('유저 리스트 불러오기 실패 : ', error);
@@ -94,8 +102,16 @@ export default props => {
     /* Chat Request Partners */
     const fetchRequestProfiles = async () => {
       try {
+        const userState = await user_online_status();
         const requestUserList = await GetRequestPartnerList();
-        setChatRequests(requestUserList);
+        const newRequestUserList = requestUserList.map(request => {
+          const userStatus = userState[request.userCode]?.status?.state;
+
+          return {
+            ...request, userStatus : userStatus
+          }
+        })
+        setChatRequests(newRequestUserList);
 
       } catch (error) {
         console.log('요청 유저 리스트 불러오기 실패 : ', error);
@@ -147,7 +163,7 @@ export default props => {
     setSelectedProfile(null);
   };
 
-  const handleCloseResponseModal =() => {
+  const handleCloseResponseModal = () => {
     setIsOpened(false)
     setSelectedChatRoom(null)
   }
@@ -213,6 +229,7 @@ export default props => {
               userName,
               profileImages,
               birthday,
+              userStatus,
             } = profile;
 
             return (
@@ -228,6 +245,7 @@ export default props => {
                 profileImages={profileImages}
                 hideContent={false}
                 birthday={birthday}
+                userStatus={userStatus}
                 onClick={() => handleOpenRequestModal(profile)} />
             )
           })
@@ -252,21 +270,23 @@ export default props => {
               userName,
               profileImages,
               birthday,
+              userStatus,
             } = request
 
             return (
               <StyledProfileItem
-              key={index}
-              userName={userName}
-              nativeLanguage={nativeLanguage}
-              content={description}
-              gender={gender}
-              interests={interests}
-              learningLanguages={learningLanguages}
-              nation={nation}
-              profileImages={profileImages}
-              hideContent={false}
-              birthday={birthday}
+                key={index}
+                userName={userName}
+                nativeLanguage={nativeLanguage}
+                content={description}
+                gender={gender}
+                interests={interests}
+                learningLanguages={learningLanguages}
+                nation={nation}
+                profileImages={profileImages}
+                hideContent={false}
+                birthday={birthday}
+                userStatus={userStatus}
                 onClick={() => handleOpenResponseModal(request)}
               />
             )

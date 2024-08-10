@@ -9,6 +9,7 @@ import Button from '../atoms/Button'
 import { useNavigate, useParams } from 'react-router-dom'
 import Modal from './Modal'
 
+
 const Container = styled.div`
   min-widht : 400px;
   display : flex;
@@ -131,6 +132,17 @@ const ProfileWrap = styled.div`
 const StyledButton = styled(Button)`
   margin-right : 12px;
 `
+const UserState = styled.div`
+${props => props.$type == 'online' && `
+  color : green;
+  `}
+${props => props.$type == 'offline'&& `
+  color : grey;
+  `}
+${props => props.$type == undefined &&`
+  color : grey;
+  `}
+`
 
 
 export default props => {
@@ -155,7 +167,21 @@ export default props => {
   useEffect(()=>{
     setSelectedProfile(props)
   },[props])
-  console.log('dd',selectedProfile)
+
+  // useEffect(()=>{
+  //   const userRef = ref(database, '/users');
+  //   onValue(userRef, (snapshot) => {
+  //     const data = snapshot.val();
+  //     if(data){
+  //       setUserStatus(data[props.userCode])
+  //     }
+  //   })
+  // },[])
+
+
+  // setTimeout(()=>{
+  //   console.log('dwdw',userStatus)
+  // },300)
 
   return (
     <Container className={[(size === 'small' ? 'small' : ''), props.className].join(' ')} onClick={onClick || handleClick}>
@@ -179,6 +205,23 @@ export default props => {
           </FlagContainer>
         </ProfileImage>
         <Wrap>
+
+        {props.userStatus === 'online' && (
+          <UserState $type={props.userStatus} >
+            <span>&#9679;</span>online
+          </UserState>
+        )} 
+        {props.userStatus === 'offline' &&(
+          <UserState $type={props.userStatus}>
+              <span>&#9679;</span>offline
+            </UserState>
+        )}
+        {props.userStatus === undefined &&(
+          <UserState $type={props.userStatus}>
+              <span>&#9679;</span>offline
+            </UserState>
+        )}
+        
           <NameWarp>
             <UserName>{props?.userName}</UserName>
             <AgeBox $gender={props?.gender}

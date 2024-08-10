@@ -8,6 +8,7 @@ import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
 import { getChatRooms } from '../../../apis/ChatAPI'
 import { PRIMARY_COLOR } from '../../../consts/color'
+import { user_online_status } from '../../../firebase/firebase'
 
 const Container = styled.div`
   display: flex;
@@ -65,11 +66,15 @@ export default props => {
 
   const fetchChatHistory = async () => {
     try {
-      const result = await getChatRooms()
-      
-      console.log('result?')
-      console.log('dddddddddddddddddddddddddddddddddddd',result)
-      setChatHistoryList(result)
+      const userState = await user_online_status();
+      const result = await getChatRooms();
+      const newResult = result.map(result => {
+        const userStatus = userState[result.userCode]?.status?.state;
+        return{
+          ...result, userStatus : userStatus
+        }
+      })
+      setChatHistoryList(newResult)
     } catch (e) {
       console.log(e)
     }
@@ -79,8 +84,8 @@ export default props => {
     fetchChatHistory()
   }, [])
 
-  const isChatDetailOpen = !!chatId
 
+  const isChatDetailOpen = !!chatId
   return (
     <Container>
       <ChatHistoryList chatHistoryList={chatHistoryList}/>

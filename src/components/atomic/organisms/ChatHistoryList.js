@@ -45,15 +45,19 @@ export default props => {
 
     const fetchProfiles = async () => {
       try {
-        const profile = await getMyProfile()
-        setMyProfile(profile)
+        const profile = await getMyProfile();
+        const newProfile = {
+          ...profile,
+          userStatus : 'online'
+        }
+        setMyProfile(newProfile)
       } catch (error) {
         console.log('내 프로필 불러오기 실패:', error)
       }
     }
 
     fetchProfiles();
-  }, [user.uid])
+  }, [])
 
   useEffect(() => {
     if (historyRef.current) {
@@ -77,7 +81,8 @@ export default props => {
     birthday,
     userName,
     userId,
-    profileImages
+    profileImages,
+    userStatus
 
   } = myProfile;
   console.log('myProfile', myProfile)
@@ -92,6 +97,7 @@ export default props => {
         birthday={birthday}
         userName={userName}
         profileImages={profileImages}
+        userStatus={userStatus}
         onClick={() => onClickHome()}
 
       />
@@ -103,7 +109,8 @@ export default props => {
             gender,
             userName,
             profileImages,
-            nation
+            nation,
+            userStatus
           } = profile
           return (
             <StyledProfileItem
@@ -116,6 +123,7 @@ export default props => {
               profileImages={profileImages}
               nation={nation}
               key={index}
+              userStatus={userStatus}
               onClick={() => onClickProfileItem(profile.chatRoomId)}
             />
 

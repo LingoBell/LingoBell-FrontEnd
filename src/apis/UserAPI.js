@@ -89,3 +89,4 @@ export const send_notification = async (chat_room_id) => {
         console.error('Error creating notification', error)
     }
 }
+

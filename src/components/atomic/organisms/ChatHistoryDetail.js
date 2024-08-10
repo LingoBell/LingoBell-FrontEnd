@@ -6,6 +6,7 @@ import ChatForm from '../molecules/ChatForm'
 import ProfileItem from '../molecules/ProfileItem'
 import { useParams } from 'react-router-dom'
 import { getChatRoomsById, GetRecommendations, getSttMessages } from '../../../apis/ChatAPI'
+import { user_online_status } from '../../../firebase/firebase'
 const HistorySection = styled.div`
   height: 100%;
   display: flex;
@@ -106,9 +107,14 @@ export default props => {
 
   const fetchChatDataById = async (chatRoomId) => {
     try {
+      const userState = await user_online_status();
       const result = await getChatRoomsById(chatRoomId)
-      console.log('hihihi', result)
-      setData(result)
+      const userStatus = userState[result.userCode]?.status?.state;
+      const newResult ={
+        ...result,
+        userStatus : userStatus
+      }
+      setData(newResult)
     } catch (error) {
       console.log('Error: ', error)
     }
@@ -144,7 +150,6 @@ export default props => {
     <HistorySection>
       <StyledChatCard>
         <HistoryProfileItem
-
           {...data}
           enterChatRoom='true'
         />
