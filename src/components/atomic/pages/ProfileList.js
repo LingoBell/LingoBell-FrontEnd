@@ -218,7 +218,12 @@ export default props => {
           />
         )}
         {activeTab === 'find' &&
-          profiles?.map((profile, index) => {
+          profiles?.sort((a,b)=>{
+            if(a.userStatus === 'online' && b.userStatus !=='online') return -1;
+            if(a.userStatus !== 'online' && b.userStatus === 'online') return 1;
+            return 0
+          })
+          .map((profile, index) => {
 
             const { description,
               gender,
@@ -260,7 +265,12 @@ export default props => {
           />
         )}
         {activeTab === 'requests' &&
-          chatRequests?.map((request, index) => {
+          chatRequests?.sort((a,b)=>{
+            if(a.userStatus === 'online' && b.userStatus !=='online') return -1;
+            if(a.userStatus !== 'online' && b.userStatus === 'online') return 1;
+            return 0
+          })
+          .map((request, index) => {
             const { description,
               gender,
               interests,
