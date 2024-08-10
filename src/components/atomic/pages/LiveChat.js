@@ -428,7 +428,7 @@ function LiveChat() {
                 <UserChatWrap isOpen={openedTab === 'USER'}>
                     <StyledChatForm data={messages.map((msg) => ({
                         ...msg,
-                        translatedMessage: showTranslation ? msg.translatedMessage : ''
+                        translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
                     }))} />
                 </UserChatWrap>
             </LiveChatWrap>

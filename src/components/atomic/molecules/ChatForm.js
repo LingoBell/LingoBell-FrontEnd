@@ -40,13 +40,19 @@ function ChatForm(props, ref) {
         return { user: state.user?.user}
       })
 
+
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
-                const messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
-                console.log("messageTye", messageType);
-
+                
+                let messageType;
+                if (message.type === 'ai' || message.type === 'quiz') {
+                    messageType = message.type;
+                } else {
+                    messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
+                } 
+                
                 return (
                     <React.Fragment key={index}>
                         {(messageType === 'partner' || messageType === 'me') && (
@@ -57,15 +63,17 @@ function ChatForm(props, ref) {
                                 >
                                     {message?.originalMessage}
                                 </ChatMessage>
-                                <ChatMessage
+                                {message?.translatedMessage && (
+                                    <ChatMessage
                                     type={messageType}
                                     isOriginal={false}
                                 >
                                     {message?.translatedMessage}
                                 </ChatMessage>
+                                )}
                             </ChatMessageWrapper>
                         )}
-                        {message.type === 'ai' && (
+                        {messageType === 'ai' && (
                             <AiMessageWrapper>
                                 <ChatMessage
                                     type={message?.type}
