@@ -84,10 +84,6 @@ const UserChatForm = styled(ChatForm)`
 
 const HistoryProfileItem = styled(ProfileItem)`
   justify-content : center;
-
-  @media screen and (max-width : 600px) {
-    scale : 0.8;
-  }
 `
 
 const AIChatForm = styled(UserChatForm)`
