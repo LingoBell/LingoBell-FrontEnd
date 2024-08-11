@@ -9,6 +9,7 @@ import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
+import { useSelector } from 'react-redux';
 
 const Wrap = styled.div`
     position: relative;
@@ -210,6 +211,22 @@ const Video = forwardRef((props, ref) => {
     const [maskImage, setMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
 
+
+    // 이 부분 추가
+    const user = useSelector(state => state.user);
+    console.log("user안에 있는 정보는 과연? 두근두근", user);
+
+    const sendLanguageInfo = () => {
+        const userInfo = {
+            type: "language",
+            userId: user.uid,
+            nativeLanguage: user.nativeLanguage,
+            learningLanguages: user.learningLanguages
+        };
+        socket.send(JSON.stringify(userInfo))
+    };
+    // 여기까지
+
     // 이미지 업로드 처리 함수
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
@@ -329,7 +346,12 @@ const Video = forwardRef((props, ref) => {
         })
 
         socket.emit('CREATE_OR_JOIN', roomName)
-        
+
+        // 이 부분 추가. 이진우
+        socket.onopen = () => {
+            sendLanguageInfo();
+        };
+        // 여기까지.        
     }
 
     const endCall = () => {
@@ -367,7 +389,7 @@ const Video = forwardRef((props, ref) => {
                 localStream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [roomName]);
+    }, [roomName, user]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
 
     useEffect(() => {
         if (faceData) {
