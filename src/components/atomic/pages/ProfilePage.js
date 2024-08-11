@@ -243,6 +243,7 @@ export default props => {
             await UpdateUserProfile(formData)
                 .then(() => {
                     navigate('/')
+                    window.location.reload();
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
