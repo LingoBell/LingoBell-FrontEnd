@@ -9,7 +9,6 @@ import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
-import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 
 const Wrap = styled.div`
@@ -37,10 +36,20 @@ const Wrap = styled.div`
     }
 `
 
+// WebRTC의 연결 문제를 해결하기 위해 STUN 서버 추가
+const iceServers = [
+    { urls: 'stun:stun.l.google.com:19302' },  // STUN 서버
+    // 필요시 TURN 서버 추가
+    // {
+    //     urls: 'turn:YOUR_TURN_SERVER_URL',
+    //     username: 'TURN_USERNAME',
+    //     credential: 'TURN_CREDENTIAL'
+    // }
+];
+
 const socket = io('')
-let pc1 = new RTCPeerConnection()
-let pc = null
-let isCaller = false
+let pc = new RTCPeerConnection({ iceServers });  // STUN 서버 설정 반영
+let isCaller = false;
 
 const VideoContainer = styled.div`
   position: relative;
@@ -194,14 +203,12 @@ const Video = forwardRef((props, ref) => {
         isMaskOn
     } = props
     const {
-        // roomName,
         chatId
     } = params
 
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const [localStream, setLocalStream] = useState(null)
-    // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
@@ -214,9 +221,8 @@ const Video = forwardRef((props, ref) => {
 
     const roomName = chatId;
 
-    // 이 부분 추가
+    // Redux로부터 사용자 정보 가져오기
     const user = useSelector(state => state.user);
-    // console.log("user안에 있는 정보는 과연? 두근두근", user);
 
     const sendLanguageInfo = () => {
         const userInfo = {
@@ -227,9 +233,7 @@ const Video = forwardRef((props, ref) => {
         };
         socket.send(JSON.stringify(userInfo))
     };
-    // 여기까지
 
-    // 이미지 업로드 처리 함수
     const handleImageUpload = (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -276,8 +280,8 @@ const Video = forwardRef((props, ref) => {
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
         }
-      
-        pc = new RTCPeerConnection()
+
+        pc = new RTCPeerConnection({ iceServers });  // STUN 서버 설정 반영
         console.log('pc done')
         pc.onicecandidate = event => {
             if (event.candidate) {
@@ -338,23 +342,18 @@ const Video = forwardRef((props, ref) => {
             console.log('OPP_DISCON')
             isCaller = true
             if (pc) {
-
-                // pc.setRemoteDescription(null)
                 pc.close()
                 pc = null
             }
             init()
-
-            // notifyDiscon()
         })
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-        // 이 부분 추가. 이진우
+        // WebSocket이 열릴 때 사용자 언어 정보를 전송
         socket.onopen = () => {
             sendLanguageInfo();
         };
-        // 여기까지.        
     }
 
     const endCall = () => {
@@ -383,8 +382,6 @@ const Video = forwardRef((props, ref) => {
             }
             console.log('closing')
             if (pc) {
-
-                // pc.setRemoteDescription(null)
                 pc.close()
                 pc = null
             }
@@ -392,7 +389,7 @@ const Video = forwardRef((props, ref) => {
                 localStream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [roomName, user]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
+    }, [roomName, user])
 
     useEffect(() => {
         if (faceData) {
@@ -447,7 +444,6 @@ const Video = forwardRef((props, ref) => {
 
                 if (results.faceLandmarks && results.faceLandmarks[0]) {
                     setFaceData(results.faceLandmarks[0]);
-                    // sendLandmarksData(results.faceLandmarks[0]);  // Send landmarks data to server
                 }
 
                 if (results.faceLandmarks) {
@@ -459,11 +455,9 @@ const Video = forwardRef((props, ref) => {
                         const width = (landmarks[454].x - landmarks[234].x) * canvas.width;
                         const height = (landmarks[152].y - landmarks[10].y) * canvas.height;
 
-                        // 이미지 로드
                         const img = new Image();
                         img.src = maskImage;
                         img.onload = function () {
-                            // 이미지 그리기
                             canvasCtx.save();
                             canvasCtx.translate(x + width / 2, y + height / 2);
                             canvasCtx.rotate(Math.atan2(landmarks[454].y - landmarks[234].y, landmarks[454].x - landmarks[234].x));
