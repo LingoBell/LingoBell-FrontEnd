@@ -328,7 +328,7 @@ function LiveChat() {
             console.log('ddd', result)
             await fetchAiRecommendations()
         } catch (error) {
-            console.error('Error creating recommendations', err)
+            console.error('Error creating recommendations', error)
         } finally {
             setLoading(false)
             setTimeout(() => {
@@ -355,7 +355,7 @@ function LiveChat() {
         }
     }
 
-    console.log('wwww',quiz)
+    // console.log('wwww',quiz)
 
     const toggleTranslation = () => {
         setShowTranslation(!showTranslation);
