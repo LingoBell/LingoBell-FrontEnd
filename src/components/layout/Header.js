@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { signOutAll } from '../../redux/userSlice'
 import { Link, useLocation } from 'react-router-dom'
 import HamburgerMenu from './HamburgerMenu'
-import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
+import { MENU_DEFAULT_COLOR, PRIMARY_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
 import { getMyProfile } from '../../apis/UserAPI'
 
 const HeaderContainer = styled.header`
@@ -122,7 +122,7 @@ export default props => {
               <HamburgerMenu/>
               <Wrap>
                 <UserName>
-                 Welcome &nbsp; <span style={{fontWeight : '550'}}>{userName}</span>
+                 Welcome &nbsp; <span style={{fontWeight : '550', color : PRIMARY_COLOR}}>{userName}</span>
                 <img src='https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'></img>
                 </UserName>
                 { 
