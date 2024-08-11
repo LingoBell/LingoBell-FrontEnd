@@ -6,7 +6,9 @@ import axios from "axios";
 const initialState = {
     user : null,
     processFinished: false,
-    isFirstLogin: 1 // 1 : pending, 2: 기존 유저, 3: 신규 유저
+    isFirstLogin: 1, // 1 : pending, 2: 기존 유저, 3: 신규 유저
+    nativeLanguage: '', // 이진우 추가.
+    learningLanguages: [], // 이진우 추가.
 };
 
 
@@ -65,6 +67,13 @@ const userSlice = createSlice({
         setUser(state, action) {
             state.user = action.payload;
             state.processFinished = true
+            // 이진우 추가
+            state.nativeLanguage = action.payload.nativeLanguage;
+            state.learningLanguages = action.payload.learningLanguages;
+            // 이진우 추가함.
+        },
+        updateLearningLanguages(state, action) {
+            state.learningLanguages = action.payload;
         },
         setProcessFinished(state) {
             state.processFinished = true
@@ -83,6 +92,6 @@ const userSlice = createSlice({
     },
 })
 
-export const { setUser, clearUser, setProcessFinished, setFirstLogin } = userSlice.actions;
+export const { setUser, clearUser, setProcessFinished, setFirstLogin, updateLearningLanguages } = userSlice.actions; // updateLearningLanguages 이거 추가함. 이진우.
 
 export default userSlice.reducer;

@@ -8,6 +8,7 @@ import { Canvas } from '@react-three/fiber';
 import ThreeScene from '../../../3Dmask/Model';
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
+import { useSelector } from 'react-redux';
 
 const Wrap = styled.div`
     display: flex;
@@ -70,6 +71,20 @@ const Video = forwardRef((props, ref) => {
     const [faceData, setFaceData] = useState(null);
     const canvasRef = useRef(null);
 
+    // 이 부분 추가
+    const user = useSelector(state => state.user);
+    console.log("user안에 있는 정보는 과연? 두근두근", user);
+
+    const sendLanguageInfo = () => {
+        const userInfo = {
+            type: "language",
+            userId: user.uid,
+            nativeLanguage: user.nativeLanguage,
+            learningLanguages: user.learningLanguages
+        };
+        socket.send(JSON.stringify(userInfo))
+    };
+    // 여기까지
 
 
     const initFaceLandmarker = async () => {
@@ -170,6 +185,12 @@ const Video = forwardRef((props, ref) => {
         })
 
         socket.emit('CREATE_OR_JOIN', roomName)
+
+        // 이 부분 추가. 이진우
+        socket.onopen = () => {
+            sendLanguageInfo();
+        };
+        // 여기까지.
     }
 
     useEffect(() => {
@@ -190,7 +211,7 @@ const Video = forwardRef((props, ref) => {
 
 
         }
-    }, [roomName])
+    }, [roomName, user]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
 
     useEffect(() => {
         onAudioStatusChange(isAudioEnabled);

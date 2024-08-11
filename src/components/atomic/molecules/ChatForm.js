@@ -38,7 +38,7 @@ function ChatForm(props, ref) {
 
     const { user } = useSelector((state) => {
         return { user: state.user?.user}
-      })
+    })
 
 
     return (
