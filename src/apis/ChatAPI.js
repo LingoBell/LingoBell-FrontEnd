@@ -102,7 +102,7 @@ export const getSttMessages = async (chat_room_id) => {
 
     try {
         const response = await axios.get(url, {chat_room_id});
-        console.log('Successfuly get stt messages', response.data);
+        // console.log('Successfuly get stt messages', response.data);
         return response.data;
     } catch (error) {
         console.log("Error fetching STT messages", error);

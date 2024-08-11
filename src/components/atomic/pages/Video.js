@@ -9,6 +9,7 @@ import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
+import { log } from 'three/webgpu';
 
 const Wrap = styled.div`
     position: relative;
@@ -192,7 +193,7 @@ const Video = forwardRef((props, ref) => {
         isMaskOn
     } = props
     const {
-        roomName,
+        // roomName,
         chatId
     } = params
 
@@ -202,13 +203,15 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 처음비디오 꺼짐
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
     const [isRemoteMaskOn, setIsRemoteMaskOn] = useState(true);
     const [maskImage, setMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
+
+    const roomName = chatId;
 
     // 이미지 업로드 처리 함수
     const handleImageUpload = (event) => {
@@ -275,7 +278,7 @@ const Video = forwardRef((props, ref) => {
         socket.on('CREATED', async () => {
             console.log('CREATED')
             isCaller = true
-            send_notification(chatId) // 상대방에게 notification pop up
+            await send_notification(chatId) // 상대방에게 notification pop up
         })
         socket.on('JOINED', async () => {
             console.log('JOINED')
@@ -287,6 +290,7 @@ const Video = forwardRef((props, ref) => {
                 console.log('A. creating OFFER')
                 const offer = await pc.createOffer();
                 await pc.setLocalDescription(new RTCSessionDescription(offer));
+                console.log('OFFER', offer)
                 socket.emit('OFFER', { roomName, offer });
             }
         })
