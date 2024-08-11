@@ -22,7 +22,19 @@ module.exports = {
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
-      }
+      },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              limit: 8192,
+              name: 'images/[name].[hash:8].[ext]'
+            },
+          },
+        ],
+      },
     ],
   },
   resolve: {

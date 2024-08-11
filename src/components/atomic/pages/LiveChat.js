@@ -250,6 +250,7 @@ function LiveChat() {
     const videoRef = useRef(null);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 초기 비디오 비활성화
+    const [isMaskOn, setIsMaskOn] = useState(true);
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -388,6 +389,10 @@ function LiveChat() {
         setIsVideoEnabled(status);
     }
 
+    const toggleMask = () => {
+        setIsMaskOn(!isMaskOn);
+    };
+
     return (
         <StyledCenteredLayout>
             <MainStyle />
@@ -397,6 +402,7 @@ function LiveChat() {
                         ref={videoRef}
                         onAudioStatusChange={handleAudioStatusChange}
                         onVideoStatusChange={handleVideoStatusChange}
+                        isMaskOn={isMaskOn}
                     />
                     <ButtonWrap>
                         <CallButton onClick={handleAudioClick}>
@@ -412,7 +418,12 @@ function LiveChat() {
                         <CallEndButton onClick={handleEndCall}>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <CallButton onClick={toggleTranslation}><span className='material-icons'>translate</span></CallButton>
+                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
+                        <CallButton onClick={toggleMask}>
+                            <span className='material-icons'>
+                                {isMaskOn ? 'face' : 'face_retouching_off'}
+                            </span>
+                        </CallButton>
                         <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
