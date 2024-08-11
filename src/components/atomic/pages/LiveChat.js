@@ -409,7 +409,7 @@ function LiveChat() {
                         <CallEndButton>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton>
+                        {/* <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton> */}
                         <CallButton onClick={toggleMask}>
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
