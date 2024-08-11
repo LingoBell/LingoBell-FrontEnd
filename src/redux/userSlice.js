@@ -6,9 +6,7 @@ import axios from "axios";
 const initialState = {
     user: null,
     processFinished: false,
-    isFirstLogin: 1, // 1 : pending, 2: 기존 유저, 3: 신규 유저
-    nativeLanguage: '', // 이진우 추가.
-    learningLanguages: [], // 이진우 추가.
+    isFirstLogin: 1 // 1 : pending, 2: 기존 유저, 3: 신규 유저
 };
 
 
@@ -31,9 +29,7 @@ export const signInWithGoogle = createAsyncThunk(
                 accessToken: result.user.accessToken
             };
             thunkAPI.dispatch(setUser(user));
-
         }
-
         thunkAPI.dispatch(setProcessFinished())
     }
 );
@@ -51,10 +47,7 @@ export const signOutAll = createAsyncThunk(
     'user/signout',
     async (_, thunkAPI) => {
         await signOut(auth);
-
         thunkAPI.dispatch(clearUser())
-
-
     }
 )
 
@@ -65,14 +58,8 @@ const userSlice = createSlice({
     reducers: {
         // 유저 로그인
         setUser(state, action) {
-            const { nativeLanguage = '', learningLanguages = [] } = action.payload;
             state.user = action.payload;
             state.processFinished = true
-            state.nativeLanguage = nativeLanguage;
-            state.learningLanguages = learningLanguages;
-        },
-        updateLearningLanguages(state, action) {
-            state.learningLanguages = action.payload;
         },
         setProcessFinished(state) {
             state.processFinished = true
@@ -91,6 +78,6 @@ const userSlice = createSlice({
     },
 })
 
-export const { setUser, clearUser, setProcessFinished, setFirstLogin, updateLearningLanguages } = userSlice.actions; // updateLearningLanguages 이거 추가함. 이진우.
+export const { setUser, clearUser, setProcessFinished, setFirstLogin } = userSlice.actions;
 
 export default userSlice.reducer;

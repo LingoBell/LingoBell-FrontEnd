@@ -8,9 +8,10 @@ import * as THREE from 'three';
 import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
-import { send_notification } from '../../../apis/UserAPI';
+import { send_notification, getMyProfile } from '../../../apis/UserAPI';
 import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
+import RecordRTC from 'recordrtc';
 
 const Wrap = styled.div`
     position: relative;
@@ -209,28 +210,77 @@ const Video = forwardRef((props, ref) => {
     const [maskImage, setMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
     const socketRef = useRef(null); // STT를 위한 WebSocket
-    const recorderRef = useRef(null);
+    const recorderRef = useRef(null); // GPU 서버 전달하기 위해
     const [isRecording, setIsRecording] = useState(false);
     const [responses, setResponses] = useState([]);
-    // const user = useSelector(state => state.user);
-    const { user, nativeLanguage, learningLanguages } = useSelector((state) => ({
-        user: state.user.user,
-        nativeLanguage: state.user.nativeLanguage,
-        learningLanguages: state.user.learningLanguages,
-    }));
-    console.log("제발제발제발제발제발제발제발제발제발", user, nativeLanguage, learningLanguages);
+    const [nativeLanguage, setNativeLanguage] = useState(null);
+    const [learningLanguages, setLearningLanguages] = useState([]);
+    const user = useSelector(state => state.user);
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const profileData = await getMyProfile();
+                setNativeLanguage(profileData.nativeLanguage);
+                setLearningLanguages(profileData.learningLanguages);
+            } catch (error) {
+                console.error("Failed to fetch profile data", error);
+            }
+        };
+
+        fetchProfileData();
+    }, []);
+
+    useEffect(() => {
+        const chatRoomId = params.chatId;
+        socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
+
+        socketRef.current.onopen = () => {
+            console.log('WebSocket connection for GPU STT opened');
+
+            if (user && nativeLanguage && learningLanguages.length > 0) {
+                sendLanguageInfo();
+            }
+        };
+
+        // STT를 실시간으로 받고싶은 경우 활용할 수 있음.
+        /* socketRef.current.onmessage = (event) => {
+            console.log('Received message:', event.data);
+            setResponses(prev => [...prev, event.data]);
+        }; */
+        socketRef.current.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
+        };
+    }, [user, nativeLanguage, learningLanguages]);
 
     const sendLanguageInfo = () => {
+        console.log("sendLanguageInfo called");
+
         const userInfo = {
             type: "language",
-            userId: user.uid,
+            userId: user.user.uid,
             nativeLanguage: nativeLanguage,
             learningLanguages: learningLanguages
         };
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+
+        console.log("여기에 userInfo가 찍히리라", userInfo);
+        /* if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(userInfo));
+            console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } else {
-            console.log("WebSocket connection is not open to send language info.");
+             console.log("WebSocket connection is not open to send language info.");
+        } */
+        try {
+            socketRef.current.send(JSON.stringify(userInfo));
+            console.log("WebSocket message sent:", JSON.stringify(userInfo));
+        } catch (error) {
+            console.error("Failed to send message. WebSocket error:", error);
         }
     };
 
@@ -355,7 +405,7 @@ const Video = forwardRef((props, ref) => {
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-        socketRef.current = new WebSocket('ws://34.64.241.5:38080');
+        /* socketRef.current = new WebSocket('ws://34.64.241.5:38080');
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
@@ -372,7 +422,7 @@ const Video = forwardRef((props, ref) => {
             if (socketRef.current) {
                 socketRef.current.close();
             }
-        };
+        }; */
     }
 
     const endCall = () => {
@@ -424,8 +474,15 @@ const Video = forwardRef((props, ref) => {
 
     // STT 오디오 데이터가 사용 가능할 때 호출되는 함수
     const handleDataAvailable = (blob) => {
-        if (blob.size > 0 && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            socketRef.current.send(blob); // Base64 인코딩 없이 Blob 자체 전송
+        if (blob.size > 0) {
+            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                console.log("Sending audio blob");
+                socketRef.current.send(blob); // Base64 인코딩 없이 Blob 자체 전송
+            } else {
+                console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+            }
+        } else {
+            console.log("No audio data to send");
         }
     };
 
@@ -468,12 +525,14 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange(isVideoEnabled);
     }, [isVideoEnabled]);
 
-    useEffect(() => {
-        if (user && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            sendLanguageInfo();
-        }
-    }, [user, nativeLanguage, learningLanguages, socketRef.current]);
-
+    // useEffect(() => {
+    //     console.log("useEffect 실행시켰고, 이제 sendLanguageInfo 함수 실행시킬거야.");
+    //     // if (user && nativeLanguage && learningLanguages.length > 0 && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+    //     if (user && nativeLanguage && learningLanguages.length > 0) {
+    //         sendLanguageInfo();
+    //         console.log("sendLanguageInfo 실행완료");
+    //     }
+    // }, [user, nativeLanguage, learningLanguages]);
 
     useImperativeHandle(ref, () => ({
         turnAudio() {
