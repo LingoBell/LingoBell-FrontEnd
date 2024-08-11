@@ -83,6 +83,7 @@ export const MENUS = [
 ]
 export default props => {
   const [userName, setUserName] = useState('')
+  const [userPic, setUserPic] = useState('')
   const dispatch = useDispatch()
   const {isLoginUser, isFirstLogin } = useSelector((state) => {
     return {isLoginUser : state.user?.user,
@@ -98,6 +99,7 @@ export default props => {
   useEffect( async()=>{
    const getUserName = await getMyProfile()
    setUserName(getUserName.userName)
+   setUserPic(getUserName.profileImages)
 
   },[])
 
@@ -120,7 +122,7 @@ export default props => {
               <HamburgerMenu/>
               <Wrap>
                 <UserName>
-                Welcome  &nbsp; <span style={{fontWeight : '550'}}>{userName}</span>
+                 Welcome &nbsp; <span style={{fontWeight : '550'}}>{userName}</span>
                 <img src='https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'></img>
                 </UserName>
                 { 

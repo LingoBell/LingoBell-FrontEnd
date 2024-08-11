@@ -7,6 +7,8 @@ import { AddUserProfile, getMyProfile, UpdateUserProfile, uploadImage } from '..
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import BaseImage from '../atoms/BaseImage'
+import Modal from '../molecules/Modal'
+import { user_online_status } from '../../../firebase/firebase'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -137,6 +139,10 @@ const StyledImg = styled.input`
     display : none;
 
 `
+
+const MyModal = styled(Modal)`
+
+`
 export default props => {
     const [selectedInterests, setSelectedInterests] = useState({})
     const [nation, setNation] = useState('')
@@ -151,12 +157,19 @@ export default props => {
     const [nativeLanguageCode, setNativeLanguageCode] = useState('')
     const [image, setImage] = useState(null)
     const [preview, setPreview] = useState(null)
+    const [viewMyProfile, setViewMyProfile] = useState(true)
+    const [myProfile, setMyProfile] = useState([])
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
             isFirstLogin: state?.user.isFirstLogin
         }
     })
+
+    const handleCloseModal = () => {
+        setViewMyProfile(false);
+
+    };
     const imgRef = useRef(null)
     const navigate = useNavigate();
     const handleChange = (nation) => {
@@ -229,7 +242,7 @@ export default props => {
             nation,
             birthday,
             nativeLanguageCode,
-            image : response.url
+            image: response.url
         };
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -253,7 +266,14 @@ export default props => {
 
     useEffect(() => {
         const fetchUserProfile = async () => {
+            const userState = await user_online_status();
             const userProfile = await getMyProfile();
+            const NewUserProfile = {
+                ...userProfile,
+                interests: userProfile.interestsName,
+                userStatus: userState[userProfile.userCode]?.status?.state
+            }
+            setMyProfile(NewUserProfile)
             if (userProfile) {
                 setName(userProfile.userName);
                 setMainLanguage(userProfile.nativeLanguage);
@@ -282,10 +302,12 @@ export default props => {
         fetchUserProfile();
     }, [user.uid]);
 
-    useEffect(()=>{
-        if(image instanceof Blob) {
+    console.log('내가원하는값', myProfile)
+
+    useEffect(() => {
+        if (image instanceof Blob) {
             const reader = new FileReader();
-            reader.onloadend =() => {
+            reader.onloadend = () => {
                 setPreview(reader.result)
             };
             reader.readAsDataURL(image)
@@ -297,7 +319,19 @@ export default props => {
     return (
         <>
             {isFirstLogin === 2 ?
-                <Wrap>
+                
+                    <Wrap>
+                            <MyModal
+                                selectedProfile={myProfile}
+                                isOpened={viewMyProfile}
+                                bttnTxt='Edit Profile'
+                                onClickCloseBtn={() => {
+                                    navigate('/')
+                                }}
+                                onClickButton={() => {
+                                    handleCloseModal()
+                                }}
+                            />
                     <Title>Edit User Profile</Title>
                     <FormItemWrap>
                         <LabelText>Name</LabelText>
@@ -495,7 +529,9 @@ export default props => {
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button onClick={handleEditSubmit}>Edit</Button>
                     </div>
-                </Wrap>
+                  
+                    </Wrap>
+                
                 :
                 <Wrap>
                     <Title>Create User Profile</Title>
@@ -511,16 +547,16 @@ export default props => {
                             <StyledImg ref={imgRef} type="file" accept="image/*" required
                                 onChange={(e) => {
                                     const file = e.target.files[0];
-                                    if(file){
+                                    if (file) {
                                         setImage(file)
                                     }
                                 }}
                             />
-                            <ImagePreview onClick={()=>{
+                            <ImagePreview onClick={() => {
                                 imgRef.current.click();
                             }} src={
-                                preview ? preview : 
-                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
+                                preview ? preview :
+                                    'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'} />
                         </ImageWrap>
                     </FormItemWrap>
 
