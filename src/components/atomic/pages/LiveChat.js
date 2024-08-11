@@ -276,7 +276,7 @@ function LiveChat() {
     //         console.error('Error creating recommendations', err)
     //     }
     // }
-        
+
     // useEffect(() => {
     //     send_notification(chatRoomId)
     // }, [chatRoomId]);
@@ -309,9 +309,9 @@ function LiveChat() {
 
         const quizData = await GetQuizzes(chatRoomId);
         const newQuizData = quizData.map(item => ({
-            ...item, type : 'quiz'
+            ...item, type: 'quiz'
         }))
-        console.log('newQuizData:',newQuizData)
+        console.log('newQuizData:', newQuizData)
         setQuiz(newQuizData)
     }
 
@@ -335,27 +335,27 @@ function LiveChat() {
                 aiChatWrapRef.current?.scrollTo({
                     top: 999999999999999999,
                     behavior: 'smooth'
-                }) 
+                })
             }, 300)
-            
+
         }
     }
 
     const requestQuizzes = async () => {
         setQuizModal(true);
         setLoading(true);
-        try{
+        try {
             const result = await CreateQuizzes(chatRoomId)
             console.log('ququququ', result)
             await fetchAiQuizzes()
-        } catch(error) {
+        } catch (error) {
             console.error('Error getting quizzes', error)
         } finally {
             setLoading(false)
         }
     }
 
-    console.log('wwww',quiz)
+    console.log('wwww', quiz)
 
     const toggleTranslation = () => {
         setShowTranslation(!showTranslation);
@@ -372,12 +372,12 @@ function LiveChat() {
             videoRef.current.turnVideo();
         }
     }
-    
+
     const handleEndCall = () => {
-        if(videoRef.current) {
+        if (videoRef.current) {
             videoRef.current.endCall();
             navigate('/')
-            
+
         }
     }
 
@@ -418,13 +418,29 @@ function LiveChat() {
                         <CallEndButton onClick={handleEndCall}>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        {/* <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton> */}
+                        <CallButton onClick={toggleTranslation} style={{ position: 'relative', display: 'inline-block', fontSize: '24px' }}>
+                            <span className="material-icons" style={{ fontSize: 'inherit' }}>
+                                translate
+                            </span>
+                            {!showTranslation && (
+                                <span
+                                    style={{
+                                        position: 'absolute',
+                                        top: '45%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%) rotate(45deg)',
+                                        height: '2px',
+                                        width: '55%',
+                                        backgroundColor: 'black',
+                                    }}
+                                />
+                            )}
+                        </CallButton>
                         <CallButton onClick={toggleMask}>
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
                             </span>
                         </CallButton>
-                        <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
                 <AIChatWrap isOpen={openedTab === 'AI'}>
@@ -455,10 +471,10 @@ function LiveChat() {
             {!loading && quizModal && (
                 <ModalOverlay>
                     <QuizModal>
-                        <CloseButton onClick={()=>{
+                        <CloseButton onClick={() => {
                             setQuizModal(false)
                         }}>x</CloseButton>
-                        <StyledQuizForm data={quiz?.slice(-5)}/>
+                        <StyledQuizForm data={quiz?.slice(-5)} />
                         {console.log('Quiz data passed to QuizForm:', quiz.slice(-5))}
                     </QuizModal>
                 </ModalOverlay>
