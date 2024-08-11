@@ -14,7 +14,7 @@ const Background = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index : 2;
+    z-index : 3;
 `
 
 const ModalBox = styled.div`
@@ -77,6 +77,7 @@ export default props => {
                             nativeLanguage = {selectedProfile.nativeLanguage}
                             content={selectedProfile.description}
                             hideContent = {true}
+                            userStatus={selectedProfile.userStatus}
                         />
                         <ButtonWrap>
                             <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>

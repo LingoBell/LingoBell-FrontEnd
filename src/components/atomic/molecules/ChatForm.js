@@ -40,25 +40,40 @@ function ChatForm(props, ref) {
         return { user: state.user?.user}
       })
 
+
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
-                const messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
-                console.log("messageTye", messageType);
+                // const messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
+                // console.log("messageTye", messageType);
+                if (message.type !== 'ai') {
+                    if (message.messageSenderId === user.uid) {
+                        message = {
+                            ...message, 
+                            type: 'me'
+                        };
+                    } else {
+                        message = {
+                            ...message, 
+                            type: 'partner'
+                        };
+                    }
+                }
+                
 
                 return (
                     <React.Fragment key={index}>
-                        {(messageType === 'partner' || messageType === 'me') && (
-                            <ChatMessageWrapper key={index} type={messageType} isDifferentType={isDifferentType}>
+                        {(message.type === 'me' || message.type === 'partner') && (
+                            <ChatMessageWrapper key={index} type={message?.type} isDifferentType={isDifferentType}>
                                 <ChatMessage
-                                    type={messageType}
+                                    type={message?.type}
                                     isOriginal={true}
                                 >
                                     {message?.originalMessage}
                                 </ChatMessage>
                                 <ChatMessage
-                                    type={messageType}
+                                    type={message?.type}
                                     isOriginal={false}
                                 >
                                     {message?.translatedMessage}

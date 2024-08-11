@@ -8,7 +8,7 @@ import IndexPage from "./components/atomic/pages/IndexPage";
 import ProfileList from "./components/atomic/pages/ProfileList";
 import Header from "./components/layout/Header";
 import LiveChat from "./components/atomic/pages/LiveChat";
-import { auth, generateToken, googleProvider, messaging, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
+import { auth, database, generateToken, googleProvider, messaging, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
@@ -19,6 +19,7 @@ import ProfilePage from "./components/atomic/pages/ProfilePage";
 import { onMessage } from "firebase/messaging";
 import { registerFcm } from "./apis/UserAPI";
 import { UpdateChatRoomStatus } from "./apis/ChatAPI";
+import { onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 
 
 export let mainDomain = 'http://localhost:8000'
@@ -99,6 +100,25 @@ export default () => {
         dispatch(checkFirstLogin())
         dispatch(setUser(JSON.parse(JSON.stringify(user))))
 
+        // 유저 접속 상태 관리
+        const userStatusDatabaseRef = ref(database, `/users/${user.uid}/status`)
+        const isOfflineForDatabase = {
+          state : 'offline',
+          last_changed : serverTimestamp(),
+        }
+        const isOnlineForDatabase = {
+          state : 'online',
+          last_changed : serverTimestamp(),
+        };
+        const connectedRef = ref(database, '.info/connected');
+        onValue(connectedRef, (snapshot) => {
+          if(snapshot.val() === false) return;
+          
+          onDisconnect(userStatusDatabaseRef).set(isOfflineForDatabase).then(()=>{
+            set(userStatusDatabaseRef, isOnlineForDatabase);
+          })
+        })
+        
       } else {
         dispatch(clearUser());
       }
