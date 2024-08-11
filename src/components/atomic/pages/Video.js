@@ -259,6 +259,7 @@ const Video = forwardRef((props, ref) => {
         };
     }, [user, nativeLanguage, learningLanguages]);
 
+
     const sendLanguageInfo = () => {
         console.log("sendLanguageInfo called");
 
@@ -321,7 +322,7 @@ const Video = forwardRef((props, ref) => {
         await initFaceLandmarker();
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
-            // audio: true,
+            audio: true,
         })
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;

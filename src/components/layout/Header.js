@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import TopBar from '../atomic/atoms/TopBar'
 import BaseImage from '../atomic/atoms/BaseImage'
@@ -6,7 +6,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { signOutAll } from '../../redux/userSlice'
 import { Link, useLocation } from 'react-router-dom'
 import HamburgerMenu from './HamburgerMenu'
-import { MENU_DEFAULT_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
+import { MENU_DEFAULT_COLOR, PRIMARY_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
+import { getMyProfile } from '../../apis/UserAPI'
 
 const HeaderContainer = styled.header`
   z-index : 10;
@@ -15,12 +16,14 @@ const HeaderContainer = styled.header`
   left: 0;
   width: 100vw;
   background-color: white;
-`
+  `
 
 
 const LogoContainer = styled.div`
   display : flex;
   align-items: center;
+  justify-content : center;
+
   
   
 
@@ -57,7 +60,18 @@ const Wrap = styled.div`
     display: none;
   }
   display : flex;
+  align-items : center;
 
+`
+
+const UserName = styled.div`
+  display : flex;
+  align-items : center;
+  padding-right : 30px;
+
+  img{
+    width : 26px;
+  }
 `
 
 export const MENUS = [
@@ -68,6 +82,8 @@ export const MENUS = [
 
 ]
 export default props => {
+  const [userName, setUserName] = useState('')
+  const [userPic, setUserPic] = useState('')
   const dispatch = useDispatch()
   const {isLoginUser, isFirstLogin } = useSelector((state) => {
     return {isLoginUser : state.user?.user,
@@ -78,6 +94,15 @@ export default props => {
   const trySignout = () => {
     dispatch(signOutAll())
   }
+
+
+  useEffect( async()=>{
+   const getUserName = await getMyProfile()
+   setUserName(getUserName.userName)
+   setUserPic(getUserName.profileImages)
+
+  },[])
+
 
   const location = useLocation()
   return (
@@ -90,12 +115,18 @@ export default props => {
           <LogoName>LingoBell</LogoName>
           
         </LogoContainer>
+        
         {
           isLoginUser && (
             <>
               <HamburgerMenu/>
               <Wrap>
+                <UserName>
+                 Welcome &nbsp; <span style={{fontWeight : '550', color : PRIMARY_COLOR}}>{userName}</span>
+                <img src='https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'></img>
+                </UserName>
                 { 
+                
                   MENUS.map(menu => {
                     if(isFirstLogin == 3 && menu.title != 'Logout') {
                       return null
