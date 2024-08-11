@@ -40,6 +40,10 @@ const ButtonWrap = styled.footer`
 
 const TestButton = styled(Button)`
     width : calc(80% - 24px);
+    ${props => props.$type == 'offline' && `
+        background-color : #eee;
+        color : black;
+        `}
 `
 
 export default props => {
@@ -80,7 +84,14 @@ export default props => {
                             userStatus={selectedProfile.userStatus}
                         />
                         <ButtonWrap>
-                            <TestButton onClick={onClickButton}>{bttnTxt}</TestButton>
+                            {selectedProfile.userStatus == 'online' ? (
+                                <TestButton
+                            onClick={onClickButton}>{bttnTxt}</TestButton>
+                            ) : (
+                                <TestButton $type="offline"
+                            disabled>{selectedProfile.userName} is offline</TestButton>
+                            )}
+                            
                         </ButtonWrap>
                     </div>
                 </ModalBox>

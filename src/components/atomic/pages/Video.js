@@ -216,7 +216,7 @@ const Video = forwardRef((props, ref) => {
 
     // 이 부분 추가
     const user = useSelector(state => state.user);
-    console.log("user안에 있는 정보는 과연? 두근두근", user);
+    // console.log("user안에 있는 정보는 과연? 두근두근", user);
 
     const sendLanguageInfo = () => {
         const userInfo = {
@@ -266,7 +266,7 @@ const Video = forwardRef((props, ref) => {
         await initFaceLandmarker();
         const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
-            // audio: true,
+            audio: true,
         })
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;

@@ -189,7 +189,7 @@ export default props => {
         <Modal
           isOpened={historyModal}
           onClickCloseBtn={() => handleCloseModal()}
-          bttnTxt="Enter Chat Room"
+          bttnTxt="Request Language Exchange"
           selectedProfile={selectedProfile}
           onClickButton={() => {
             navigate(`/live-chat/${chatId.chatId}`)
