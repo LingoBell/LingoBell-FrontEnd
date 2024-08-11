@@ -202,7 +202,7 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 처음비디오 꺼짐
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
@@ -251,7 +251,7 @@ const Video = forwardRef((props, ref) => {
         })
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
-        stream.getVideoTracks().enabled = isVideoEnabled;
+        stream.getVideoTracks().forEach(track => (track.enabled = false)); // 비디오 비활성화
         setLocalStream(stream);
 
         if (localVideoRef.current) {
@@ -332,6 +332,22 @@ const Video = forwardRef((props, ref) => {
         
     }
 
+    const endCall = () => {
+        console.log('Ending call...')
+        if(pc) {
+            pc.close();
+            pc = null;
+        }
+        if(localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            setLocalStream(null)
+        }
+        if(socket) {
+            socket.emit('DISCONNECTED', roomName)
+            socket.close()
+        }
+    }
+
     useEffect(() => {
         init()
 
@@ -382,6 +398,9 @@ const Video = forwardRef((props, ref) => {
                 setIsVideoEnabled(enabled);
             }
         },
+        endCall(){
+            endCall()
+        }
     }));
 
     useEffect(() => {

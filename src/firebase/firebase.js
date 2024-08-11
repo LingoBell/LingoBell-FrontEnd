@@ -1,7 +1,9 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getMessaging, getToken, isSupported, onMessage } from 'firebase/messaging';
+import { getDatabase, onValue, ref } from 'firebase/database';
 import { registerFcm } from '../apis/UserAPI';
+
 
 const firebaseConfig = {
     'apiKey': "AIzaSyAfXBd6KqRqNPGkk3vdq71IRC_aJGJxYbw",
@@ -18,7 +20,11 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const messaging = getMessaging(app)
+export const database = getDatabase(app); // Realtime Database 초기화
 
+
+
+// FCM 토큰 생성 및 등록
 export const generateToken = async () => {
    const permission =  await Notification.requestPermission()
    console.log(permission)
@@ -35,4 +41,23 @@ export const generateToken = async () => {
 }
 }
 
-
+// 유저 접속중 유무 판단
+export const user_online_status = () => {
+    return new Promise((resolve, reject) => {
+        try {
+            const userRef = ref(database, '/users');
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    resolve(data); // 데이터를 resolve하여 반환
+                } else {
+                    resolve({}); // 데이터가 없으면 빈 객체를 반환
+                }
+            }, (error) => {
+                reject(error); // 오류가 발생하면 reject
+            });
+        } catch (error) {
+            reject(error);
+        }
+    });
+};
