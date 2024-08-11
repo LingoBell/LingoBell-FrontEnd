@@ -41,42 +41,50 @@ function ChatForm(props, ref) {
     })
 
 
+
     return (
         <StyledChatCard className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
-                
-                let messageType;
-                if (message.type === 'ai' || message.type === 'quiz') {
-                    messageType = message.type;
-                } else {
-                    messageType = message.messageSenderId === user.uid ? 'me' : 'partner';
-                } 
+
+                if (message.type !== 'ai') {
+                    if (message.messageSenderId === user.uid) {
+                        message = {
+                            ...message, 
+                            type: 'me'
+                        };
+                    } else {
+                        message = {
+                            ...message, 
+                            type: 'partner'
+                        };
+                    }
+                }
                 
                 return (
                     <React.Fragment key={index}>
-                        {(messageType === 'partner' || messageType === 'me') && (
-                            <ChatMessageWrapper key={index} type={messageType} isDifferentType={isDifferentType}>
+                        {(message.type === 'me' || message.type === 'partner') && (
+                            <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType}>
                                 <ChatMessage
-                                    type={messageType}
+                                    type={message.type}
                                     isOriginal={true}
                                 >
-                                    {message?.originalMessage}
+                                    {message.originalMessage}
                                 </ChatMessage>
                                 {message?.translatedMessage && (
                                     <ChatMessage
-                                    type={messageType}
+                                    type={message.type}
                                     isOriginal={false}
                                 >
-                                    {message?.translatedMessage}
+                                    {message.translatedMessage}
                                 </ChatMessage>
                                 )}
                             </ChatMessageWrapper>
                         )}
-                        {messageType === 'ai' && (
+                        {message.type === 'ai' && (
                             <AiMessageWrapper>
                                 <ChatMessage
-                                    type={message?.type}
+                                    type={message.type}
                                 >
                                     <pre style={{ whiteSpace: 'pre-wrap' }}>{message?.aiRecommendation?.trim()}</pre>
                                 </ChatMessage>

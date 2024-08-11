@@ -1,17 +1,22 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import io from "socket.io-client";
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
+import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import axios from "axios";
-import { Canvas } from '@react-three/fiber';
-import ThreeScene from '../../../3Dmask/Model';
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
 import { useSelector } from 'react-redux';
 
 const Wrap = styled.div`
+    position: relative;
+    width: 100%;
+    height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     background-color: #666;
     > video {
@@ -30,6 +35,7 @@ const Wrap = styled.div`
         }
     }
 `
+
 const socket = io('')
 let pc1 = new RTCPeerConnection()
 let pc = null
@@ -48,12 +54,143 @@ const CanvasStyled = styled.canvas`
   z-index: 5;
 `;
 
+function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
+    const meshRef = useRef();
+    const { scene, camera } = useThree();
+
+    const texture = useLoader(THREE.TextureLoader, maskImage);
+
+    useEffect(() => {
+        camera.left = -videoWidth / 2;
+        camera.right = videoWidth / 2;
+        camera.top = videoHeight / 2;
+        camera.bottom = -videoHeight / 2;
+        camera.near = 0.1;
+        camera.far = 1000;
+        camera.position.z = 500;
+        camera.updateProjectionMatrix();
+    }, [camera, videoWidth, videoHeight]);
+
+    const geometry = useMemo(() => new THREE.BufferGeometry(), []);
+
+    const material = useMemo(() => {
+        texture.encoding = THREE.sRGBEncoding;
+        texture.anisotropy = 16;
+
+        return new THREE.ShaderMaterial({
+            uniforms: {
+                map: { value: texture },
+                opacity: { value: 1 },
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D map;
+                uniform float opacity;
+                varying vec2 vUv;
+                void main() {
+                    vec4 texColor = texture2D(map, vUv);
+                    gl_FragColor = vec4(texColor.rgb, texColor.a * opacity);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide,
+        });
+    }, [texture]);
+
+    useEffect(() => {
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        meshRef.current = mesh;
+
+        return () => {
+            scene.remove(mesh);
+        };
+    }, [scene, geometry, material]);
+
+    useFrame(() => {
+        if (faceData && meshRef.current) {
+            const faceOval = [10, 338, 297, 332, 284, 251, 389, 356, 454, 323, 361, 288, 397, 365, 379, 378, 400, 377, 152, 148, 176, 149, 150, 136, 172, 58, 132, 93, 234, 127, 162, 21, 54, 103, 67, 109];
+            const leftEye = [33, 7, 163, 144, 145, 153, 154, 155, 133, 173, 157, 158, 159, 160, 161, 246];
+            const rightEye = [362, 382, 381, 380, 374, 373, 390, 249, 263, 466, 388, 387, 386, 385, 384, 398];
+            const nose = [193, 122, 6, 351, 419, 456, 363, 360, 279, 358, 327, 326, 2, 97, 98];
+            const mouth = [0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61, 185, 40, 39, 37];
+
+            const featureGroups = [leftEye, rightEye, nose, mouth];
+
+            const positions = [];
+            const indices = [];
+            const uvs = [];
+
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+            const addContour = (contour) => {
+                const startIndex = positions.length / 3;
+                contour.forEach((index) => {
+                    const point = faceData[index];
+                    const x = (point.x - 0.5) * videoWidth;
+                    const y = (0.5 - point.y) * videoHeight;
+                    const z = -point.z * 150;
+                    positions.push(x, y, z);
+
+                    minX = Math.min(minX, point.x);
+                    maxX = Math.max(maxX, point.x);
+                    minY = Math.min(minY, point.y);
+                    maxY = Math.max(maxY, point.y);
+                });
+
+                for (let i = startIndex + 1; i < positions.length / 3 - 1; i++) {
+                    indices.push(startIndex, i, i + 1);
+                }
+            };
+
+            addContour(faceOval);
+            featureGroups.forEach(addContour);
+
+            const calculateUV = (x, y) => [
+                (x - minX) / (maxX - minX),
+                1 - (y - minY) / (maxY - minY)
+            ];
+
+            faceOval.forEach((index) => {
+                const point = faceData[index];
+                const [u, v] = calculateUV(point.x, point.y);
+                uvs.push(u, v);
+            });
+
+            featureGroups.forEach(group => {
+                group.forEach((index) => {
+                    const point = faceData[index];
+                    const [u, v] = calculateUV(point.x, point.y);
+                    uvs.push(u, v);
+                });
+            });
+
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geometry.setIndex(indices);
+            geometry.computeVertexNormals();
+
+            meshRef.current.position.set(0, 0, 0);
+            meshRef.current.scale.set(1.4, 1.4, 1.4);
+        }
+    });
+
+    return null;
+}
+
 const Video = forwardRef((props, ref) => {
     const params = useParams()
     const {
         notifyDiscon,
         onAudioStatusChange,
-        onVideoStatusChange
+        onVideoStatusChange,
+        isMaskOn
     } = props
     const {
         roomName,
@@ -66,10 +203,14 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 처음비디오 꺼짐
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
+    const [remoteFaceData, setRemoteFaceData] = useState(null);
+    const [isRemoteMaskOn, setIsRemoteMaskOn] = useState(true);
+    const [maskImage, setMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
+
 
     // 이 부분 추가
     const user = useSelector(state => state.user);
@@ -86,6 +227,17 @@ const Video = forwardRef((props, ref) => {
     };
     // 여기까지
 
+    // 이미지 업로드 처리 함수
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setMaskImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const initFaceLandmarker = async () => {
         const filesetResolver = await FilesetResolver.forVisionTasks(
@@ -103,6 +255,10 @@ const Video = forwardRef((props, ref) => {
         setFaceLandmarker(landmarker);
     }
 
+    const sendLandmarksData = (landmarksData) => {
+        socket.emit('LANDMARKS_DATA', { landmarksData, isMaskOn });
+    };
+
     const init = async () => {
         console.log('init start');
         await initFaceLandmarker();
@@ -112,13 +268,13 @@ const Video = forwardRef((props, ref) => {
         })
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
-        stream.getVideoTracks().enabled = isVideoEnabled;
+        stream.getVideoTracks().forEach(track => (track.enabled = false)); // 비디오 비활성화
         setLocalStream(stream);
 
-        // console.log('스트림 ',stream);
-        // console.log('비디오', stream.getVideoTracks())
-        // console.log('오디오', stream.getAudioTracks())
-
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
+        }
+      
         pc = new RTCPeerConnection()
         console.log('pc done')
         pc.onicecandidate = event => {
@@ -170,6 +326,11 @@ const Video = forwardRef((props, ref) => {
             await pc.addIceCandidate(new RTCIceCandidate(candidate))
         })
 
+        socket.on('LANDMARKS_DATA_RECEIVED', ({ landmarksData, isMaskOn }) => {
+            setRemoteFaceData(landmarksData);
+            setIsRemoteMaskOn(isMaskOn);
+        });
+
         socket.on('OPP_DISCONNECTED', async () => {
             console.log('OPP_DISCON')
             isCaller = true
@@ -190,7 +351,23 @@ const Video = forwardRef((props, ref) => {
         socket.onopen = () => {
             sendLanguageInfo();
         };
-        // 여기까지.
+        // 여기까지.        
+    }
+
+    const endCall = () => {
+        console.log('Ending call...')
+        if(pc) {
+            pc.close();
+            pc = null;
+        }
+        if(localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            setLocalStream(null)
+        }
+        if(socket) {
+            socket.emit('DISCONNECTED', roomName)
+            socket.close()
+        }
     }
 
     useEffect(() => {
@@ -208,10 +385,17 @@ const Video = forwardRef((props, ref) => {
                 pc.close()
                 pc = null
             }
-
-
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
         }
     }, [roomName, user]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
+
+    useEffect(() => {
+        if (faceData) {
+            sendLandmarksData(faceData);
+        }
+    }, [faceData, isMaskOn]);
 
     useEffect(() => {
         onAudioStatusChange(isAudioEnabled);
@@ -236,150 +420,119 @@ const Video = forwardRef((props, ref) => {
                 setIsVideoEnabled(enabled);
             }
         },
+        endCall(){
+            endCall()
+        }
     }));
 
     useEffect(() => {
         if (faceLandmarker && localVideoRef.current) {
             const video = localVideoRef.current;
+            const canvas = canvasRef.current;
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
 
-            video.addEventListener('loadedmetadata', () => {
-                // const canvasElement = document.createElement('canvas');
-                // canvasElement.width = video.videoWidth;
-                // canvasElement.height = video.videoHeight;
-                // canvasElement.style.position = 'absolute';
-                // canvasElement.style.top = '0';
-                // canvasElement.style.left = '0';
-                // canvasElement.style.pointerEvents = 'none';
-                // document.body.appendChild(canvasElement);
-                const canvas = canvasRef.current;
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
+            const canvasCtx = canvas.getContext('2d');
+            canvasCtx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                const canvasCtx = canvas.getContext('2d');
-                const drawingUtils = new DrawingUtils(canvasCtx);
+            const predictWebcam = async () => {
+                if (!video.videoWidth || !video.videoHeight) {
+                    return;
+                }
 
-                const predictWebcam = async () => {
-                    if (!video.videoWidth || !video.videoHeight) {
-                        return;
+                const results = await faceLandmarker.detectForVideo(video, performance.now());
+
+                if (results.faceLandmarks && results.faceLandmarks[0]) {
+                    setFaceData(results.faceLandmarks[0]);
+                    // sendLandmarksData(results.faceLandmarks[0]);  // Send landmarks data to server
+                }
+
+                if (results.faceLandmarks) {
+                    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (const landmarks of results.faceLandmarks) {
+
+                        const x = landmarks[0].x * canvas.width;
+                        const y = landmarks[0].y * canvas.height;
+                        const width = (landmarks[454].x - landmarks[234].x) * canvas.width;
+                        const height = (landmarks[152].y - landmarks[10].y) * canvas.height;
+
+                        // 이미지 로드
+                        const img = new Image();
+                        img.src = maskImage;
+                        img.onload = function () {
+                            // 이미지 그리기
+                            canvasCtx.save();
+                            canvasCtx.translate(x + width / 2, y + height / 2);
+                            canvasCtx.rotate(Math.atan2(landmarks[454].y - landmarks[234].y, landmarks[454].x - landmarks[234].x));
+                            canvasCtx.drawImage(img, -width / 2, -height / 2, width, height);
+                            canvasCtx.restore();
+                        };
                     }
+                }
+                requestAnimationFrame(predictWebcam);
+            };
+            video.addEventListener('loadedmetadata', predictWebcam);
 
-                        const results = await faceLandmarker.detectForVideo(video, performance.now());
-
-                        setFaceData(results.faceLandmarks[0]);
-                        // console.log('아ㅏ아아아ㅏ아아아아아아ㅏㅏㅏ', results.faceLandmarks[0]);
-                        // await createFaceLandmark(results.faceLandmarks[0]);
-
-                        if (results.faceLandmarks) {
-                            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-                            for (const landmarks of results.faceLandmarks) {
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_TESSELATION,
-                                    { color: "#C0C0C070", lineWidth: 1 }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE,
-                                    { color: "#FF3030" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_EYEBROW,
-                                    { color: "#FF3030" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_LEFT_EYE,
-                                    { color: "#30FF30" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_LEFT_EYEBROW,
-                                    { color: "#30FF30" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_FACE_OVAL,
-                                    { color: "#E0E0E0" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_LIPS,
-                                    { color: "#E0E0E0" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_RIGHT_IRIS,
-                                    { color: "#FF3030" }
-                                );
-                                drawingUtils.drawConnectors(
-                                    landmarks,
-                                    FaceLandmarker.FACE_LANDMARKS_LEFT_IRIS,
-                                    { color: "#30FF30" }
-                                );
-                            }
-                        }
-                        requestAnimationFrame(predictWebcam);
-                    };
-
-                    // if (faceLandmarker) {
-                    //     const results = await faceLandmarker.detectForVideo(localVideoRef.current, performance.now());
-
-                    //     // if (results.faceLandmarks.length > 0) {
-                    //     //     socket.emit('LANDMARKS_DATA', results.faceLandmarks[0]);
-
-                    //     //     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-                    //     //     results.faceLandmarks.forEach(landmarks => {
-                    //     //         drawingUtils.drawConnectors(
-                    //     //             landmarks,
-                    //     //             FaceLandmarker.FACE_LANDMARKS_TESSELATION,
-                    //     //             { color: '#C0C0C070', lineWidth: 1 }
-                    //     //         );
-                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_RIGHT_EYE, { color: '#FF3030' });
-                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LEFT_EYE, { color: '#30FF30' });
-                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_FACE_OVAL, { color: '#E0E0E0' });
-                    //     //         drawingUtils.drawConnectors(landmarks, FaceLandmarker.FACE_LANDMARKS_LIPS, { color: '#E0E0E0' });
-                    //     //     });
-                    //     // }
-
-                    //     if (results.faceLandmarks.length > 0) {
-                    //         const faceData = results.faceLandmarks[0];
-                    //         try {
-                    //           const overlayImage = await createFaceLandmark(faceData);
-                    //           console.log('백에서 받음', overlayImage);
-
-                    //           const image = new Image();
-                    //           image.src = `data:image/jpeg;base64,${overlayImage}`;
-                    //           image.onload = () => {
-                    //             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-                    //             canvasCtx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                    //           };
-                    //         } catch (error) {
-                    //           console.error('Error in creating face landmark:', error);
-                    //         }
-                    //       }
-                    // }
-                //     requestAnimationFrame(predictWebcam);
-                // };
-
-                predictWebcam();
-            });
+            return () => {
+                video.removeEventListener('loadedmetadata', predictWebcam);
+            };
         }
-    }, [faceLandmarker]);
-
-    // console.log('ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ', faceData);
+    }, [faceLandmarker, localStream]);
 
     return (
-        // <VideoContainer>
-        //     <video 
-        //     ref={localVideoRef} playsInline id="left_cam" controls preload="metadata" autoPlay></video>
-        //     <CanvasStyled ref={canvasRef} />
-        //     <video ref={remoteVideoRef} playsInline id="right_cam" controls preload="metadata" autoPlay></video>
-        //     {/* <ThreeScene /> */}
-        // </VideoContainer>
         <Wrap>
             <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
+            <canvas ref={canvasRef} style={{ display: 'none' }} />
             <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
+            {maskImage && faceData && isMaskOn && (
+                <Canvas
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: `360px`,
+                        height: `263px`,
+                        pointerEvents: 'none'
+                    }}
+                    orthographic
+                    camera={{ zoom: 1, position: [0, 0, 500] }}
+                >
+                    <ambientLight intensity={0.4} />
+                    <pointLight position={[0, 0, 500]} intensity={0.6} />
+                    <directionalLight position={[0, 0, 500]} intensity={0.5} />
+                    <FaceMask
+                        faceData={faceData}
+                        videoWidth={localVideoRef.current.videoWidth}
+                        videoHeight={localVideoRef.current.videoHeight}
+                        maskImage={maskImage}
+                    />
+                </Canvas>
+            )}
+            {maskImage && remoteFaceData && isRemoteMaskOn && (
+                <Canvas
+                    style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: 0,
+                        width: `360px`,
+                        height: `263px`,
+                        pointerEvents: 'none'
+                    }}
+                    orthographic
+                    camera={{ zoom: 1, position: [0, 0, 500] }}
+                >
+                    <ambientLight intensity={0.4} />
+                    <pointLight position={[0, 0, 500]} intensity={0.6} />
+                    <directionalLight position={[0, 0, 500]} intensity={0.5} />
+                    <FaceMask
+                        faceData={remoteFaceData}
+                        videoWidth={remoteVideoRef.current ? remoteVideoRef.current.videoWidth : 360}
+                        videoHeight={remoteVideoRef.current ? remoteVideoRef.current.videoHeight : 263}
+                        maskImage={maskImage}
+                    />
+                </Canvas>
+            )}
+            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} />
         </Wrap>
     );
 });
