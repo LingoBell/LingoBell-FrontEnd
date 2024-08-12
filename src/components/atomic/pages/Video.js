@@ -227,11 +227,10 @@ const Video = forwardRef((props, ref) => {
                 console.error("Failed to fetch profile data", error);
             }
         };
-
         fetchProfileData();
     }, []);
 
-    useEffect(() => {
+    /* useEffect(() => {
         const chatRoomId = params.chatId;
         socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
 
@@ -243,11 +242,6 @@ const Video = forwardRef((props, ref) => {
             }
         };
 
-        // STT를 실시간으로 받고싶은 경우 활용할 수 있음.
-        /* socketRef.current.onmessage = (event) => {
-            console.log('Received message:', event.data);
-            setResponses(prev => [...prev, event.data]);
-        }; */
         socketRef.current.onclose = () => {
             console.log('WebSocket connection closed');
         };
@@ -257,7 +251,7 @@ const Video = forwardRef((props, ref) => {
                 socketRef.current.close();
             }
         };
-    }, [user, nativeLanguage, learningLanguages]);
+    }, [user, nativeLanguage, learningLanguages]); */
 
     const sendLanguageInfo = () => {
         console.log("sendLanguageInfo called");
@@ -270,18 +264,18 @@ const Video = forwardRef((props, ref) => {
         };
 
         console.log("여기에 userInfo가 찍히리라", userInfo);
-        /* if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } else {
              console.log("WebSocket connection is not open to send language info.");
-        } */
-        try {
+        }
+        /* try {
             socketRef.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } catch (error) {
             console.error("Failed to send message. WebSocket error:", error);
-        }
+        } */
     };
 
     // 이미지 업로드 처리 함수
@@ -405,7 +399,9 @@ const Video = forwardRef((props, ref) => {
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-        /* socketRef.current = new WebSocket('ws://34.64.241.5:38080');
+
+        const chatRoomId = params.chatId;
+        socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
@@ -422,7 +418,7 @@ const Video = forwardRef((props, ref) => {
             if (socketRef.current) {
                 socketRef.current.close();
             }
-        }; */
+        };
     }
 
     const endCall = () => {
@@ -525,14 +521,14 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange(isVideoEnabled);
     }, [isVideoEnabled]);
 
-    // useEffect(() => {
-    //     console.log("useEffect 실행시켰고, 이제 sendLanguageInfo 함수 실행시킬거야.");
-    //     // if (user && nativeLanguage && learningLanguages.length > 0 && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-    //     if (user && nativeLanguage && learningLanguages.length > 0) {
-    //         sendLanguageInfo();
-    //         console.log("sendLanguageInfo 실행완료");
-    //     }
-    // }, [user, nativeLanguage, learningLanguages]);
+    useEffect(() => {
+        console.log("useEffect 실행시켰고, 이제 sendLanguageInfo 함수 실행시킬거야.");
+        // if (user && nativeLanguage && learningLanguages.length > 0 && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+        if (user && nativeLanguage && learningLanguages.length > 0) {
+            sendLanguageInfo();
+            console.log("sendLanguageInfo 실행완료");
+        }
+    }, [user, nativeLanguage, learningLanguages]);
 
     useImperativeHandle(ref, () => ({
         turnAudio() {
