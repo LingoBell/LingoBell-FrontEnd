@@ -120,20 +120,20 @@ export default props => {
     }
   }
 
-  const fetchSttMessages = async (chatRoomId) => {
+  const fetchSttAndTranslatedMessages = async (chatRoomId) => {
     try {
-      const data = await getSttMessages(chatRoomId);
-      console.log("fetchSttMessages result", data);
+      const data = await getSttAndTranslatedMessages(chatRoomId);
+      console.log("fetchSttAndTranslatedMessages result", data);
       setMessages(data.messages);
     } catch (error) {
-      console.log("Error occured while fetchSttMessages on ChatHistoryDetail");
+      console.log("Error occured while fetchSttAndTranslatedMessages on ChatHistoryDetail");
     }
   };
 
   useEffect(() => {
     if (chatRoomId) {
       fetchChatDataById(chatRoomId)
-      fetchSttMessages(chatRoomId)
+      fetchSttAndTranslatedMessages(chatRoomId)
     }
   }, [chatRoomId])
 

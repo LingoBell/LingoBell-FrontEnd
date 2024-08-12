@@ -479,7 +479,24 @@ function LiveChat() {
                         <CallEndButton onClick={handleEndCall}>
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
-                        {/* <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton> */}
+                        <CallButton onClick={toggleTranslation} style={{ position: 'relative', display: 'inline-block', fontSize: '24px' }}>
+                            <span className="material-icons" style={{ fontSize: 'inherit' }}>
+                                translate
+                            </span>
+                            {!showTranslation && (
+                                <span
+                                    style={{
+                                        position: 'absolute',
+                                        top: '45%',
+                                        left: '50%',
+                                        transform: 'translate(-50%, -50%) rotate(45deg)',
+                                        height: '2px',
+                                        width: '55%',
+                                        backgroundColor: 'black',
+                                    }}
+                                />
+                            )}
+                        </CallButton>
                         <CallButton onClick={toggleMask}
                             onMouseEnter={() => {
                                 setHoverMask(true)
@@ -493,7 +510,6 @@ function LiveChat() {
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
                             </span>
                         </CallButton>
-                        <CallButton><span className='material-icons'>calendar_month</span></CallButton>
                     </ButtonWrap>
                 </VideoWrap>
                 <AIChatWrap isOpen={openedTab === 'AI'}>
