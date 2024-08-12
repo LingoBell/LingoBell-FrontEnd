@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
+import BaseImage from "../atoms/BaseImage";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -232,7 +233,18 @@ const CloseButton = styled.button`
     cursor: pointer;
 `;
 
+const MaskButton = styled(BaseImage)`
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    
+`
 
+const HoverWrap = styled.div`
+    display : flex;
+    justify-content : space-evenly;
+
+`
 
 
 function LiveChat() {
@@ -249,8 +261,12 @@ function LiveChat() {
     const audioRef = useRef(null);
     const videoRef = useRef(null);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 초기 비디오 비활성화
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
+    const [hoverMask, setHoverMask] = useState(false);
+    const [keepHover, setKeepHover] = useState(false);
+    const maskRef = useRef(null);
+
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -393,6 +409,30 @@ function LiveChat() {
         setIsMaskOn(!isMaskOn);
     };
 
+    const handleMaskClick = (value) => {
+        if (videoRef.current) {
+            videoRef.current.changeSelection(value); // 자식 컴포넌트의 메서드를 호출
+        }
+    };
+
+
+    const maskList = [
+        { src: 'https://storage.googleapis.com/lingobellstorage/Hamzzi.png', value: 'image1' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/actionmask.jpeg', value: 'image2' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/bonobono.png', value: 'image3' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/staria.png', value: 'image4' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
+    ]
+    useEffect(() => {
+        if (!hoverMask) {
+            const timer = setTimeout(() => {
+                setKeepHover(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [hoverMask]);
+
     return (
         <StyledCenteredLayout>
             <MainStyle />
@@ -404,6 +444,27 @@ function LiveChat() {
                         onVideoStatusChange={handleVideoStatusChange}
                         isMaskOn={isMaskOn}
                     />
+                    {(hoverMask || keepHover) && (
+                        <HoverWrap
+                            onMouseEnter={() => {
+                                setKeepHover(true)
+                                setHoverMask(true)
+                            }} // 새로 생긴 버튼에 마우스가 들어오면 유지
+                            onMouseLeave={() => {
+                                setKeepHover(false)
+                                setHoverMask(false)
+                            }} // 새로 생긴 버튼에서 마우스가 나가면 종료
+                        >
+                            {maskList.map((mask, index) =>
+                                <MaskButton
+                                    key={index}
+                                    src={mask.src}
+                                    onClick={() => {
+                                        handleMaskClick(mask.value)
+                                    }} />
+                            )}
+                        </HoverWrap>
+                    )}
                     <ButtonWrap>
                         <CallButton onClick={handleAudioClick}>
                             <span className='material-icons'>
@@ -436,7 +497,15 @@ function LiveChat() {
                                 />
                             )}
                         </CallButton>
-                        <CallButton onClick={toggleMask}>
+                        <CallButton onClick={toggleMask}
+                            onMouseEnter={() => {
+                                setHoverMask(true)
+                                setKeepHover(true);
+                            }}
+                            onMouseLeave={() => {
+                                setHoverMask(false)
+                            }}
+                        >
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
                             </span>
