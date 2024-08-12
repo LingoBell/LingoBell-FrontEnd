@@ -249,7 +249,7 @@ function LiveChat() {
     const audioRef = useRef(null);
     const videoRef = useRef(null);
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 초기 비디오 비활성화
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
 
     const navigate = useNavigate()
