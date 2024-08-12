@@ -427,15 +427,6 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
     
-    useEffect(() => {
-        if (!hoverMask) {
-            const timer = setTimeout(() => {
-                setKeepHover(false);
-            }, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [hoverMask]);
-
     return (
         <StyledCenteredLayout>
             <MainStyle />
