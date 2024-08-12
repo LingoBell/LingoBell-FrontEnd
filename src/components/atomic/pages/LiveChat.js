@@ -6,7 +6,7 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useNavigate, useParams } from "react-router-dom";
-import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttAndTranslatedMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 import BaseImage from "../atoms/BaseImage";
@@ -237,6 +237,13 @@ const MaskButton = styled(BaseImage)`
     width: 24px;
     height: 24px;
     padding: 4px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+
+  &:hover {
+    transform: scale(1.4);
+  }
+
     
 `
 
@@ -263,8 +270,6 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
-    const [hoverMask, setHoverMask] = useState(false);
-    const [keepHover, setKeepHover] = useState(false);
     const maskRef = useRef(null);
 
 
@@ -272,7 +277,7 @@ function LiveChat() {
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const data = await getSttMessages(chatRoomId);
+                const data = await getSttAndTranslatedMessages(chatRoomId);
                 setMessages(data.messages);
             } catch (err) {
                 console.error('Error fetching STT messages on LiveChat useEffect', err);
@@ -424,14 +429,6 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
-    useEffect(() => {
-        if (!hoverMask) {
-            const timer = setTimeout(() => {
-                setKeepHover(false);
-            }, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [hoverMask]);
 
     return (
         <StyledCenteredLayout>
@@ -444,27 +441,18 @@ function LiveChat() {
                         onVideoStatusChange={handleVideoStatusChange}
                         isMaskOn={isMaskOn}
                     />
-                    {(hoverMask || keepHover) && (
-                        <HoverWrap
-                            onMouseEnter={() => {
-                                setKeepHover(true)
-                                setHoverMask(true)
-                            }} // 새로 생긴 버튼에 마우스가 들어오면 유지
-                            onMouseLeave={() => {
-                                setKeepHover(false)
-                                setHoverMask(false)
-                            }} // 새로 생긴 버튼에서 마우스가 나가면 종료
-                        >
-                            {maskList.map((mask, index) =>
-                                <MaskButton
-                                    key={index}
-                                    src={mask.src}
-                                    onClick={() => {
-                                        handleMaskClick(mask.value)
-                                    }} />
-                            )}
-                        </HoverWrap>
-                    )}
+                    <HoverWrap
+                    >
+                        {maskList.map((mask, index) =>
+                            <MaskButton
+                                key={index}
+                                src={mask.src}
+                                onClick={() => {
+                                    handleMaskClick(mask.value)
+                                }} />
+                        )}
+                    </HoverWrap>
+
                     <ButtonWrap>
                         <CallButton onClick={handleAudioClick}>
                             <span className='material-icons'>
@@ -498,13 +486,6 @@ function LiveChat() {
                             )}
                         </CallButton>
                         <CallButton onClick={toggleMask}
-                            onMouseEnter={() => {
-                                setHoverMask(true)
-                                setKeepHover(true);
-                            }}
-                            onMouseLeave={() => {
-                                setHoverMask(false)
-                            }}
                         >
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
