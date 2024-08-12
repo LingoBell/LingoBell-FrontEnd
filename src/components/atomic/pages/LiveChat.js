@@ -265,7 +265,7 @@ function LiveChat() {
     const [isMaskOn, setIsMaskOn] = useState(true);
     const [hoverMask, setHoverMask] = useState(false);
     const [keepHover, setKeepHover] = useState(false);
-
+    const maskRef = useRef(null);
 
 
     const navigate = useNavigate()
@@ -409,13 +409,20 @@ function LiveChat() {
         setIsMaskOn(!isMaskOn);
     };
 
+    const handleMaskClick = (value) => {
+        if (videoRef.current) {
+            videoRef.current.changeSelection(value); // 자식 컴포넌트의 메서드를 호출
+        }
+    };
+
+
     const maskList = [
-        'https://storage.googleapis.com/lingobellstorage/Hamzzi.png',
-        'https://storage.googleapis.com/lingobellstorage/Joker.jpeg',
-        'https://storage.googleapis.com/lingobellstorage/actionmask.jpeg',
-        'https://storage.googleapis.com/lingobellstorage/bonobono.png',
-        'https://storage.googleapis.com/lingobellstorage/kaksital.png',
-        'https://storage.googleapis.com/lingobellstorage/staria.png'
+        { src: 'https://storage.googleapis.com/lingobellstorage/Hamzzi.png', value: 'image1' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/actionmask.jpeg', value: 'image2' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/bonobono.png', value: 'image3' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/staria.png', value: 'image4' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
+        { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
     useEffect(() => {
         if (!hoverMask) {
@@ -448,8 +455,13 @@ function LiveChat() {
                                 setHoverMask(false)
                             }} // 새로 생긴 버튼에서 마우스가 나가면 종료
                         >
-                            {maskList.map(src =>
-                                <MaskButton src={src} />
+                            {maskList.map((mask, index) =>
+                                <MaskButton
+                                    key={index}
+                                    src={mask.src}
+                                    onClick={() => {
+                                        handleMaskClick(mask.value)
+                                    }} />
                             )}
                         </HoverWrap>
                     )}
