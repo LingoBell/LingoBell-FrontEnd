@@ -230,12 +230,12 @@ const Video = forwardRef((props, ref) => {
         };
         socket.send(JSON.stringify(userInfo))
     };
-    
+
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
             const audioTrack = stream.getAudioTracks()[0];
             audioTrack.enabled = false;
-            
+
             setTimeout(() => {
                 audioTrack.enabled = true;
             }, 10);
@@ -254,6 +254,7 @@ const Video = forwardRef((props, ref) => {
     const handleImageChange = (event) => {
         const selectedImage = availableImages[event.target.value];
         setLocalMaskImage(selectedImage);
+        console.log('마스크 변경', event.target.value);
         socket.emit('MASK_CHANGED', { roomName, maskImage: event.target.value });
     };
 
@@ -293,7 +294,7 @@ const Video = forwardRef((props, ref) => {
             localVideoRef.current.srcObject = stream;
             localVideoRef.current.muted = true;
         }
-      
+
         pc = new RTCPeerConnection()
         console.log('pc done')
         pc.onicecandidate = event => {
@@ -339,7 +340,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
-            socket.emit('ANSWER', {roomName, answer})
+            socket.emit('ANSWER', { roomName, answer })
             muteLocalAudioForMe(stream);
         })
 
@@ -382,15 +383,15 @@ const Video = forwardRef((props, ref) => {
 
     const endCall = () => {
         console.log('Ending call...')
-        if(pc) {
+        if (pc) {
             pc.close();
             pc = null;
         }
-        if(localStream) {
+        if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             setLocalStream(null)
         }
-        if(socket) {
+        if (socket) {
             socket.emit('DISCONNECTED', roomName)
             socket.close()
         }
@@ -446,21 +447,23 @@ const Video = forwardRef((props, ref) => {
                 setIsVideoEnabled(enabled);
             }
         },
-        endCall(){
+        endCall() {
             endCall()
         },
         changeSelection(value) {
             // 옵션 변경을 위해 호출될 함수
             const selectedMask = availableImages[value];
             if (selectedMask) {
-                setLocalMaskImage(selectedMask)
+                setLocalMaskImage(selectedMask);
                 setSelectedImage(selectedMask);
+                console.log('마스크 변경', value);
+                socket.emit('MASK_CHANGED', { roomName, maskImage: value });
             }
         },
 
     }));
 
-    
+
 
     useEffect(() => {
         if (faceLandmarker && localVideoRef.current) {
