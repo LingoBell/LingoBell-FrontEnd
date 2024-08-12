@@ -6,7 +6,7 @@ import CenteredMainLayout from "../templates/CenteredMainLayout";
 import axios from "axios";
 import Video from "./Video";
 import { useNavigate, useParams } from "react-router-dom";
-import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
+import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttAndTranslatedMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 import BaseImage from "../atoms/BaseImage";
@@ -267,12 +267,11 @@ function LiveChat() {
     const [keepHover, setKeepHover] = useState(false);
     const maskRef = useRef(null);
 
-
     const navigate = useNavigate()
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const data = await getSttMessages(chatRoomId);
+                const data = await getSttAndTranslatedMessages(chatRoomId);
                 setMessages(data.messages);
             } catch (err) {
                 console.error('Error fetching STT messages on LiveChat useEffect', err);
@@ -353,7 +352,6 @@ function LiveChat() {
                     behavior: 'smooth'
                 })
             }, 300)
-
         }
     }
 
@@ -393,7 +391,6 @@ function LiveChat() {
         if (videoRef.current) {
             videoRef.current.endCall();
             navigate('/')
-
         }
     }
 
@@ -424,6 +421,7 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
+    
     useEffect(() => {
         if (!hoverMask) {
             const timer = setTimeout(() => {

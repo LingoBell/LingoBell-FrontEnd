@@ -292,6 +292,8 @@ const Video = forwardRef((props, ref) => {
                 setMaskImage(e.target.result);
             };
             reader.readAsDataURL(file);
+        }
+    }    
     
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
@@ -393,7 +395,6 @@ const Video = forwardRef((props, ref) => {
             console.log('ANSWER_RECEIVED')
             await pc.setRemoteDescription(new RTCSessionDescription(answer))
             muteLocalAudioForMe(stream);
-
         })
         socket.on('OFFER_RECEIVED', async (offer) => {
             console.log('OFFER_RECEIVED')
@@ -436,17 +437,12 @@ const Video = forwardRef((props, ref) => {
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-
         const chatRoomId = params.chatId;
         socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
 
-        socketRef.current.onmessage = (event) => {
-            console.log('Received message:', event.data);
-            setResponses(prev => [...prev, event.data]);
-        };
         socketRef.current.onclose = () => {
             console.log('WebSocket connection closed');
         };
@@ -505,12 +501,11 @@ const Video = forwardRef((props, ref) => {
         }
     };
 
-    // STT 오디오 데이터가 사용 가능할 때 호출되는 함수
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
             if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
                 console.log("Sending audio blob");
-                socketRef.current.send(blob); // Base64 인코딩 없이 Blob 자체 전송
+                socketRef.current.send(blob);
             } else {
                 console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
             }
@@ -559,7 +554,6 @@ const Video = forwardRef((props, ref) => {
     }, [isVideoEnabled]);
 
     useEffect(() => {
-        console.log("useEffect 실행시켰고, 이제 sendLanguageInfo 함수 실행시킬거야.");
         if (user && nativeLanguage && learningLanguages.length > 0) {
             sendLanguageInfo();
             console.log("sendLanguageInfo 실행완료");
@@ -592,7 +586,6 @@ const Video = forwardRef((props, ref) => {
                 setSelectedImage(selectedMask);
             }
         },
-
     }));
 
     useEffect(() => {
