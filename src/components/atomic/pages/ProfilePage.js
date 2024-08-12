@@ -209,7 +209,11 @@ export default props => {
         ) {
             alert("All fields required")
             return false
-        } else {
+        }
+         if (userIntroduce.length > 254) {
+            alert('user introduction fields cannot exceed 255words')
+        }
+        else {
             await AddUserProfile(formData)
                 .then(() => {
                     window.location.reload();
@@ -252,7 +256,11 @@ export default props => {
         ) {
             alert("All fields required")
             return false
-        } else {
+        }
+         if (userIntroduce.length > 254) {
+            alert('user introduction fields cannot exceed 255 characters!')
+        }
+        else {
             await UpdateUserProfile(formData)
                 .then(() => {
                     navigate('/')
@@ -319,19 +327,19 @@ export default props => {
     return (
         <>
             {isFirstLogin === 2 ?
-                
-                    <Wrap>
-                            <MyModal
-                                selectedProfile={myProfile}
-                                isOpened={viewMyProfile}
-                                bttnTxt='Edit Profile'
-                                onClickCloseBtn={() => {
-                                    navigate('/')
-                                }}
-                                onClickButton={() => {
-                                    handleCloseModal()
-                                }}
-                            />
+
+                <Wrap>
+                    <MyModal
+                        selectedProfile={myProfile}
+                        isOpened={viewMyProfile}
+                        bttnTxt='Edit Profile'
+                        onClickCloseBtn={() => {
+                            navigate('/')
+                        }}
+                        onClickButton={() => {
+                            handleCloseModal()
+                        }}
+                    />
                     <Title>Edit User Profile</Title>
                     <FormItemWrap>
                         <LabelText>Name</LabelText>
@@ -346,16 +354,16 @@ export default props => {
                             <StyledImg ref={imgRef} type="file" accept="image/*" required
                                 onChange={(e) => {
                                     const file = e.target.files[0];
-                                    if(file){
+                                    if (file) {
                                         setImage(file)
                                     }
                                 }}
                             />
-                            <ImagePreview onClick={()=>{
+                            <ImagePreview onClick={() => {
                                 imgRef.current.click();
                             }} src={
-                                preview ? preview : 
-                                'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}/>
+                                preview ? preview :
+                                    'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'} />
                         </ImageWrap>
                     </FormItemWrap>
 
@@ -529,9 +537,9 @@ export default props => {
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         <Button onClick={handleEditSubmit}>Edit</Button>
                     </div>
-                  
-                    </Wrap>
-                
+
+                </Wrap>
+
                 :
                 <Wrap>
                     <Title>Create User Profile</Title>
