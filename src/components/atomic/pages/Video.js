@@ -9,7 +9,7 @@ import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import action from '../../../assets/images/action.jpg'
 import bono from '../../../assets/images/bono.png'
 import ddung from '../../../assets/images/ddung.png'
-import gaksital from '../../../assets/images/gak.png'
+import gaksital from '../../../assets/images/gaksital.png'
 import jocker from '../../../assets/images/jocker.jpg'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
@@ -47,6 +47,7 @@ let pc = null
 let isCaller = false
 
 const ImageSelector = styled.select`
+  display : none;
   position: absolute;
   bottom: 10px;
   left: 10px;
@@ -212,6 +213,7 @@ const Video = forwardRef((props, ref) => {
     const [localMaskImage, setLocalMaskImage] = useState(defaultMaskImage);
     const [remoteMaskImage, setRemoteMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
+    const [selectedImage, setSelectedImage] = useState("image1");
 
     const roomName = chatId;
 
@@ -241,12 +243,12 @@ const Video = forwardRef((props, ref) => {
     };
 
     const [availableImages] = useState({
-        default: defaultMaskImage,
-        image1: action,
-        image2: bono,
-        image3: ddung,
-        image4: gaksital,
-        image5: jocker
+        image1: defaultMaskImage,
+        image2: action,
+        image3: bono,
+        image4: ddung,
+        image5: gaksital,
+        image6: jocker
     });
 
     const handleImageChange = (event) => {
@@ -446,8 +448,19 @@ const Video = forwardRef((props, ref) => {
         },
         endCall(){
             endCall()
-        }
+        },
+        changeSelection(value) {
+            // 옵션 변경을 위해 호출될 함수
+            const selectedMask = availableImages[value];
+            if (selectedMask) {
+                setLocalMaskImage(selectedMask)
+                setSelectedImage(selectedMask);
+            }
+        },
+
     }));
+
+    
 
     useEffect(() => {
         if (faceLandmarker && localVideoRef.current) {
@@ -557,13 +570,13 @@ const Video = forwardRef((props, ref) => {
                 </Canvas>
             )}
             {/* <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} /> */}
-            <ImageSelector onChange={handleImageChange}>
-                <option value="default">hamzzik</option>
-                <option value="image1">action mask</option>
-                <option value="image2">bono bono</option>
-                <option value="image3">ddung e</option>
-                <option value="image4">korea traditional mask</option>
-                <option value="image5">jocker</option>
+            <ImageSelector onChange={handleImageChange} value={selectedImage}>
+                <option value="image1">hamzzik</option>
+                <option value="image2">action mask</option>
+                <option value="image3">bono bono</option>
+                <option value="image4">ddung e</option>
+                <option value="image5">korea traditional mask</option>
+                <option value="image6">jocker</option>
             </ImageSelector>
         </Wrap>
     );
