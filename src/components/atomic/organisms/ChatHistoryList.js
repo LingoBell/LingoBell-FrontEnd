@@ -83,7 +83,6 @@ export default props => {
     userId,
     profileImages,
     userStatus
-
   } = myProfile;
   console.log('myProfile', myProfile)
   return (
@@ -103,7 +102,12 @@ export default props => {
       />
       {/* 채팅히스토리데이터 */}
       {
-        chatHistoryList.map((profile, index) => {
+        chatHistoryList?.sort((a,b)=>{
+          if(a.userStatus === 'online' && b.userStatus !== 'online') return -1;
+          if(a.userStatus !== 'online' && b.userStatus === 'online ') return 1;
+          return 0
+        })
+        .map((profile, index) => {
           const {
             birthday,
             gender,
