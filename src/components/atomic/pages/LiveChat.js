@@ -278,6 +278,11 @@ function LiveChat() {
             try {
                 const data = await getSttAndTranslatedMessages(chatRoomId);
                 setMessages(data.messages);
+                document.querySelector('#user-chat-form-wrap')?.scrollTo({
+                    top: 999999999999999999,
+                    behavior: 'smooth'
+                })
+                
             } catch (err) {
                 console.error('Error fetching STT messages on LiveChat useEffect', err);
             }
@@ -509,7 +514,7 @@ function LiveChat() {
                     </StyledChatForm>
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm data={messages.map((msg) => ({
+                    <StyledChatForm  id='user-chat-form-wrap' data={messages.map((msg) => ({
                         ...msg,
                         translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
                     }))} />
