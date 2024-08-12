@@ -43,7 +43,7 @@ const Wrap = styled.div`
     }
 `
 
-const socket = io(window.location.host.includes('lingobell.xyz') ? 'http://socket.lingobell.xyz' : "")
+const socket = io(window.location.host.includes('lingobell.xyz') ? 'https://socket.lingobell.xyz' : "")
 let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
@@ -465,6 +465,7 @@ const Video = forwardRef((props, ref) => {
     }
 
     const startRecording = () => {
+        console.log(isAudioEnabled, socketRef.current)
         if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
@@ -489,6 +490,7 @@ const Video = forwardRef((props, ref) => {
         if (recorderRef.current) {
             recorderRef.current.stopRecording(() => {
                 let blob = recorderRef.current.getBlob();
+                
                 console.log('Recording stopped, blob created', blob);
             });
             setIsRecording(false);
@@ -498,12 +500,30 @@ const Video = forwardRef((props, ref) => {
     // STT 오디오 데이터가 사용 가능할 때 호출되는 함수
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
-            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                console.log("Sending audio blob");
-                socketRef.current.send(blob); // Base64 인코딩 없이 Blob 자체 전송
-            } else {
-                console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
-            }
+            // Blob을 Base64로 인코딩
+            const reader = new FileReader();
+            reader.onload = function() {
+                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                    const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
+                    console.log('user', user)
+                    const message = JSON.stringify({
+                        user_id: user.user.uid,
+                        blob: base64Data
+                    });
+                    // websocket.send(message);
+                    console.log("Sending audio blob");
+                    // const message = JSON.stringify({
+                    //     user_id: user.uid,
+                    //     blob: base64Data
+                    // });
+                    socketRef.current.send(message); // Base64 인코딩 없이 Blob 자체 전송
+                } else {
+                    console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+                }
+                
+            };
+            reader.readAsDataURL(blob);
+            
         } else {
             console.log("No audio data to send");
         }
@@ -542,7 +562,7 @@ const Video = forwardRef((props, ref) => {
         } else {
             stopRecording();
         }
-    }, [isAudioEnabled]);
+    }, [isAudioEnabled, socketRef.current]);
 
     useEffect(() => {
         onVideoStatusChange(isVideoEnabled);

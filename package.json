@@ -42,7 +42,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config webpack.config.js",
-    "build": "webpack build --config webpack.prod.config.js",
+    "build": "webpack build --config webpack.prod.config.js && cp -r ./dist/* ../LingoBell-BackEnd/dist &&cp -r ./public/* ../LingoBell-BackEnd/dist && gcloud compute scp --recurse ./dist/* lingobellers@lingobell-server:~/LingoBell-BackEnd/dist --zone 'asia-northeast3-a'  --project lingobell-c87d8 && gcloud compute scp --recurse ./public/* lingobellers@lingobell-server:~/LingoBell-BackEnd/dist --zone 'asia-northeast3-a'  --project lingobell-c87d8",
     "deploy": "gh-pages -d dist"
   },
   "repository": {
