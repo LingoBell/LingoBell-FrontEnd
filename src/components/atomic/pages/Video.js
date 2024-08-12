@@ -283,21 +283,11 @@ const Video = forwardRef((props, ref) => {
         } */
     };
 
-    // 이미지 업로드 처리 함수
-    const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setMaskImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
-    
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
             const audioTrack = stream.getAudioTracks()[0];
             audioTrack.enabled = false;
-            
+
             setTimeout(() => {
                 audioTrack.enabled = true;
             }, 10);
@@ -316,6 +306,7 @@ const Video = forwardRef((props, ref) => {
     const handleImageChange = (event) => {
         const selectedImage = availableImages[event.target.value];
         setLocalMaskImage(selectedImage);
+        console.log('마스크 변경', event.target.value);
         socket.emit('MASK_CHANGED', { roomName, maskImage: event.target.value });
     };
 
@@ -401,8 +392,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
-
-            socket.emit('ANSWER', {roomName, answer})
+            socket.emit('ANSWER', { roomName, answer })
             muteLocalAudioForMe(stream);
         })
 
@@ -588,8 +578,10 @@ const Video = forwardRef((props, ref) => {
             // 옵션 변경을 위해 호출될 함수
             const selectedMask = availableImages[value];
             if (selectedMask) {
-                setLocalMaskImage(selectedMask)
+                setLocalMaskImage(selectedMask);
                 setSelectedImage(selectedMask);
+                console.log('마스크 변경', value);
+                socket.emit('MASK_CHANGED', { roomName, maskImage: value });
             }
         },
 
@@ -702,7 +694,6 @@ const Video = forwardRef((props, ref) => {
                     />
                 </Canvas>
             )}
-            {/* <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} /> */}
             <ImageSelector onChange={handleImageChange} value={selectedImage}>
                 <option value="image1">hamzzik</option>
                 <option value="image2">action mask</option>
