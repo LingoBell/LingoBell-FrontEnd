@@ -202,7 +202,7 @@ const Video = forwardRef((props, ref) => {
     const [localStream, setLocalStream] = useState(null)
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
-    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
