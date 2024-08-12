@@ -13,8 +13,10 @@ import gaksital from '../../../assets/images/gaksital.png'
 import jocker from '../../../assets/images/jocker.jpg'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
-import { send_notification } from '../../../apis/UserAPI';
+import { send_notification, getMyProfile } from '../../../apis/UserAPI';
+import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
+import RecordRTC from 'recordrtc';
 
 const Wrap = styled.div`
     position: relative;
@@ -193,11 +195,8 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange,
         isMaskOn
     } = props
-    const {
-        // roomName,
-        chatId
-    } = params
-
+    const { chatId } = params
+    const roomName = chatId;
     const localVideoRef = useRef(null);
     const remoteVideoRef = useRef(null);
     const [localStream, setLocalStream] = useState(null)
@@ -213,23 +212,86 @@ const Video = forwardRef((props, ref) => {
     const [localMaskImage, setLocalMaskImage] = useState(defaultMaskImage);
     const [remoteMaskImage, setRemoteMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
+    const socketRef = useRef(null); // STT를 위한 WebSocket
+    const recorderRef = useRef(null); // GPU 서버 전달하기 위해
+    const [isRecording, setIsRecording] = useState(false);
+    const [responses, setResponses] = useState([]);
+    const [nativeLanguage, setNativeLanguage] = useState(null);
+    const [learningLanguages, setLearningLanguages] = useState([]);
+    const user = useSelector(state => state.user);
     const [selectedImage, setSelectedImage] = useState("image1");
 
-    const roomName = chatId;
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            try {
+                const profileData = await getMyProfile();
+                setNativeLanguage(profileData.nativeLanguage);
+                setLearningLanguages(profileData.learningLanguages);
+            } catch (error) {
+                console.error("Failed to fetch profile data", error);
+            }
+        };
+        fetchProfileData();
+    }, []);
 
-    // 이 부분 추가
-    const user = useSelector(state => state.user);
-    // console.log("user안에 있는 정보는 과연? 두근두근", user);
+    /* useEffect(() => {
+        const chatRoomId = params.chatId;
+        socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
+
+        socketRef.current.onopen = () => {
+            console.log('WebSocket connection for GPU STT opened');
+
+            if (user && nativeLanguage && learningLanguages.length > 0) {
+                sendLanguageInfo();
+            }
+        };
+
+        socketRef.current.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
+        };
+    }, [user, nativeLanguage, learningLanguages]); */
+
 
     const sendLanguageInfo = () => {
+        console.log("sendLanguageInfo called");
+
         const userInfo = {
             type: "language",
-            userId: user.uid,
-            nativeLanguage: user.nativeLanguage,
-            learningLanguages: user.learningLanguages
+            userId: user.user.uid,
+            nativeLanguage: nativeLanguage,
+            learningLanguages: learningLanguages
         };
-        socket.send(JSON.stringify(userInfo))
+
+        console.log("여기에 userInfo가 찍히리라", userInfo);
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            socketRef.current.send(JSON.stringify(userInfo));
+            console.log("WebSocket message sent:", JSON.stringify(userInfo));
+        } else {
+             console.log("WebSocket connection is not open to send language info.");
+        }
+        /* try {
+            socketRef.current.send(JSON.stringify(userInfo));
+            console.log("WebSocket message sent:", JSON.stringify(userInfo));
+        } catch (error) {
+            console.error("Failed to send message. WebSocket error:", error);
+        } */
     };
+
+    // 이미지 업로드 처리 함수
+    const handleImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                setMaskImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
     
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
@@ -293,7 +355,7 @@ const Video = forwardRef((props, ref) => {
             localVideoRef.current.srcObject = stream;
             localVideoRef.current.muted = true;
         }
-      
+
         pc = new RTCPeerConnection()
         console.log('pc done')
         pc.onicecandidate = event => {
@@ -339,6 +401,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
+
             socket.emit('ANSWER', {roomName, answer})
             muteLocalAudioForMe(stream);
         })
@@ -373,31 +436,91 @@ const Video = forwardRef((props, ref) => {
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-        // 이 부분 추가. 이진우
-        socket.onopen = () => {
-            sendLanguageInfo();
+
+        const chatRoomId = params.chatId;
+        socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
+        socketRef.current.onopen = () => {
+            console.log('WebSocket connection for GPU STT opened');
         };
-        // 여기까지.        
+
+        socketRef.current.onmessage = (event) => {
+            console.log('Received message:', event.data);
+            setResponses(prev => [...prev, event.data]);
+        };
+        socketRef.current.onclose = () => {
+            console.log('WebSocket connection closed');
+        };
+
+        return () => {
+            if (socketRef.current) {
+                socketRef.current.close();
+            }
+        };
     }
 
     const endCall = () => {
         console.log('Ending call...')
-        if(pc) {
+        if (pc) {
             pc.close();
             pc = null;
         }
-        if(localStream) {
+        if (localStream) {
             localStream.getTracks().forEach(track => track.stop());
             setLocalStream(null)
         }
-        if(socket) {
+        if (socket) {
             socket.emit('DISCONNECTED', roomName)
             socket.close()
         }
     }
 
+    const startRecording = () => {
+        if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    recorderRef.current = RecordRTC(stream, {
+                        type: 'audio',
+                        mimeType: 'audio/wav',
+                        recorderType: RecordRTC.StereoAudioRecorder,
+                        timeSlice: 500,
+                        desiredSampRate: 16000,
+                        numberOfAudioChannels: 1,
+                        ondataavailable: handleDataAvailable
+                    });
+                    recorderRef.current.startRecording();
+                    setIsRecording(true);
+                })
+                .catch(error => console.error('Error accessing the microphone', error));
+        }
+    };
+
+    // STT 오디오 스트리밍 중지
+    const stopRecording = () => {
+        if (recorderRef.current) {
+            recorderRef.current.stopRecording(() => {
+                let blob = recorderRef.current.getBlob();
+                console.log('Recording stopped, blob created', blob);
+            });
+            setIsRecording(false);
+        }
+    };
+
+    // STT 오디오 데이터가 사용 가능할 때 호출되는 함수
+    const handleDataAvailable = (blob) => {
+        if (blob.size > 0) {
+            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                console.log("Sending audio blob");
+                socketRef.current.send(blob); // Base64 인코딩 없이 Blob 자체 전송
+            } else {
+                console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+            }
+        } else {
+            console.log("No audio data to send");
+        }
+    };
+
     useEffect(() => {
-        init()
+        init();
 
         return () => {
             if (socket) {
@@ -406,7 +529,6 @@ const Video = forwardRef((props, ref) => {
             }
             console.log('closing')
             if (pc) {
-
                 // pc.setRemoteDescription(null)
                 pc.close()
                 pc = null
@@ -415,7 +537,7 @@ const Video = forwardRef((props, ref) => {
                 localStream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [roomName]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
+    }, [roomName])
 
     useEffect(() => {
         if (faceData) {
@@ -425,11 +547,24 @@ const Video = forwardRef((props, ref) => {
 
     useEffect(() => {
         onAudioStatusChange(isAudioEnabled);
+        if (isAudioEnabled) {
+            startRecording();
+        } else {
+            stopRecording();
+        }
     }, [isAudioEnabled]);
 
     useEffect(() => {
         onVideoStatusChange(isVideoEnabled);
     }, [isVideoEnabled]);
+
+    useEffect(() => {
+        console.log("useEffect 실행시켰고, 이제 sendLanguageInfo 함수 실행시킬거야.");
+        if (user && nativeLanguage && learningLanguages.length > 0) {
+            sendLanguageInfo();
+            console.log("sendLanguageInfo 실행완료");
+        }
+    }, [user, nativeLanguage, learningLanguages]);
 
     useImperativeHandle(ref, () => ({
         turnAudio() {
@@ -446,7 +581,7 @@ const Video = forwardRef((props, ref) => {
                 setIsVideoEnabled(enabled);
             }
         },
-        endCall(){
+        endCall() {
             endCall()
         },
         changeSelection(value) {
@@ -459,8 +594,6 @@ const Video = forwardRef((props, ref) => {
         },
 
     }));
-
-    
 
     useEffect(() => {
         if (faceLandmarker && localVideoRef.current) {
