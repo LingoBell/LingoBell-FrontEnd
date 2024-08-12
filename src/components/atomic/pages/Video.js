@@ -556,6 +556,7 @@ const Video = forwardRef((props, ref) => {
                     />
                 </Canvas>
             )}
+            {/* <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} /> */}
             <ImageSelector onChange={handleImageChange}>
                 <option value="default">hamzzik</option>
                 <option value="image1">action mask</option>
