@@ -4,7 +4,7 @@ import TopBar from '../atomic/atoms/TopBar'
 import BaseImage from '../atomic/atoms/BaseImage'
 import { useDispatch, useSelector } from 'react-redux'
 import { signOutAll } from '../../redux/userSlice'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import HamburgerMenu from './HamburgerMenu'
 import { MENU_DEFAULT_COLOR, PRIMARY_COLOR, SELECTED_MENU_COLOR } from '../../consts/color'
 import { getMyProfile } from '../../apis/UserAPI'
@@ -91,8 +91,11 @@ export default props => {
     }
   })
   console.log('dddddd',isFirstLogin)
+  const navigate = useNavigate()
+
   const trySignout = () => {
     dispatch(signOutAll())
+    window.location.reload()
   }
 
 
