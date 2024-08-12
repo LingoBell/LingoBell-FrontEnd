@@ -6,10 +6,14 @@ import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-
 import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import defaultMaskImage from '../../../assets/images/hamzzi.png'
+import action from '../../../assets/images/action.jpg'
+import bono from '../../../assets/images/bono.png'
+import ddung from '../../../assets/images/ddung.png'
+import gaksital from '../../../assets/images/gak.png'
+import jocker from '../../../assets/images/jocker.jpg'
 import axios from "axios";
 import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification } from '../../../apis/UserAPI';
-import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 
 const Wrap = styled.div`
@@ -42,17 +46,12 @@ let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
 
-const VideoContainer = styled.div`
-  position: relative;
-  display: inline-block;
-`;
-
-const CanvasStyled = styled.canvas`
+const ImageSelector = styled.select`
   position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 5;
+  bottom: 10px;
+  left: 10px;
+  padding: 5px;
+  font-size: 16px;
 `;
 
 function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
@@ -122,7 +121,7 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
             const nose = [193, 122, 6, 351, 419, 456, 363, 360, 279, 358, 327, 326, 2, 97, 98];
             const mouth = [0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146, 61, 185, 40, 39, 37];
 
-            const featureGroups = [leftEye, rightEye, nose, mouth];
+            const featureGroups = [faceOval, leftEye, rightEye, nose, mouth];
 
             const positions = [];
             const indices = [];
@@ -178,7 +177,7 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
             geometry.computeVertexNormals();
 
             meshRef.current.position.set(0, 0, 0);
-            meshRef.current.scale.set(1.4, 1.4, 1.4);
+            meshRef.current.scale.set(1.3, 1.3, 1.3);
         }
     });
 
@@ -209,7 +208,9 @@ const Video = forwardRef((props, ref) => {
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
     const [isRemoteMaskOn, setIsRemoteMaskOn] = useState(true);
-    const [maskImage, setMaskImage] = useState(defaultMaskImage);
+    // const [maskImage, setMaskImage] = useState(defaultMaskImage);
+    const [localMaskImage, setLocalMaskImage] = useState(defaultMaskImage);
+    const [remoteMaskImage, setRemoteMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
 
     const roomName = chatId;
@@ -227,18 +228,31 @@ const Video = forwardRef((props, ref) => {
         };
         socket.send(JSON.stringify(userInfo))
     };
-    // 여기까지
-
-    // 이미지 업로드 처리 함수
-    const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setMaskImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
+    
+    const muteLocalAudioForMe = (stream) => {
+        if (stream && stream.getAudioTracks().length > 0) {
+            const audioTrack = stream.getAudioTracks()[0];
+            audioTrack.enabled = false;
+            
+            setTimeout(() => {
+                audioTrack.enabled = true;
+            }, 10);
         }
+    };
+
+    const [availableImages] = useState({
+        default: defaultMaskImage,
+        image1: action,
+        image2: bono,
+        image3: ddung,
+        image4: gaksital,
+        image5: jocker
+    });
+
+    const handleImageChange = (event) => {
+        const selectedImage = availableImages[event.target.value];
+        setLocalMaskImage(selectedImage);
+        socket.emit('MASK_CHANGED', { roomName, maskImage: event.target.value });
     };
 
     const initFaceLandmarker = async () => {
@@ -270,11 +284,12 @@ const Video = forwardRef((props, ref) => {
         })
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
-        stream.getVideoTracks().forEach(track => (track.enabled = false)); // 비디오 비활성화
+        stream.getVideoTracks().enabled = isVideoEnabled; // 비디오 비활성화
         setLocalStream(stream);
 
         if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
+            localVideoRef.current.muted = true;
         }
       
         pc = new RTCPeerConnection()
@@ -313,6 +328,7 @@ const Video = forwardRef((props, ref) => {
         socket.on('ANSWER_RECEIVED', async (answer) => {
             console.log('ANSWER_RECEIVED')
             await pc.setRemoteDescription(new RTCSessionDescription(answer))
+            muteLocalAudioForMe(stream);
 
         })
         socket.on('OFFER_RECEIVED', async (offer) => {
@@ -322,6 +338,7 @@ const Video = forwardRef((props, ref) => {
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
             socket.emit('ANSWER', {roomName, answer})
+            muteLocalAudioForMe(stream);
         })
 
         socket.on('CANDIDATE_RECEIVED', async (candidate) => {
@@ -332,6 +349,10 @@ const Video = forwardRef((props, ref) => {
         socket.on('LANDMARKS_DATA_RECEIVED', ({ landmarksData, isMaskOn }) => {
             setRemoteFaceData(landmarksData);
             setIsRemoteMaskOn(isMaskOn);
+        });
+
+        socket.on('MASK_CHANGED_RECEIVED', ({ maskImage }) => {
+            setRemoteMaskImage(availableImages[maskImage]);
         });
 
         socket.on('OPP_DISCONNECTED', async () => {
@@ -392,7 +413,7 @@ const Video = forwardRef((props, ref) => {
                 localStream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [roomName, user]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
+    }, [roomName]) // user도 들어오면 다시 실행시키도록 추가. 이진우 추가.
 
     useEffect(() => {
         if (faceData) {
@@ -461,7 +482,7 @@ const Video = forwardRef((props, ref) => {
 
                         // 이미지 로드
                         const img = new Image();
-                        img.src = maskImage;
+                        img.src = localMaskImage;
                         img.onload = function () {
                             // 이미지 그리기
                             canvasCtx.save();
@@ -487,7 +508,7 @@ const Video = forwardRef((props, ref) => {
             <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
-            {maskImage && faceData && isMaskOn && (
+            {localMaskImage && faceData && isMaskOn && (
                 <Canvas
                     style={{
                         position: 'absolute',
@@ -507,11 +528,11 @@ const Video = forwardRef((props, ref) => {
                         faceData={faceData}
                         videoWidth={localVideoRef.current.videoWidth}
                         videoHeight={localVideoRef.current.videoHeight}
-                        maskImage={maskImage}
+                        maskImage={localMaskImage}
                     />
                 </Canvas>
             )}
-            {maskImage && remoteFaceData && isRemoteMaskOn && (
+            {remoteMaskImage && remoteFaceData && isRemoteMaskOn && (
                 <Canvas
                     style={{
                         position: 'absolute',
@@ -531,11 +552,18 @@ const Video = forwardRef((props, ref) => {
                         faceData={remoteFaceData}
                         videoWidth={remoteVideoRef.current ? remoteVideoRef.current.videoWidth : 360}
                         videoHeight={remoteVideoRef.current ? remoteVideoRef.current.videoHeight : 263}
-                        maskImage={maskImage}
+                        maskImage={remoteMaskImage}
                     />
                 </Canvas>
             )}
-            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} />
+            <ImageSelector onChange={handleImageChange}>
+                <option value="default">hamzzik</option>
+                <option value="image1">action mask</option>
+                <option value="image2">bono bono</option>
+                <option value="image3">ddung e</option>
+                <option value="image4">korea traditional mask</option>
+                <option value="image5">jocker</option>
+            </ImageSelector>
         </Wrap>
     );
 });
