@@ -267,7 +267,7 @@ function LiveChat() {
     const aiChatWrapRef = useRef(null)
     const audioRef = useRef(null);
     const videoRef = useRef(null);
-    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
     const maskRef = useRef(null);
@@ -427,14 +427,14 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
     
-    useEffect(() => {
-        if (!hoverMask) {
-            const timer = setTimeout(() => {
-                setKeepHover(false);
-            }, 300);
-            return () => clearTimeout(timer);
-        }
-    }, [hoverMask]);
+    // useEffect(() => {
+    //     if (!hoverMask) {
+    //         const timer = setTimeout(() => {
+    //             setKeepHover(false);
+    //         }, 300);
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [hoverMask]);
 
     return (
         <StyledCenteredLayout>
