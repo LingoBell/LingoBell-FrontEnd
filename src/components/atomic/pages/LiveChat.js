@@ -272,7 +272,6 @@ function LiveChat() {
     const [isMaskOn, setIsMaskOn] = useState(true);
     const maskRef = useRef(null);
 
-
     const navigate = useNavigate()
     useEffect(() => {
         const fetchMessages = async () => {
@@ -358,7 +357,6 @@ function LiveChat() {
                     behavior: 'smooth'
                 })
             }, 300)
-
         }
     }
 
@@ -398,7 +396,6 @@ function LiveChat() {
         if (videoRef.current) {
             videoRef.current.endCall();
             navigate('/')
-
         }
     }
 
@@ -429,6 +426,15 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
+    
+    useEffect(() => {
+        if (!hoverMask) {
+            const timer = setTimeout(() => {
+                setKeepHover(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [hoverMask]);
 
     return (
         <StyledCenteredLayout>
