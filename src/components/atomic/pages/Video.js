@@ -438,7 +438,7 @@ const Video = forwardRef((props, ref) => {
         socket.emit('CREATE_OR_JOIN', roomName)
 
         const chatRoomId = params.chatId;
-        socketRef.current = new WebSocket(`ws://34.64.241.5:38080/ws/${chatRoomId}`);
+        socketRef.current = new WebSocket(`wss://ai.lingobell.xyz/ws/${chatRoomId}`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
