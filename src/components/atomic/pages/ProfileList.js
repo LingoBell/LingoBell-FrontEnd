@@ -75,53 +75,57 @@ export default props => {
 
   const user = useSelector((state) => state.user.user);
 
+  const fetchProfiles = async () => {
+    try {
+      const userState = await user_online_status();
+      const userList = await GetPartnerList();
+      const newUserList = userList.map(profile => {
 
+        const userStatus = userState[profile.userCode]?.status?.state;
+
+        return {
+          ...profile, userStatus: userStatus
+        }
+      })
+      setProfiles(newUserList);
+      console.log('profile-info', newUserList)
+
+    } catch (error) {
+      console.log('유저 리스트 불러오기 실패 : ', error);
+    }
+  };
+
+  /* Chat Request Partners */
+  const fetchRequestProfiles = async () => {
+    try {
+      const userState = await user_online_status();
+      const requestUserList = await GetRequestPartnerList();
+      const newRequestUserList = requestUserList.map(request => {
+        const userStatus = userState[request.userCode]?.status?.state;
+
+        return {
+          ...request, userStatus : userStatus
+        }
+      })
+      setChatRequests(newRequestUserList);
+
+    } catch (error) {
+      console.log('요청 유저 리스트 불러오기 실패 : ', error);
+    }
+  };
 
   useEffect(() => {
     /* Find Partners */
-    const fetchProfiles = async () => {
-      try {
-        const userState = await user_online_status();
-        const userList = await GetPartnerList();
-        const newUserList = userList.map(profile => {
-
-          const userStatus = userState[profile.userCode]?.status?.state;
-
-          return {
-            ...profile, userStatus: userStatus
-          }
-        })
-        setProfiles(newUserList);
-        console.log('profile-info', newUserList)
-
-      } catch (error) {
-        console.log('유저 리스트 불러오기 실패 : ', error);
-      }
-    };
-
-    /* Chat Request Partners */
-    const fetchRequestProfiles = async () => {
-      try {
-        const userState = await user_online_status();
-        const requestUserList = await GetRequestPartnerList();
-        const newRequestUserList = requestUserList.map(request => {
-          const userStatus = userState[request.userCode]?.status?.state;
-
-          return {
-            ...request, userStatus : userStatus
-          }
-        })
-        setChatRequests(newRequestUserList);
-
-      } catch (error) {
-        console.log('요청 유저 리스트 불러오기 실패 : ', error);
-      }
-    };
+    
 
     fetchProfiles();
     fetchRequestProfiles();
 
   }, [user.uid]);
+
+  useEffect(() => {
+    fetchProfiles();
+  }, [activeTab])
 
   /* Chat Request Partners */
   // useEffect(() => {
