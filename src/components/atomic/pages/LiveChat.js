@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttMessages } from "../../../apis/ChatAPI";
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
+import BaseImage from "../atoms/BaseImage";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -232,7 +233,18 @@ const CloseButton = styled.button`
     cursor: pointer;
 `;
 
+const MaskButton = styled(BaseImage)`
+    width: 24px;
+    height: 24px;
+    padding: 4px;
+    
+`
 
+const HoverWrap = styled.div`
+    display : flex;
+    justify-content : space-evenly;
+
+`
 
 
 function LiveChat() {
@@ -251,6 +263,10 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(false); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
+    const [hoverMask, setHoverMask] = useState(false);
+    const [keepHover, setKeepHover] = useState(false);
+
+
 
     const navigate = useNavigate()
     useEffect(() => {
@@ -276,7 +292,7 @@ function LiveChat() {
     //         console.error('Error creating recommendations', err)
     //     }
     // }
-        
+
     // useEffect(() => {
     //     send_notification(chatRoomId)
     // }, [chatRoomId]);
@@ -309,9 +325,9 @@ function LiveChat() {
 
         const quizData = await GetQuizzes(chatRoomId);
         const newQuizData = quizData.map(item => ({
-            ...item, type : 'quiz'
+            ...item, type: 'quiz'
         }))
-        console.log('newQuizData:',newQuizData)
+        console.log('newQuizData:', newQuizData)
         setQuiz(newQuizData)
     }
 
@@ -335,20 +351,20 @@ function LiveChat() {
                 aiChatWrapRef.current?.scrollTo({
                     top: 999999999999999999,
                     behavior: 'smooth'
-                }) 
+                })
             }, 300)
-            
+
         }
     }
 
     const requestQuizzes = async () => {
         setQuizModal(true);
         setLoading(true);
-        try{
+        try {
             const result = await CreateQuizzes(chatRoomId)
             console.log('ququququ', result)
             await fetchAiQuizzes()
-        } catch(error) {
+        } catch (error) {
             console.error('Error getting quizzes', error)
         } finally {
             setLoading(false)
@@ -372,12 +388,12 @@ function LiveChat() {
             videoRef.current.turnVideo();
         }
     }
-    
+
     const handleEndCall = () => {
-        if(videoRef.current) {
+        if (videoRef.current) {
             videoRef.current.endCall();
             navigate('/')
-            
+
         }
     }
 
@@ -393,6 +409,23 @@ function LiveChat() {
         setIsMaskOn(!isMaskOn);
     };
 
+    const maskList = [
+        'https://storage.googleapis.com/lingobellstorage/Hamzzi.png',
+        'https://storage.googleapis.com/lingobellstorage/Joker.jpeg',
+        'https://storage.googleapis.com/lingobellstorage/actionmask.jpeg',
+        'https://storage.googleapis.com/lingobellstorage/bonobono.png',
+        'https://storage.googleapis.com/lingobellstorage/kaksital.png',
+        'https://storage.googleapis.com/lingobellstorage/staria.png'
+    ]
+    useEffect(() => {
+        if (!hoverMask) {
+            const timer = setTimeout(() => {
+                setKeepHover(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [hoverMask]);
+
     return (
         <StyledCenteredLayout>
             <MainStyle />
@@ -404,6 +437,22 @@ function LiveChat() {
                         onVideoStatusChange={handleVideoStatusChange}
                         isMaskOn={isMaskOn}
                     />
+                    {(hoverMask || keepHover) && (
+                        <HoverWrap
+                            onMouseEnter={() => {
+                                setKeepHover(true)
+                                setHoverMask(true)
+                            }} // 새로 생긴 버튼에 마우스가 들어오면 유지
+                            onMouseLeave={() => {
+                                setKeepHover(false)
+                                setHoverMask(false)
+                            }} // 새로 생긴 버튼에서 마우스가 나가면 종료
+                        >
+                            {maskList.map(src =>
+                                <MaskButton src={src} />
+                            )}
+                        </HoverWrap>
+                    )}
                     <ButtonWrap>
                         <CallButton onClick={handleAudioClick}>
                             <span className='material-icons'>
@@ -419,7 +468,15 @@ function LiveChat() {
                             <span className='material-icons'>call_end</span>
                         </CallEndButton>
                         {/* <CallButton onClick={startTranscription}><span className='material-icons'>translate</span></CallButton> */}
-                        <CallButton onClick={toggleMask}>
+                        <CallButton onClick={toggleMask}
+                            onMouseEnter={() => {
+                                setHoverMask(true)
+                                setKeepHover(true);
+                            }}
+                            onMouseLeave={() => {
+                                setHoverMask(false)
+                            }}
+                        >
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}
                             </span>
@@ -455,10 +512,10 @@ function LiveChat() {
             {!loading && quizModal && (
                 <ModalOverlay>
                     <QuizModal>
-                        <CloseButton onClick={()=>{
+                        <CloseButton onClick={() => {
                             setQuizModal(false)
                         }}>x</CloseButton>
-                        <StyledQuizForm data={quiz?.slice(-5)}/>
+                        <StyledQuizForm data={quiz?.slice(-5)} />
                         {console.log('Quiz data passed to QuizForm:', quiz.slice(-5))}
                     </QuizModal>
                 </ModalOverlay>

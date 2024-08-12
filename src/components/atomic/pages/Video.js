@@ -535,7 +535,7 @@ const Video = forwardRef((props, ref) => {
                     />
                 </Canvas>
             )}
-            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} />
+            {/* <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} /> */}
         </Wrap>
     );
 });
