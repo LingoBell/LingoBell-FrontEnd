@@ -22,7 +22,7 @@ import { UpdateChatRoomStatus } from "./apis/ChatAPI";
 import { onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
 
 
-export let mainDomain = ''
+export let mainDomain = 'http://localhost:8000'
 axios.defaults.baseURL = mainDomain + "/api" //api엔드포인트 defualtUrl설정
 axios.defaults.withCredentials = true;
 
