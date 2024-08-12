@@ -43,7 +43,7 @@ const Wrap = styled.div`
     }
 `
 
-const socket = io(window.location.host.includes('lingobell.xyz') ? 'http://socket.lingobell.xyz' : "")
+const socket = io(window.location.host.includes('lingobell.xyz') ? 'https://socket.lingobell.xyz' : "")
 let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
@@ -294,12 +294,12 @@ const Video = forwardRef((props, ref) => {
             reader.readAsDataURL(file);
         }
     }    
-    
+
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
             const audioTrack = stream.getAudioTracks()[0];
             audioTrack.enabled = false;
-            
+
             setTimeout(() => {
                 audioTrack.enabled = true;
             }, 10);
@@ -318,6 +318,7 @@ const Video = forwardRef((props, ref) => {
     const handleImageChange = (event) => {
         const selectedImage = availableImages[event.target.value];
         setLocalMaskImage(selectedImage);
+        console.log('마스크 변경', event.target.value);
         socket.emit('MASK_CHANGED', { roomName, maskImage: event.target.value });
     };
 
@@ -402,8 +403,7 @@ const Video = forwardRef((props, ref) => {
             const answer = await pc.createAnswer()
             await pc.setLocalDescription(new RTCSessionDescription(answer))
             console.log('emit answer')
-
-            socket.emit('ANSWER', {roomName, answer})
+            socket.emit('ANSWER', { roomName, answer })
             muteLocalAudioForMe(stream);
         })
 
@@ -471,6 +471,7 @@ const Video = forwardRef((props, ref) => {
     }
 
     const startRecording = () => {
+        console.log(isAudioEnabled, socketRef.current)
         if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
@@ -495,6 +496,7 @@ const Video = forwardRef((props, ref) => {
         if (recorderRef.current) {
             recorderRef.current.stopRecording(() => {
                 let blob = recorderRef.current.getBlob();
+                
                 console.log('Recording stopped, blob created', blob);
             });
             setIsRecording(false);
@@ -509,6 +511,29 @@ const Video = forwardRef((props, ref) => {
             } else {
                 console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
             }
+            // Blob을 Base64로 인코딩
+            const reader = new FileReader();
+            reader.onload = function() {
+                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                    const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
+                    console.log('user', user)
+                    const message = JSON.stringify({
+                        user_id: user.user.uid,
+                        blob: base64Data
+                    });
+                    // websocket.send(message);
+                    console.log("Sending audio blob");
+                    // const message = JSON.stringify({
+                    //     user_id: user.uid,
+                    //     blob: base64Data
+                    // });
+                    socketRef.current.send(message); // Base64 인코딩 없이 Blob 자체 전송
+                } else {
+                    console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+                }
+                
+            };
+            reader.readAsDataURL(blob);
         } else {
             console.log("No audio data to send");
         }
@@ -547,7 +572,7 @@ const Video = forwardRef((props, ref) => {
         } else {
             stopRecording();
         }
-    }, [isAudioEnabled]);
+    }, [isAudioEnabled, socketRef.current]);
 
     useEffect(() => {
         onVideoStatusChange(isVideoEnabled);
@@ -582,8 +607,10 @@ const Video = forwardRef((props, ref) => {
             // 옵션 변경을 위해 호출될 함수
             const selectedMask = availableImages[value];
             if (selectedMask) {
-                setLocalMaskImage(selectedMask)
+                setLocalMaskImage(selectedMask);
                 setSelectedImage(selectedMask);
+                console.log('마스크 변경', value);
+                socket.emit('MASK_CHANGED', { roomName, maskImage: value });
             }
         },
     }));
@@ -695,7 +722,6 @@ const Video = forwardRef((props, ref) => {
                     />
                 </Canvas>
             )}
-            {/* <input type="file" accept="image/*" onChange={handleImageUpload} style={{ position: 'absolute', bottom: 10, left: 10 }} /> */}
             <ImageSelector onChange={handleImageChange} value={selectedImage}>
                 <option value="image1">hamzzik</option>
                 <option value="image2">action mask</option>

@@ -237,6 +237,13 @@ const MaskButton = styled(BaseImage)`
     width: 24px;
     height: 24px;
     padding: 4px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+
+  &:hover {
+    transform: scale(1.4);
+  }
+
     
 `
 
@@ -263,8 +270,6 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
-    const [hoverMask, setHoverMask] = useState(false);
-    const [keepHover, setKeepHover] = useState(false);
     const maskRef = useRef(null);
 
     const navigate = useNavigate()
@@ -442,27 +447,18 @@ function LiveChat() {
                         onVideoStatusChange={handleVideoStatusChange}
                         isMaskOn={isMaskOn}
                     />
-                    {(hoverMask || keepHover) && (
-                        <HoverWrap
-                            onMouseEnter={() => {
-                                setKeepHover(true)
-                                setHoverMask(true)
-                            }} // 새로 생긴 버튼에 마우스가 들어오면 유지
-                            onMouseLeave={() => {
-                                setKeepHover(false)
-                                setHoverMask(false)
-                            }} // 새로 생긴 버튼에서 마우스가 나가면 종료
-                        >
-                            {maskList.map((mask, index) =>
-                                <MaskButton
-                                    key={index}
-                                    src={mask.src}
-                                    onClick={() => {
-                                        handleMaskClick(mask.value)
-                                    }} />
-                            )}
-                        </HoverWrap>
-                    )}
+                    <HoverWrap
+                    >
+                        {maskList.map((mask, index) =>
+                            <MaskButton
+                                key={index}
+                                src={mask.src}
+                                onClick={() => {
+                                    handleMaskClick(mask.value)
+                                }} />
+                        )}
+                    </HoverWrap>
+
                     <ButtonWrap>
                         <CallButton onClick={handleAudioClick}>
                             <span className='material-icons'>
@@ -496,13 +492,6 @@ function LiveChat() {
                             )}
                         </CallButton>
                         <CallButton onClick={toggleMask}
-                            onMouseEnter={() => {
-                                setHoverMask(true)
-                                setKeepHover(true);
-                            }}
-                            onMouseLeave={() => {
-                                setHoverMask(false)
-                            }}
                         >
                             <span className='material-icons'>
                                 {isMaskOn ? 'face' : 'face_retouching_off'}

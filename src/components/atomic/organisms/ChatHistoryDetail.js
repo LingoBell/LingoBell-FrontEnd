@@ -5,7 +5,7 @@ import ChatCard from '../templates/ChatSectionCard'
 import ChatForm from '../molecules/ChatForm'
 import ProfileItem from '../molecules/ProfileItem'
 import { useParams } from 'react-router-dom'
-import { getChatRoomsById, GetRecommendations, getSttMessages } from '../../../apis/ChatAPI'
+import { getChatRoomsById, GetRecommendations, getSttAndTranslatedMessages } from '../../../apis/ChatAPI'
 import { user_online_status } from '../../../firebase/firebase'
 const HistorySection = styled.div`
   height: 100%;
