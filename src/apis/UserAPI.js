@@ -45,8 +45,6 @@ export const UpdateUserProfile = async (formData) => {
 }
 
 export const uploadImage = async (image) => {
-    const formData = new FormData();
-    formData.append('image', image);
 
     try {
         const response = await axios.post('/users/image-upload', formData, {

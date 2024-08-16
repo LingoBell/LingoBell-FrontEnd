@@ -39,6 +39,7 @@ export const checkFirstLogin = createAsyncThunk(
     async (_, thunkAPI) => {
         const response = await axios.get('/users/check')
         const result = response.data
+        console.log('DDWDWD',result)
         thunkAPI.dispatch(setFirstLogin({ result }))
     }
 )
