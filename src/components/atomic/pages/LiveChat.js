@@ -119,7 +119,6 @@ const VideoWrap = styled.div`
         flex: auto;
         order: 2;
         height : calc(100vh - 92px);
-        overflow : hidden;
     }
 `
 
