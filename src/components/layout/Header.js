@@ -42,6 +42,7 @@ const MenuTab = styled.div`
   border-bottom: 0;
   text-decoration: none;
   font-size: 16px;
+  cursor : pointer;
   color: ${MENU_DEFAULT_COLOR};
   ${props => props.$selected ? `
     color: ${SELECTED_MENU_COLOR};

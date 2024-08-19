@@ -43,7 +43,7 @@ function ChatForm(props, ref) {
 
 
     return (
-        <StyledChatCard className={className} ref={ref}>
+        <StyledChatCard id={id} className={className} ref={ref}>
             {data && data?.map((message, index) => {
                 const isDifferentType = index > 0 && data[index - 1].type !== message.type;
 
