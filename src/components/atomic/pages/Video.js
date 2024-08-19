@@ -227,6 +227,12 @@ const Video = forwardRef((props, ref) => {
                 const profileData = await getMyProfile();
                 setNativeLanguage(profileData.nativeLanguage);
                 setLearningLanguages(profileData.learningLanguages);
+
+                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                    sendLanguageInfo(); 
+                    console.log("useEffect안에서 fetchProfileData함수 실행 즉 sendLanguageInfo() 실행 완료");
+                }
+                
             } catch (error) {
                 console.error("Failed to fetch profile data", error);
             }
@@ -438,7 +444,8 @@ const Video = forwardRef((props, ref) => {
         socket.emit('CREATE_OR_JOIN', roomName)
 
         const chatRoomId = params.chatId;
-        socketRef.current = new WebSocket(`wss://ai.lingobell.xyz/ws/${chatRoomId}`);
+        // socketRef.current = new WebSocket(`ws://ai.lingobell.xyz/ws/${chatRoomId}`);
+        socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
@@ -505,40 +512,28 @@ const Video = forwardRef((props, ref) => {
 
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
-            if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                console.log("Sending audio blob");
-                socketRef.current.send(blob);
-            } else {
-                console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
-            }
-            // Blob을 Base64로 인코딩
             const reader = new FileReader();
-            reader.onload = function() {
+            reader.onloadend = function () {
                 if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
                     const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
-                    console.log('user', user)
-                    const message = JSON.stringify({
-                        user_id: user.user.uid,
-                        blob: base64Data
-                    });
-                    // websocket.send(message);
-                    console.log("Sending audio blob");
-                    // const message = JSON.stringify({
-                    //     user_id: user.uid,
-                    //     blob: base64Data
-                    // });
-                    socketRef.current.send(message); // Base64 인코딩 없이 Blob 자체 전송
+    
+                    const message = {
+                        type: "audio",
+                        userId: user.user.uid,
+                        blob: base64Data // Blob 대신 Base64 데이터를 보냅니다.
+                    };
+                    socketRef.current.send(JSON.stringify(message));
+                    console.log("Sending audio blob as Base64:", message);
                 } else {
                     console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
                 }
-                
             };
             reader.readAsDataURL(blob);
         } else {
             console.log("No audio data to send");
         }
     };
-
+    
     useEffect(() => {
         init();
 
@@ -578,12 +573,12 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange(isVideoEnabled);
     }, [isVideoEnabled]);
 
-    useEffect(() => {
-        if (user && nativeLanguage && learningLanguages.length > 0) {
-            sendLanguageInfo();
-            console.log("sendLanguageInfo 실행완료");
-        }
-    }, [user, nativeLanguage, learningLanguages]);
+    // useEffect(() => {
+    //     if (user && nativeLanguage && learningLanguages.length > 0) {
+    //         sendLanguageInfo();
+    //         console.log("sendLanguageInfo 실행완료");
+    //     }
+    // }, [user, nativeLanguage, learningLanguages]);
 
     useImperativeHandle(ref, () => ({
         turnAudio() {
