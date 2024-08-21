@@ -19,27 +19,77 @@ import { useSelector } from 'react-redux';
 import RecordRTC from 'recordrtc';
 
 const Wrap = styled.div`
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #666;
-    > video {
-        width: 50%;
-        height: 50vh;
-        object-fit: contain;
-        border-radius: 8px;
+    height : 100%;
+    @media screen and (min-width : 600px) {
+         position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
+
     @media screen and (min-width: 1024px) {
         flex-direction: column;
         background-color: transparent;
         flex: 1;
+        overflow : hidden;
+       
+    }
+`
+const VideoWrap = styled.div`
+    width : 100%;
+    height : 50%;
+    position: relative;
         > video {
             width: 100%;
-            height: 50%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }    
+    @media screen and (min-width : 600px) {
+        height : 100%;
+        
+        >video {
+            width : 100%;
+            height : 100%;
+            min-height : 230px;
+            border-radius : 8px;
+        }        
+    }
+
+    @media screen and (min-width : 1024px) {
+        height : 50%;
+
+        > video {
+            width: 100%;
+            height: 100%;
         }
+    }
+`
+
+const VideoWrap2 = styled.div`
+    // display : flex;
+    // flex-direction : column;
+    // flex : 1;
+    // width : 100%;
+    // max-height : 90%;
+    height : calc(100% - 93px);
+
+    @media screen and (min-width : 600px) {
+    display : flex;
+    flex-direction : row;
+    flex: 1;
+    width : 100%;
+    max-height : 240px;
+    }
+
+    @media screen and (min-width : 1024px) {
+    display : flex;
+    flex-direction : column;
+    flex : 1;
+    width : 100%;
+    max-height : 100%;
     }
 `
 
@@ -279,7 +329,7 @@ const Video = forwardRef((props, ref) => {
             socketRef.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } else {
-             console.log("WebSocket connection is not open to send language info.");
+            console.log("WebSocket connection is not open to send language info.");
         }
         /* try {
             socketRef.current.send(JSON.stringify(userInfo));
@@ -299,7 +349,7 @@ const Video = forwardRef((props, ref) => {
             };
             reader.readAsDataURL(file);
         }
-    }    
+    }
 
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
@@ -503,7 +553,7 @@ const Video = forwardRef((props, ref) => {
         if (recorderRef.current) {
             recorderRef.current.stopRecording(() => {
                 let blob = recorderRef.current.getBlob();
-                
+
                 console.log('Recording stopped, blob created', blob);
             });
             setIsRecording(false);
@@ -513,6 +563,7 @@ const Video = forwardRef((props, ref) => {
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
             const reader = new FileReader();
+
             reader.onloadend = function () {
                 if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
                     const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
@@ -666,43 +717,66 @@ const Video = forwardRef((props, ref) => {
 
     return (
         <Wrap>
-            <video ref={localVideoRef} playsInline id="left_cam" controls={false} preload="metadata" autoPlay></video>
+            <VideoWrap2>
+            <VideoWrap>
+                <video
+                    style={{backgroundColor : 'black'}}
+                    ref={localVideoRef}
+                    playsInline id="left_cam"
+                    controls={false}
+                    preload="metadata"
+                    autoPlay></video>
+                {localMaskImage && faceData && isMaskOn && (
+                    <Canvas
+                        style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            width: `100%`,
+                            height: '100%',
+                            pointerEvents: 'none',
+                        
+                        }}
+                        orthographic
+                        camera={{ zoom: 1, position: [0, 0, 500] }}
+                    >
+                        <ambientLight intensity={0.4} />
+                        <pointLight position={[0, 0, 500]} intensity={0.6} />
+                        <directionalLight position={[0, 0, 500]} intensity={0.5} />
+                        <FaceMask
+                            faceData={faceData}
+                            videoWidth={localVideoRef.current.videoWidth}
+                            videoHeight={localVideoRef.current.videoHeight}
+                            maskImage={localMaskImage}
+                        />
+                    </Canvas>
+                )}
+            </VideoWrap>
+
+
             <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <video ref={remoteVideoRef} playsInline id="right_cam" controls={false} preload="metadata" autoPlay></video>
-            {localMaskImage && faceData && isMaskOn && (
-                <Canvas
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: `360px`,
-                        height: `263px`,
-                        pointerEvents: 'none'
-                    }}
-                    orthographic
-                    camera={{ zoom: 1, position: [0, 0, 500] }}
-                >
-                    <ambientLight intensity={0.4} />
-                    <pointLight position={[0, 0, 500]} intensity={0.6} />
-                    <directionalLight position={[0, 0, 500]} intensity={0.5} />
-                    <FaceMask
-                        faceData={faceData}
-                        videoWidth={localVideoRef.current.videoWidth}
-                        videoHeight={localVideoRef.current.videoHeight}
-                        maskImage={localMaskImage}
-                    />
-                </Canvas>
-            )}
+            <div style={{ padding: '1px', height: '1%' }} />
+
+            <VideoWrap>
+            <video
+                style={{backgroundColor : 'black'}}
+                ref={remoteVideoRef}
+                playsInline id="right_cam"
+                controls={false}
+                preload="metadata"
+                autoPlay></video>
             {remoteMaskImage && remoteFaceData && isRemoteMaskOn && (
                 <Canvas
                     style={{
                         position: 'absolute',
-                        top: '50%',
-                        left: 0,
-                        width: `360px`,
-                        height: `263px`,
-                        pointerEvents: 'none'
-                    }}
+                        top: 0,
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: `100%`,
+                        height: '100%',
+                        pointerEvents: 'none',
+                }}
                     orthographic
                     camera={{ zoom: 1, position: [0, 0, 500] }}
                 >
@@ -717,6 +791,8 @@ const Video = forwardRef((props, ref) => {
                     />
                 </Canvas>
             )}
+            </VideoWrap>
+            </VideoWrap2>
             <ImageSelector onChange={handleImageChange} value={selectedImage}>
                 <option value="image1">hamzzik</option>
                 <option value="image2">action mask</option>
@@ -725,7 +801,7 @@ const Video = forwardRef((props, ref) => {
                 <option value="image5">korea traditional mask</option>
                 <option value="image6">jocker</option>
             </ImageSelector>
-        </Wrap>
+        </Wrap >
     );
 });
 

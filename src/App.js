@@ -123,8 +123,8 @@ export default () => {
       } else {
         dispatch(clearUser());
       }
+     await generateToken() // FCM 토큰 요청
       dispatch(setProcessFinished())
-      generateToken() // FCM 토큰 요청
     });
     return () => unsubscribe();
   }, [dispatch]);

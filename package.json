@@ -9,6 +9,7 @@
     "@reduxjs/toolkit": "^2.2.6",
     "@tensorflow-models/facemesh": "^0.0.5",
     "axios": "^1.7.2",
+    "babel-plugin-styled-components": "^2.1.4",
     "firebase": "^10.12.3",
     "gh-pages": "^6.1.1",
     "prop-types": "^15.8.1",
