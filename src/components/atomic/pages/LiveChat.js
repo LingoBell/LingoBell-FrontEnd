@@ -10,6 +10,7 @@ import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecomm
 import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 import BaseImage from "../atoms/BaseImage";
+import _ from "lodash";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -18,8 +19,9 @@ const MainStyle = createGlobalStyle`
 `
 const StyledCenteredLayout = styled(CenteredMainLayout)`
     height: 100%;
+    width : 100vw;
     padding-bottom: 57px;
-    overflow:auto;
+    overflow: auto;
     @media screen and (min-width: 1024px) {
         padding: 16px;
     }
@@ -30,6 +32,7 @@ const LiveChatWrap = styled.div`
     /* padding: 15px; */
     /* gap: 16px; */
     height: 100%;
+    width : 100%;
     @media screen and(min-width : 600px) {
         flex-direction : column;
     }
@@ -55,10 +58,8 @@ const AIChatWrap = styled.div`
     // display: ${props => props.isOpen ? `block` : 'none'}
     @media screen and (min-width : 600px) {
     transform : translateY(0);
-        order : 2;
-        min-width : 30%;
-        width : 100%;
-        height : 30%;
+        order : 1;
+        width : 50%;
         overflow : auto;
 
     }
@@ -74,14 +75,13 @@ const AIChatWrap = styled.div`
 
 const UserChatWrap = styled.div`
     transform : translateY(-2000px);
-
     @media screen and (min-width : 600px) {
     transform : translateY(0);
-        order : 3;
-        width : 100%;
-        height : 30%;
+        order : 2;
+        width: 50%;
         overflow : auto;
-        margin-bottom :50px;
+        /* margin-bottom :50px; */
+        margin-top: 34px;
         // display: ${props => props.isOpen ? `block` : 'none'}
     }
     @media screen and (min-width: 1024px) {
@@ -90,6 +90,7 @@ const UserChatWrap = styled.div`
         height : 100%;
         order: 3;
         overflow : auto;
+        margin-top : 0;
 
     }
 
@@ -107,8 +108,8 @@ const VideoWrap = styled.div`
         display: flex;
         flex-direction: row;
         flex: 1;
+        max-height: 240px;
         order : 1;
-        height : 100%;
     }
 
     @media screen and (min-width: 1024px) {
@@ -118,6 +119,7 @@ const VideoWrap = styled.div`
         gap: 16px;
         flex: auto;
         order: 2;
+        max-height: 100%;
         height : calc(100vh - 92px);
     }
 `
@@ -159,6 +161,7 @@ const StyledQuizForm = styled(QuizForm)`
 const ButtonWrap = styled.div`
     position: fixed;
     bottom: 0;
+    z-index: 2;
     left: 0;
     right: 0;
     width: 100%;
@@ -196,7 +199,7 @@ const CallEndButton = styled(CallButton)`
 const AiButton = styled.div`
     background-color : ${PRIMARY_COLOR};
     padding : 6px;
-    margin-bottom : 12px;
+    margin-bottom : 6px;
     border-radius : 6px;
     color : white;
     cursor : pointer;
@@ -288,6 +291,25 @@ const HoverWrap = styled.div`
 
 `
 
+const ResponsiveChat = styled.div`
+
+
+    @media screen and (min-width : 600px) and (max-width : 1023px) {
+        display : flex;
+        gap: 2px;
+        position: relative;
+        top: 0;
+        width : 100%;
+        margin-top: 20px;
+        height: calc(50vh - 53px);
+        flex-direction : row;
+        order : 2;
+
+    }
+    
+   
+`
+
 
 function LiveChat() {
     const [openedTab, setOpenedTab] = useState('AI')
@@ -305,6 +327,7 @@ function LiveChat() {
     const [isAudioEnabled, setIsAudioEnabled] = useState(false);
     const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
     const [isMaskOn, setIsMaskOn] = useState(true);
+    const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
 
     const navigate = useNavigate()
@@ -435,7 +458,8 @@ function LiveChat() {
     const handleEndCall = () => {
         if (videoRef.current) {
             videoRef.current.endCall();
-            navigate('/')
+            navigate('/');
+            window.location.reload();
         }
     }
 
@@ -466,6 +490,31 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
+
+
+    useEffect(() => {
+        // 600 ~ 1023px 사이에서 레이아웃 조건부 변화 
+        const handleResize = _.throttle(() => {
+            const width = window.innerWidth;
+            if (width >= 600 && width <= 1023) {
+                setResponsive(true)
+            } else {
+                setResponsive(false)
+            }
+        },200) // 지연시간 -> debounce는 200ms 동안 크기가 변경되지 않으면 마지막에 한 번만 실행
+                            // throttle은 200ms 간격으로 실행
+        handleResize()
+        
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+
+    }, [])
+
+
 
     return (
         <StyledCenteredLayout>
@@ -534,32 +583,70 @@ function LiveChat() {
                     </ButtonWrap>
                 </VideoWrap>
 
-                {/* AI 챗폼 */}
-                <AIChatWrap isOpen={openedTab === 'AI'}>
-                    {loading && (
-                        <LoadingOverlay>
-                            <Loader />
-                        </LoadingOverlay>
-                    )}
-                    <AiButtonWrap>
-                        <AiButton
-                            onClick={requestRecommendations}
-                        >Topic genereate</AiButton>
-                        <AiButton
-                            onClick={requestQuizzes}
-                        >Quiz genereate</AiButton>
-                    </AiButtonWrap>
-                    <StyledChatForm ref={aiChatWrapRef} // id={'aiChatList'}
-                        data={recommendation}>
-                    </StyledChatForm>
-                </AIChatWrap>
-                {/* 유저 스크립트 폼 */}
-                <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm id='user-chat-form-wrap' data={messages.map((msg) => ({
-                        ...msg,
-                        translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
-                    }))} />
-                </UserChatWrap>
+
+
+                {responsive && ( // 600 ~ 1023px일때 다른 레이아웃)
+                    <>
+                        <ResponsiveChat>
+                            <AIChatWrap isOpen={openedTab === 'AI'}>
+                                {loading && (
+                                    <LoadingOverlay>
+                                        <Loader />
+                                    </LoadingOverlay>
+                                )}
+                                <AiButtonWrap>
+                                    <AiButton
+                                        onClick={requestRecommendations}
+                                    >Topic genereate</AiButton>
+                                    <AiButton
+                                        onClick={requestQuizzes}
+                                    >Quiz genereate</AiButton>
+                                </AiButtonWrap>
+                                <StyledChatForm ref={aiChatWrapRef} // id={'aiChatList'}
+                                    data={recommendation}>
+                                </StyledChatForm>
+                            </AIChatWrap>
+                            {/* 유저 스크립트 폼 */}
+                            <UserChatWrap isOpen={openedTab === 'USER'}>
+                                <StyledChatForm id='user-chat-form-wrap' data={messages.map((msg) => ({
+                                    ...msg,
+                                    translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
+                                }))} />
+                            </UserChatWrap>
+                        </ResponsiveChat>
+                    </>
+                )}
+
+                {!responsive && (
+                    <>
+                        <AIChatWrap isOpen={openedTab === 'AI'}>
+                            {loading && (
+                                <LoadingOverlay>
+                                    <Loader />
+                                </LoadingOverlay>
+                            )}
+                            <AiButtonWrap>
+                                <AiButton
+                                    onClick={requestRecommendations}
+                                >Topic genereate</AiButton>
+                                <AiButton
+                                    onClick={requestQuizzes}
+                                >Quiz genereate</AiButton>
+                            </AiButtonWrap>
+                            <StyledChatForm ref={aiChatWrapRef} // id={'aiChatList'}
+                                data={recommendation}>
+                            </StyledChatForm>
+                        </AIChatWrap>
+
+                        <UserChatWrap isOpen={openedTab === 'USER'}>
+                            <StyledChatForm id='user-chat-form-wrap' data={messages.map((msg) => ({
+                                ...msg,
+                                translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
+                            }))} />
+                        </UserChatWrap>
+                    </>
+                )}
+
             </LiveChatWrap>
             {!loading && quizModal && (
                 //퀴즈모달
