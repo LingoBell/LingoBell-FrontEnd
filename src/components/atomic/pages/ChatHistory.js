@@ -63,6 +63,7 @@ export default props => {
   } = useParams()
 
   const [chatHistoryList, setChatHistoryList] = useState([])
+  const [loading, setLoading] = useState(true)
 
   const fetchChatHistory = async () => {
     try {
@@ -75,6 +76,7 @@ export default props => {
         }
       })
       setChatHistoryList(newResult)
+      setLoading(false)
     } catch (e) {
       console.log(e)
     }
@@ -84,6 +86,9 @@ export default props => {
     fetchChatHistory()
   }, [])
 
+  if(loading) {
+    return <div style={{fontSize : '20px'}}>Loading ...</div>
+  }
 
   const isChatDetailOpen = !!chatId
   return (

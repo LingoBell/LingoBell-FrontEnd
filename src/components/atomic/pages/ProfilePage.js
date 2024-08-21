@@ -160,6 +160,7 @@ export default props => {
     const [preview, setPreview] = useState(null)
     const [viewMyProfile, setViewMyProfile] = useState(true)
     const [myProfile, setMyProfile] = useState([])
+    const [loading, setLoading] = useState(true)
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
@@ -280,6 +281,7 @@ export default props => {
         const fetchUserProfile = async () => {
             const userState = await user_online_status();
             const userProfile = await getMyProfile();
+            setLoading(false); // 유저데이터 불러온 후 로딩 삭제
             const NewUserProfile = {
                 ...userProfile,
                 interests: userProfile?.interestsName,
@@ -328,10 +330,13 @@ export default props => {
         }
     }, [image])
 
+    if(loading) {
+        return <div style={{fontSize : '20px'}}>Loading ...</div>
+    }
+
     return (
         <>
             {isFirstLogin === 2 ?
-
                 <Wrap>
                     <MyModal
                         selectedProfile={myProfile}
