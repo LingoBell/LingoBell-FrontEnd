@@ -339,18 +339,6 @@ const Video = forwardRef((props, ref) => {
         } */
     };
 
-    // 이미지 업로드 처리 함수
-    const handleImageUpload = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setMaskImage(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    }
-
     const muteLocalAudioForMe = (stream) => {
         if (stream && stream.getAudioTracks().length > 0) {
             const audioTrack = stream.getAudioTracks()[0];
@@ -714,6 +702,37 @@ const Video = forwardRef((props, ref) => {
             };
         }
     }, [faceLandmarker, localStream]);
+
+    // 프레임을 캡처하여 서버로 전송
+    const captureFrameAndSend = async () => {
+        if (!localVideoRef.current || !canvasRef.current) return;
+
+        const video = localVideoRef.current;
+        const canvas = canvasRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // 이미지 데이터를 Blob으로 변환
+        canvas.toBlob((blob) => {
+            if (blob) {
+                // Blob 데이터를 socket을 통해 서버로 전송
+                socket.emit('FRAME_DATA', blob);
+                console.log('프레임 소켓으로 전송중.......')
+            }
+        }, 'image/jpeg');
+    };
+
+    useEffect(() => {
+        // 주기적으로 프레임을 캡처하고 전송 (예: 200ms 마다 전송)
+        const intervalId = setInterval(() => {
+            captureFrameAndSend();
+        }, 200);
+
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <Wrap>
