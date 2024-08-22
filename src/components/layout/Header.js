@@ -102,8 +102,10 @@ export default props => {
 
   useEffect( async()=>{
    const getUserName = await getMyProfile()
-   setUserName(getUserName.userName)
-   setUserPic(getUserName.profileImages)
+   if (getUserName) {
+     setUserName(getUserName.userName)
+     setUserPic(getUserName.profileImages)
+   }
 
   },[])
 
@@ -126,7 +128,7 @@ export default props => {
               <HamburgerMenu/>
               <Wrap>
                 <UserName>
-                 Welcome &nbsp; <span style={{fontWeight : '550', color : PRIMARY_COLOR}}>{userName}</span>
+                 Welcome &nbsp; <span style={{fontWeight : '550', color : PRIMARY_COLOR}}>{userName ? userName : 'New user'}</span>
                 <img src='https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'></img>
                 </UserName>
                 { 

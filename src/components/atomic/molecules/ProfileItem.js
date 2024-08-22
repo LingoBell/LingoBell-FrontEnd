@@ -126,7 +126,7 @@ const ProfileWrap = styled.div`
   display : flex;
   padding-right : 12px;
   @media screen and (max-width : 600px) {
-    scale : 0.8;
+    // scale : 0.8;
   }
 `
 const StyledButton = styled(Button)`

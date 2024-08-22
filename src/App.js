@@ -123,8 +123,8 @@ export default () => {
       } else {
         dispatch(clearUser());
       }
+     await generateToken() // FCM 토큰 요청
       dispatch(setProcessFinished())
-      generateToken() // FCM 토큰 요청
     });
     return () => unsubscribe();
   }, [dispatch]);
@@ -153,10 +153,11 @@ export default () => {
       return (
         <>
           {/* <Route path="/" element={<IndexPage signInWithGoogle={signInWithGoogle} signOut={signOutUser} />} /> */}
-          <Route path='/' element={<ChatHistory />} />
+          <Route path="/" element={<ChatHistory/>}>
           <Route path='/chat-history'>
             <Route path=':chatId' element={<ChatHistory />} />
             <Route path='' element={<ChatHistory />} />
+          </Route>
           </Route>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path='/partners' element={<ProfileList />} />

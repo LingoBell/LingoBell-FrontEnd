@@ -117,6 +117,7 @@ export default props => {
                       key={menu.title} 
                       to={menu.link}
                       $selected={menu.link === location.pathname}
+                      onClick={onClose}
                     >
                       {menu.title}
                     </HamburgerMenu>

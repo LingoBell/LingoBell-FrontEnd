@@ -5,10 +5,11 @@ import { languages, interests, nations } from '../../../consts/profileDataKeyLis
 import Select from 'react-select'
 import { AddUserProfile, getMyProfile, UpdateUserProfile, uploadImage } from '../../../apis/UserAPI'
 import { useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import BaseImage from '../atoms/BaseImage'
 import Modal from '../molecules/Modal'
 import { user_online_status } from '../../../firebase/firebase'
+import { checkFirstLogin } from '../../../redux/userSlice'
 
 const options = nations.map(nation => ({
     label: nation.name,
@@ -159,12 +160,15 @@ export default props => {
     const [preview, setPreview] = useState(null)
     const [viewMyProfile, setViewMyProfile] = useState(true)
     const [myProfile, setMyProfile] = useState([])
+    const [loading, setLoading] = useState(true)
     const { user, isFirstLogin } = useSelector((state) => {
         return {
             user: state.user?.user,
             isFirstLogin: state?.user.isFirstLogin
         }
     })
+
+    const dispatch = useDispatch()
 
     const handleCloseModal = () => {
         setViewMyProfile(false);
@@ -199,7 +203,7 @@ export default props => {
             nation,
             birthday,
             nativeLanguageCode,
-            image: response.url
+            image: response?.url
         }
 
         if (Object.keys(selectedInterests).length === 0 ||
@@ -210,14 +214,15 @@ export default props => {
             alert("All fields required")
             return false
         }
-         if (userIntroduce.length > 254) {
+        if (userIntroduce.length > 254) {
             alert('user introduction fields cannot exceed 255words')
         }
         else {
             await AddUserProfile(formData)
                 .then(() => {
-                    window.location.reload();
+                    dispatch(checkFirstLogin())
                     navigate('/')
+
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
@@ -257,14 +262,14 @@ export default props => {
             alert("All fields required")
             return false
         }
-         if (userIntroduce.length > 254) {
+        if (userIntroduce.length > 254) {
             alert('user introduction fields cannot exceed 255 characters!')
         }
         else {
             await UpdateUserProfile(formData)
                 .then(() => {
+                    dispatch(checkFirstLogin())
                     navigate('/')
-                    window.location.reload();
                 })
                 .catch(error => {
                     console.error("Error submitting form:", error);
@@ -276,10 +281,11 @@ export default props => {
         const fetchUserProfile = async () => {
             const userState = await user_online_status();
             const userProfile = await getMyProfile();
+            setLoading(false); // 유저데이터 불러온 후 로딩 삭제
             const NewUserProfile = {
                 ...userProfile,
-                interests: userProfile.interestsName,
-                userStatus: userState[userProfile.userCode]?.status?.state
+                interests: userProfile?.interestsName,
+                userStatus: userState[userProfile?.userCode]?.status?.state
             }
             setMyProfile(NewUserProfile)
             if (userProfile) {
@@ -310,7 +316,7 @@ export default props => {
         fetchUserProfile();
     }, [user.uid]);
 
-    console.log('내가원하는값', myProfile)
+    // console.log('내가원하는값', myProfile)
 
     useEffect(() => {
         if (image instanceof Blob) {
@@ -324,10 +330,13 @@ export default props => {
         }
     }, [image])
 
+    if(loading) {
+        return <div style={{fontSize : '20px'}}>Loading ...</div>
+    }
+
     return (
         <>
             {isFirstLogin === 2 ?
-
                 <Wrap>
                     <MyModal
                         selectedProfile={myProfile}
