@@ -254,10 +254,9 @@ const HoverWrap = styled.div`
 `
 
 
-function LiveChat() {
+function LiveChat({ userId, showTranslation }) {
     const [openedTab, setOpenedTab] = useState('AI')
     const [messages, setMessages] = useState([]);
-    const [showTranslation, setShowTranslation] = useState(true);
     const { chatId: chatRoomId } = useParams()
     const timestamp = new Date().toISOString();
     const [recommendation, setRecommendation] = useState([])
@@ -273,6 +272,7 @@ function LiveChat() {
     const maskRef = useRef(null);
 
     const navigate = useNavigate()
+    /* // 기존 HTTP통신으로 단방향 AI 스크립트 조회 API
     useEffect(() => {
         const fetchMessages = async () => {
             try {
@@ -282,7 +282,7 @@ function LiveChat() {
                     top: 999999999999999999,
                     behavior: 'smooth'
                 })
-                
+
             } catch (err) {
                 console.error('Error fetching STT messages on LiveChat useEffect', err);
             }
@@ -290,8 +290,19 @@ function LiveChat() {
 
         const intervalId = setInterval(fetchMessages, 1000);
         return () => clearInterval(intervalId);
-    }, [chatRoomId]);
+    }, [chatRoomId]); */
 
+    useEffect(() => {
+        const fetchMessages = async () => {
+            if (videoRef.current) {
+                const videoMessages = videoRef.current.getWebSocketMessages();
+                setMessages(videoMessages);
+            }
+        };
+
+        const intervalId = setInterval(fetchMessages, 1000);
+        return () => clearInterval(intervalId);
+    }, [chatRoomId]);
 
     // const send_notification = async () => {
     //     try {
@@ -514,7 +525,7 @@ function LiveChat() {
                     </StyledChatForm>
                 </AIChatWrap>
                 <UserChatWrap isOpen={openedTab === 'USER'}>
-                    <StyledChatForm  id='user-chat-form-wrap' data={messages.map((msg) => ({
+                    <StyledChatForm id='user-chat-form-wrap' data={messages.map((msg) => ({
                         ...msg,
                         translatedMessage: showTranslation && msg.translatedMessage ? msg.translatedMessage : null
                     }))} />

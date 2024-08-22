@@ -214,6 +214,7 @@ const Video = forwardRef((props, ref) => {
     const canvasRef = useRef(null);
     const socketRef = useRef(null); // STT를 위한 WebSocket
     const recorderRef = useRef(null); // GPU 서버 전달하기 위해
+    const [messages, setMessages] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [responses, setResponses] = useState([]);
     const [nativeLanguage, setNativeLanguage] = useState(null);
@@ -448,6 +449,11 @@ const Video = forwardRef((props, ref) => {
         socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
+        };
+
+        socketRef.current.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            setMessages((prevMessages) => [...prevMessages, message]);
         };
 
         socketRef.current.onclose = () => {
