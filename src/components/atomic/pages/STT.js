@@ -1,22 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
-const STT = () => {
+const useSTT = (userId, chatRoomId) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState([]);
+  const [translation, setTranslation] = useState([]);
   const [detectedLanguage, setDetectedLanguage] = useState('Undefined');
   const [processingTime, setProcessingTime] = useState('Undefined');
   const [error, setError] = useState(null);
-
 
   const websocketRef = useRef(null);
   const audioContextRef = useRef(null);
   const streamRef = useRef(null);
 
-  const connectWebsocket = () => {
-    websocketRef.current = new WebSocket('ws://localhost:8765');
+  const connectWebsocket = useCallback(() => {
+    websocketRef.current = new WebSocket(`ws://localhost:8765`);
     websocketRef.current.onopen = () => {
       console.log("WebSocket connection established");
+      websocketRef.current.send(JSON.stringify({
+        userId: userId,
+        chatRoomId: chatRoomId
+      }))
       setIsConnected(true);
     };
     websocketRef.current.onclose = () => {
@@ -24,17 +28,23 @@ const STT = () => {
       setIsConnected(false);
     };
     websocketRef.current.onmessage = (event) => {
-      console.log("Message from server:", event.data);
-      const transcriptData = JSON.parse(event.data);
-      updateTranscription(transcriptData);
-    };
-  };
+        console.log("Message from server:", event.data);
+        const transcriptData = JSON.parse(event.data);
+        console.log('zzzzzzzzz', transcriptData)
+        // if (data.type === "transcription") {
+          updateTranscription(transcriptData);
+        // }
+        
+      };
+  }, [userId, chatRoomId]);
 
-  const updateTranscription = (transcriptData) => {
+  const updateTranscription = useCallback((transcriptData) => {
+    console.log('왜안돼,,ㅡㅡ')
     if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
       setTranscription(prev => [...prev, transcriptData.words]);
     } else if (transcriptData.text) {
       setTranscription(prev => [...prev, [{ word: transcriptData.text, probability: 1 }]]);
+      
     }
 
     if (transcriptData.language && transcriptData.language_probability) {
@@ -44,9 +54,9 @@ const STT = () => {
     if (transcriptData.processing_time) {
       setProcessingTime(`Processing time: ${transcriptData.processing_time.toFixed(2)} seconds`);
     }
-  };
+  }, []);
 
-  const startRecording = async () => {
+  const startRecording = useCallback(async () => {
     setError(null);
     audioContextRef.current = new AudioContext();
     try {
@@ -82,9 +92,9 @@ const STT = () => {
           setError(`녹음을 시작하는 중 오류가 발생했습니다: ${error.message}`);
         }
       }
-  };
+  }, []);
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
     }
@@ -92,9 +102,9 @@ const STT = () => {
       audioContextRef.current.close();
     }
     setIsRecording(false);
-  };
+  }, []);
 
-  const processAudio = (sampleData) => {
+  const processAudio = useCallback((sampleData) => {
     const outputSampleRate = 16000;
     const decreaseResultBuffer = decreaseSampleRate(sampleData, audioContextRef.current.sampleRate, outputSampleRate);
     const audioData = convertFloat32ToInt16(decreaseResultBuffer);
@@ -102,7 +112,9 @@ const STT = () => {
     if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
       websocketRef.current.send(audioData);
     }
-  };
+  }, []);
+
+  // decreaseSampleRate and convertFloat32ToInt16 functions here...
 
   const decreaseSampleRate = (buffer, inputSampleRate, outputSampleRate) => {
     if (inputSampleRate === outputSampleRate) {
@@ -138,35 +150,18 @@ const STT = () => {
     };
   }, []);
 
-  return (
-    <div style={{ fontFamily: 'Arial, sans-serif', maxWidth: '800px', margin: '0 auto', padding: '20px' }}>
-      <h1 style={{ textAlign: 'center' }}>Transcribe a Web Audio Stream with Huggingface VAD + Whisper</h1>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '20px' }}>
-        <button onClick={connectWebsocket} disabled={isConnected}>Connect</button>
-        <button onClick={startRecording} disabled={!isConnected || isRecording}>Start Streaming</button>
-        <button onClick={stopRecording} disabled={!isRecording}>Stop Streaming</button>
-      </div>
-      <div style={{ border: '1px solid #ccc', padding: '10px', minHeight: '200px', marginBottom: '20px' }}>
-        {transcription.map((sentence, index) => (
-          <p key={index}>
-            {sentence.map((word, wordIndex) => (
-              <span
-                key={wordIndex}
-                style={{
-                  color: word.probability > 0.9 ? 'green' : word.probability > 0.6 ? 'orange' : 'red'
-                }}
-              >
-                {word.word}{' '}
-              </span>
-            ))}
-          </p>
-        ))}
-      </div>
-      <div>WebSocket: {isConnected ? 'Connected' : 'Not Connected'}</div>
-      <div>Detected Language: {detectedLanguage}</div>
-      <div>Last Processing Time: {processingTime}</div>
-    </div>
-  );
+  return {
+    isConnected,
+    isRecording,
+    transcription,
+    translation,
+    detectedLanguage,
+    processingTime,
+    error,
+    connectWebsocket,
+    startRecording,
+    stopRecording
+  };
 };
 
-export default STT;
+export default useSTT;

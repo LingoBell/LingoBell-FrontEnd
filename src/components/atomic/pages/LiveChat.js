@@ -11,6 +11,8 @@ import { PRIMARY_COLOR } from "../../../consts/color";
 import QuizForm from "../molecules/QuizForm";
 import BaseImage from "../atoms/BaseImage";
 import _ from "lodash";
+import useSTT from "./STT";
+import { useSelector } from "react-redux";
 
 const MainStyle = createGlobalStyle`
     #root > main {
@@ -330,26 +332,56 @@ function LiveChat() {
     const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
 
-    const navigate = useNavigate()
+    const { user } = useSelector((state) => state.user);
+    const userId = user?.uid;
+
+    const {
+        isConnected,
+        isRecording,
+        transcription,
+        detectedLanguage,
+        processingTime,
+        error,
+        connectWebsocket,
+        startRecording,
+        stopRecording
+    } = useSTT(userId, chatRoomId);
+
+    const navigate = useNavigate();
+
+    // useEffect(() => {
+    //     const fetchMessages = async () => {
+    //         try {
+    //             const data = await getSttAndTranslatedMessages(chatRoomId);
+    //             setMessages(data.messages);
+    //             // document.querySelector('#user-chat-form-wrap')?.scrollTo({
+    //             //     top: 999999999999999999,
+    //             //     behavior: 'smooth'
+    //             // })
+
+    //         } catch (err) {
+    //             console.error('Error fetching STT messages on LiveChat useEffect', err);
+    //         }
+    //     };
+
+    //     const intervalId = setInterval(fetchMessages, 1000);
+    //     return () => clearInterval(intervalId);
+    // }, [chatRoomId]);
+
     useEffect(() => {
-        const fetchMessages = async () => {
-            try {
-                const data = await getSttAndTranslatedMessages(chatRoomId);
-                setMessages(data.messages);
-                document.querySelector('#user-chat-form-wrap')?.scrollTo({
-                    top: 999999999999999999,
-                    behavior: 'smooth'
-                })
-
-            } catch (err) {
-                console.error('Error fetching STT messages on LiveChat useEffect', err);
-            }
-        };
-
-        const intervalId = setInterval(fetchMessages, 1000);
-        return () => clearInterval(intervalId);
-    }, [chatRoomId]);
-
+        console.log('transcription', transcription);
+        if (transcription.length > 0) {
+            const latestTranscription = transcription[transcription.length - 1];
+            const newMessage = {
+                messageSenderId: userId,
+                originalMessage: latestTranscription.map(word => word.word).join(' '),
+                translatedMessage: '',  // 번역 로직이 필요하다면 여기에 추가
+                type: userId === user.uid ? 'me' : 'partner'
+            };
+            setMessages(prev => [...prev, newMessage]);
+            console.log('message', messages);
+        }
+    }, [transcription, userId, user.uid]);
 
     // const send_notification = async () => {
     //     try {
@@ -501,10 +533,10 @@ function LiveChat() {
             } else {
                 setResponsive(false)
             }
-        },200) // 지연시간 -> debounce는 200ms 동안 크기가 변경되지 않으면 마지막에 한 번만 실행
-                            // throttle은 200ms 간격으로 실행
+        }, 200) // 지연시간 -> debounce는 200ms 동안 크기가 변경되지 않으면 마지막에 한 번만 실행
+        // throttle은 200ms 간격으로 실행
         handleResize()
-        
+
 
         window.addEventListener('resize', handleResize);
 
@@ -577,6 +609,16 @@ function LiveChat() {
                             >
                                 <span className='material-icons'>
                                     {isMaskOn ? 'face' : 'face_retouching_off'}
+                                </span>
+                            </CallButton>
+                            <CallButton onClick={connectWebsocket} disabled={isConnected}>
+                                <span className='material-icons'>
+                                    {isConnected ? 'link' : 'link_off'}
+                                </span>
+                            </CallButton>
+                            <CallButton onClick={isRecording ? stopRecording : startRecording}>
+                                <span className='material-icons'>
+                                    {isRecording ? 'stop' : 'mic'}
                                 </span>
                             </CallButton>
                         </div>
