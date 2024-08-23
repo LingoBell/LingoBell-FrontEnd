@@ -18,6 +18,7 @@ const useSTT = (userId, chatRoomId) => {
     websocketRef.current.onopen = () => {
       console.log("WebSocket connection established");
       websocketRef.current.send(JSON.stringify({
+        type: 'config',
         userId: userId,
         chatRoomId: chatRoomId
       }))
@@ -43,8 +44,8 @@ const useSTT = (userId, chatRoomId) => {
     if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
       setTranscription(prev => [...prev, transcriptData.words]);
     } else if (transcriptData.text) {
-      setTranscription(prev => [...prev, [{ word: transcriptData.text, probability: 1 }]]);
-      
+      setTranscription(prev => [...prev, [{ word: transcriptData.text, translation: transcriptData.translated_message, probability: 1 }]]);
+
     }
 
     if (transcriptData.language && transcriptData.language_probability) {

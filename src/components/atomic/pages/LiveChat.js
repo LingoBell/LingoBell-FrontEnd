@@ -375,7 +375,7 @@ function LiveChat() {
             const newMessage = {
                 messageSenderId: userId,
                 originalMessage: latestTranscription.map(word => word.word).join(' '),
-                translatedMessage: '',  // 번역 로직이 필요하다면 여기에 추가
+                translatedMessage: latestTranscription.map(translation => translation.translation).join(' '),  // 번역 로직이 필요하다면 여기에 추가
                 type: userId === user.uid ? 'me' : 'partner'
             };
             setMessages(prev => [...prev, newMessage]);
