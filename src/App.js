@@ -20,6 +20,7 @@ import { onMessage } from "firebase/messaging";
 import { registerFcm } from "./apis/UserAPI";
 import { UpdateChatRoomStatus } from "./apis/ChatAPI";
 import { onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
+import STT from "./components/atomic/pages/STT";
 
 
 export let mainDomain = ''// 'http://localhost:8000'
@@ -167,6 +168,7 @@ export default () => {
           <Route path="/live-chat/:chatId" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
           <Route path='/video' element={<Video />} />
+          <Route path='/stt' element={<STT />} />
         </>
       )
     }

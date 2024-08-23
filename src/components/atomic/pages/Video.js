@@ -279,10 +279,10 @@ const Video = forwardRef((props, ref) => {
                 setLearningLanguages(profileData.learningLanguages);
 
                 if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-                    sendLanguageInfo(); 
+                    sendLanguageInfo();
                     console.log("useEffect안에서 fetchProfileData함수 실행 즉 sendLanguageInfo() 실행 완료");
                 }
-                
+
             } catch (error) {
                 console.error("Failed to fetch profile data", error);
             }
@@ -393,6 +393,18 @@ const Video = forwardRef((props, ref) => {
             video: true,
             audio: true,
         })
+
+        socketRef.current = new WebSocket(`ws://localhost:8765`);
+        socketRef.current.onopen = () => {
+            console.log('WebSocket connected');
+        };
+
+        socketRef.current.onclose = () => {
+            console.log('WebSocket closed');
+        };
+
+        startRecording();
+
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
         stream.getVideoTracks().enabled = isVideoEnabled; // 비디오 비활성화
@@ -525,8 +537,8 @@ const Video = forwardRef((props, ref) => {
                         mimeType: 'audio/wav',
                         recorderType: RecordRTC.StereoAudioRecorder,
                         timeSlice: 500,
-                        desiredSampRate: 16000,
-                        numberOfAudioChannels: 1,
+                        // desiredSampRate: 16000,
+                        // numberOfAudioChannels: 1,
                         ondataavailable: handleDataAvailable
                     });
                     recorderRef.current.startRecording();
@@ -555,7 +567,7 @@ const Video = forwardRef((props, ref) => {
             reader.onloadend = function () {
                 if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
                     const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
-    
+
                     const message = {
                         type: "audio",
                         userId: user.user.uid,
@@ -572,7 +584,7 @@ const Video = forwardRef((props, ref) => {
             console.log("No audio data to send");
         }
     };
-    
+
     useEffect(() => {
         init();
 
@@ -737,80 +749,80 @@ const Video = forwardRef((props, ref) => {
     return (
         <Wrap>
             <VideoWrap2>
-            <VideoWrap>
-                <video
-                    style={{backgroundColor : 'black'}}
-                    ref={localVideoRef}
-                    playsInline id="left_cam"
-                    controls={false}
-                    preload="metadata"
-                    autoPlay></video>
-                {localMaskImage && faceData && isMaskOn && (
-                    <Canvas
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: `100%`,
-                            height: '100%',
-                            pointerEvents: 'none',
-                        
-                        }}
-                        orthographic
-                        camera={{ zoom: 1, position: [0, 0, 500] }}
-                    >
-                        <ambientLight intensity={0.4} />
-                        <pointLight position={[0, 0, 500]} intensity={0.6} />
-                        <directionalLight position={[0, 0, 500]} intensity={0.5} />
-                        <FaceMask
-                            faceData={faceData}
-                            videoWidth={localVideoRef.current.videoWidth}
-                            videoHeight={localVideoRef.current.videoHeight}
-                            maskImage={localMaskImage}
-                        />
-                    </Canvas>
-                )}
-            </VideoWrap>
+                <VideoWrap>
+                    <video
+                        style={{ backgroundColor: 'black' }}
+                        ref={localVideoRef}
+                        playsInline id="left_cam"
+                        controls={false}
+                        preload="metadata"
+                        autoPlay></video>
+                    {localMaskImage && faceData && isMaskOn && (
+                        <Canvas
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: `100%`,
+                                height: '100%',
+                                pointerEvents: 'none',
+
+                            }}
+                            orthographic
+                            camera={{ zoom: 1, position: [0, 0, 500] }}
+                        >
+                            <ambientLight intensity={0.4} />
+                            <pointLight position={[0, 0, 500]} intensity={0.6} />
+                            <directionalLight position={[0, 0, 500]} intensity={0.5} />
+                            <FaceMask
+                                faceData={faceData}
+                                videoWidth={localVideoRef.current.videoWidth}
+                                videoHeight={localVideoRef.current.videoHeight}
+                                maskImage={localMaskImage}
+                            />
+                        </Canvas>
+                    )}
+                </VideoWrap>
 
 
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div style={{ padding: '1px', height: '1%' }} />
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
+                <div style={{ padding: '1px', height: '1%' }} />
 
-            <VideoWrap>
-            <video
-                style={{backgroundColor : 'black'}}
-                ref={remoteVideoRef}
-                playsInline id="right_cam"
-                controls={false}
-                preload="metadata"
-                autoPlay></video>
-            {remoteMaskImage && remoteFaceData && isRemoteMaskOn && (
-                <Canvas
-                    style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        width: `100%`,
-                        height: '100%',
-                        pointerEvents: 'none',
-                }}
-                    orthographic
-                    camera={{ zoom: 1, position: [0, 0, 500] }}
-                >
-                    <ambientLight intensity={0.4} />
-                    <pointLight position={[0, 0, 500]} intensity={0.6} />
-                    <directionalLight position={[0, 0, 500]} intensity={0.5} />
-                    <FaceMask
-                        faceData={remoteFaceData}
-                        videoWidth={remoteVideoRef.current ? remoteVideoRef.current.videoWidth : 360}
-                        videoHeight={remoteVideoRef.current ? remoteVideoRef.current.videoHeight : 263}
-                        maskImage={remoteMaskImage}
-                    />
-                </Canvas>
-            )}
-            </VideoWrap>
+                <VideoWrap>
+                    <video
+                        style={{ backgroundColor: 'black' }}
+                        ref={remoteVideoRef}
+                        playsInline id="right_cam"
+                        controls={false}
+                        preload="metadata"
+                        autoPlay></video>
+                    {remoteMaskImage && remoteFaceData && isRemoteMaskOn && (
+                        <Canvas
+                            style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: '50%',
+                                transform: 'translateX(-50%)',
+                                width: `100%`,
+                                height: '100%',
+                                pointerEvents: 'none',
+                            }}
+                            orthographic
+                            camera={{ zoom: 1, position: [0, 0, 500] }}
+                        >
+                            <ambientLight intensity={0.4} />
+                            <pointLight position={[0, 0, 500]} intensity={0.6} />
+                            <directionalLight position={[0, 0, 500]} intensity={0.5} />
+                            <FaceMask
+                                faceData={remoteFaceData}
+                                videoWidth={remoteVideoRef.current ? remoteVideoRef.current.videoWidth : 360}
+                                videoHeight={remoteVideoRef.current ? remoteVideoRef.current.videoHeight : 263}
+                                maskImage={remoteMaskImage}
+                            />
+                        </Canvas>
+                    )}
+                </VideoWrap>
             </VideoWrap2>
             <ImageSelector onChange={handleImageChange} value={selectedImage}>
                 <option value="image1">hamzzik</option>
