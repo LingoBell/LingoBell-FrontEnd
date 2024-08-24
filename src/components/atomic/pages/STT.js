@@ -31,7 +31,7 @@ const useSTT = (userId, chatRoomId) => {
     websocketRef.current.onmessage = (event) => {
         console.log("Message from server:", event.data);
         const transcriptData = JSON.parse(event.data);
-        console.log('zzzzzzzzz', transcriptData)
+        console.log('transcriptData (STT)', transcriptData)
         // if (data.type === "transcription") {
           updateTranscription(transcriptData);
         // }
@@ -40,7 +40,6 @@ const useSTT = (userId, chatRoomId) => {
   }, [userId, chatRoomId]);
 
   const updateTranscription = useCallback((transcriptData) => {
-    console.log('왜안돼,,ㅡㅡ')
     if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
       setTranscription(prev => [...prev, transcriptData.words]);
     } else if (transcriptData.text) {
@@ -114,8 +113,6 @@ const useSTT = (userId, chatRoomId) => {
       websocketRef.current.send(audioData);
     }
   }, []);
-
-  // decreaseSampleRate and convertFloat32ToInt16 functions here...
 
   const decreaseSampleRate = (buffer, inputSampleRate, outputSampleRate) => {
     if (inputSampleRate === outputSampleRate) {
