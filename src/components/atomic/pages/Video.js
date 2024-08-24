@@ -394,14 +394,14 @@ const Video = forwardRef((props, ref) => {
             audio: true,
         })
 
-        socketRef.current = new WebSocket(`ws://localhost:8765`);
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
+        // socketRef.current = new WebSocket(`ws://localhost:8765`);
+        // socketRef.current.onopen = () => {
+        //     console.log('WebSocket connected');
+        // };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket closed');
-        };
+        // socketRef.current.onclose = () => {
+        //     console.log('WebSocket closed');
+        // };
 
         startRecording();
 
@@ -495,7 +495,7 @@ const Video = forwardRef((props, ref) => {
 
         const chatRoomId = params.chatId;
         // socketRef.current = new WebSocket(`ws://ai.lingobell.xyz/ws/${chatRoomId}`);
-        socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
+        socketRef.current = new WebSocket(`ws://192.168.0.223:8765`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
