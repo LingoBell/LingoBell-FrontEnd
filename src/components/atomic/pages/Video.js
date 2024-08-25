@@ -17,6 +17,7 @@ import { send_notification, getMyProfile } from '../../../apis/UserAPI';
 import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 import RecordRTC from 'recordrtc';
+import useSTT from './STT';
 
 const Wrap = styled.div`
     height : 100%;
@@ -245,6 +246,20 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange,
         isMaskOn
     } = props
+
+    const {
+        isConnected: isSTTConnected,
+        isRecording: isSTTRecording,
+        transcription,
+        translation,
+        detectedLanguage,
+        processingTime,
+        error: sttError,
+        connectWebsocket: connectSTTWebsocket,
+        startRecording: startSTTRecording,
+        stopRecording: stopSTTRecording
+    } = useSTT(user?.user.uid, chatId);
+
     const { chatId } = params
     const roomName = chatId;
     const localVideoRef = useRef(null);
@@ -620,6 +635,7 @@ const Video = forwardRef((props, ref) => {
 
     useEffect(() => {
         init();
+        connectSTTWebsocket();
 
         return () => {
             if (socket) {
@@ -635,6 +651,7 @@ const Video = forwardRef((props, ref) => {
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
+            stopSTTRecording();
         }
     }, [roomName])
 
@@ -670,6 +687,11 @@ const Video = forwardRef((props, ref) => {
                 const enabled = !isAudioEnabled;
                 localStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
                 setIsAudioEnabled(enabled);
+                if (enabled) {
+                    startSTTRecording();
+                } else {
+                    stopSTTRecording();
+                }
             }
         },
         turnVideo() {
