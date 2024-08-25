@@ -253,7 +253,7 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
@@ -407,7 +407,7 @@ const Video = forwardRef((props, ref) => {
 
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
-        stream.getVideoTracks().enabled = isVideoEnabled; // 비디오 비활성화
+        stream.getVideoTracks().enabled = isVideoEnabled;
         setLocalStream(stream);
 
         if (localVideoRef.current) {
@@ -495,7 +495,8 @@ const Video = forwardRef((props, ref) => {
 
         const chatRoomId = params.chatId;
         // socketRef.current = new WebSocket(`ws://ai.lingobell.xyz/ws/${chatRoomId}`);
-        socketRef.current = new WebSocket(`ws://192.168.0.223:8765`);
+        // socketRef.current = new WebSocket(`ws://localhost:8765`);
+        socketRef.current = new WebSocket(`ws://192.168.0.30:8765`);
         socketRef.current.onopen = () => {
             console.log('WebSocket connection for GPU STT opened');
         };
@@ -504,11 +505,43 @@ const Video = forwardRef((props, ref) => {
             console.log('WebSocket connection closed');
         };
 
+        // 프레임 캡처 및 전송 로직
+        const captureAndSendFrame = () => {
+            if (localVideoRef.current && canvasRef.current) {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.drawImage(localVideoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                
+                canvasRef.current.toBlob(blob => {
+                    socket.emit('video_frame', blob);
+                }, 'image/jpeg');
+            }
+        };
+
+        const intervalId = setInterval(captureAndSendFrame, 1000 / 30); // 30 FPS
+
+        // 서버로부터 처리된 프레임 수신
+        socket.on('processed_frame', (processedImageData) => {
+            const img = new Image();
+            img.onload = () => {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+            };
+            // img.src = processedImageData;
+            img.src = URL.createObjectURL(new Blob([processedImageData]));
+        });
+
         return () => {
+            clearInterval(intervalId);
+            socketRef.current.disconnect();
             if (socketRef.current) {
                 socketRef.current.close();
             }
         };
+        // return () => {
+        //     if (socketRef.current) {
+        //         socketRef.current.close();
+        //     }
+        // };
     }
 
     const endCall = () => {
@@ -715,36 +748,36 @@ const Video = forwardRef((props, ref) => {
         }
     }, [faceLandmarker, localStream]);
 
-    // 프레임을 캡처하여 서버로 전송
-    const captureFrameAndSend = async () => {
-        if (!localVideoRef.current || !canvasRef.current) return;
+    // // 프레임을 캡처하여 서버로 전송
+    // const captureFrameAndSend = async () => {
+    //     if (!localVideoRef.current || !canvasRef.current) return;
 
-        const video = localVideoRef.current;
-        const canvas = canvasRef.current;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+    //     const video = localVideoRef.current;
+    //     const canvas = canvasRef.current;
+    //     canvas.width = video.videoWidth;
+    //     canvas.height = video.videoHeight;
 
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //     const ctx = canvas.getContext('2d');
+    //     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // 이미지 데이터를 Blob으로 변환
-        canvas.toBlob((blob) => {
-            if (blob) {
-                // Blob 데이터를 socket을 통해 서버로 전송
-                socket.emit('FRAME_DATA', blob);
-                console.log('프레임 소켓으로 전송중.......')
-            }
-        }, 'image/jpeg');
-    };
+    //     // 이미지 데이터를 Blob으로 변환
+    //     canvas.toBlob((blob) => {
+    //         if (blob) {
+    //             // Blob 데이터를 socket을 통해 서버로 전송
+    //             socket.emit('FRAME_DATA', blob);
+    //             console.log('프레임 소켓으로 전송중.......')
+    //         }
+    //     }, 'image/jpeg');
+    // };
 
-    useEffect(() => {
-        // 주기적으로 프레임을 캡처하고 전송 (예: 200ms 마다 전송)
-        const intervalId = setInterval(() => {
-            captureFrameAndSend();
-        }, 200);
+    // useEffect(() => {
+    //     // 주기적으로 프레임을 캡처하고 전송 (예: 200ms 마다 전송)
+    //     const intervalId = setInterval(() => {
+    //         captureFrameAndSend();
+    //     }, 200);
 
-        return () => clearInterval(intervalId);
-    }, []);
+    //     return () => clearInterval(intervalId);
+    // }, []);
 
     return (
         <Wrap>
