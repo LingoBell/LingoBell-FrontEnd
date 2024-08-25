@@ -13,31 +13,87 @@ const useSTT = (userId, chatRoomId) => {
   const audioContextRef = useRef(null);
   const streamRef = useRef(null);
 
+  // const connectWebsocket = useCallback(() => {
+  //   const connect = () => {
+  //     console.log("Attempting to connect to WebSocket...");
+  //     websocketRef.current = new WebSocket(`ws://192.168.0.30:8765`);
+  
+  //     websocketRef.current.onopen = () => {
+  //       console.log("WebSocket connection established");
+  //       websocketRef.current.send(JSON.stringify({
+  //         type: 'config',
+  //         userId: userId,
+  //         chatRoomId: chatRoomId
+  //       }));
+  //       setIsConnected(true);
+  //     };
+  
+  //     websocketRef.current.onclose = (event) => {
+  //       console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`);
+  //       setIsConnected(false);
+  //       // 연결이 비정상적으로 종료된 경우 재연결 시도
+  //       if (event.code !== 1000) {
+  //         console.log("Attempting to reconnect in 5 seconds...");
+  //         setTimeout(connect, 5000);
+  //       }
+  //     };
+  
+  //     websocketRef.current.onerror = (error) => {
+  //       console.error("WebSocket error observed:", error);
+  //     };
+  
+  //     websocketRef.current.onmessage = (event) => {
+  //       console.log("Message from server:", event.data);
+  //       try {
+  //         const transcriptData = JSON.parse(event.data);
+  //         console.log('transcriptData (STT)', transcriptData);
+  //         updateTranscription(transcriptData);
+  //       } catch (error) {
+  //         console.error("Error parsing message:", error);
+  //       }
+  //     };
+  //   };
+  
+  //   connect();
+  // }, [userId, chatRoomId, updateTranscription]);
+
   const connectWebsocket = useCallback(() => {
     websocketRef.current = new WebSocket(`ws://localhost:8765`);
+
     websocketRef.current.onopen = () => {
       console.log("WebSocket connection established");
-      websocketRef.current.send(JSON.stringify({
-        type: 'config',
-        userId: userId,
-        chatRoomId: chatRoomId
-      }))
-      setIsConnected(true);
+
+      // WebSocket 연결이 성공적으로 이루어진 후에만 설정 메시지를 보냅니다.
+      if (userId && chatRoomId) {
+        websocketRef.current.send(JSON.stringify({
+          type: 'config',
+          userId: userId,
+          chatRoomId: chatRoomId
+        }));
+        setIsConnected(true);
+      } else {
+        console.error("userId 또는 chatRoomId가 누락되었습니다.");
+      }
     };
-    websocketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
+
+    websocketRef.current.onclose = (event) => {
+      console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`);
       setIsConnected(false);
     };
+
+    websocketRef.current.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
     websocketRef.current.onmessage = (event) => {
         console.log("Message from server:", event.data);
         const transcriptData = JSON.parse(event.data);
-        console.log('transcriptData (STT)', transcriptData)
-        // if (data.type === "transcription") {
-          updateTranscription(transcriptData);
-        // }
-        
-      };
-  }, [userId, chatRoomId]);
+        console.log('transcriptData (STT)', transcriptData);
+
+        updateTranscription(transcriptData);
+    };
+}, [userId, chatRoomId, updateTranscription]);
+
 
   const updateTranscription = useCallback((transcriptData) => {
     if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
@@ -158,7 +214,8 @@ const useSTT = (userId, chatRoomId) => {
     error,
     connectWebsocket,
     startRecording,
-    stopRecording
+    stopRecording,
+    websocket: websocketRef.current
   };
 };
 
