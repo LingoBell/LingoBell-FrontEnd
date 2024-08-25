@@ -17,6 +17,7 @@ import { send_notification, getMyProfile } from '../../../apis/UserAPI';
 import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 import RecordRTC from 'recordrtc';
+import useSTT from './STT';
 
 const Wrap = styled.div`
     height : 100%;
@@ -245,6 +246,21 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange,
         isMaskOn
     } = props
+
+    const {
+        isConnected: isSTTConnected,
+        isRecording: isSTTRecording,
+        transcription,
+        translation,
+        detectedLanguage,
+        processingTime,
+        error: sttError,
+        connectWebsocket: connectSTTWebsocket,
+        startRecording,
+        stopRecording,
+        websocket: sttWebsocket
+    } = useSTT(user?.user.uid, chatId);
+
     const { chatId } = params
     const roomName = chatId;
     const localVideoRef = useRef(null);
@@ -253,7 +269,7 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
@@ -278,7 +294,7 @@ const Video = forwardRef((props, ref) => {
                 setNativeLanguage(profileData.nativeLanguage);
                 setLearningLanguages(profileData.learningLanguages);
 
-                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                if (sttWebsocket.current && sttWebsocket.current.readyState === WebSocket.OPEN) {
                     sendLanguageInfo();
                     console.log("useEffect안에서 fetchProfileData함수 실행 즉 sendLanguageInfo() 실행 완료");
                 }
@@ -325,8 +341,8 @@ const Video = forwardRef((props, ref) => {
         };
 
         console.log("여기에 userInfo가 찍히리라", userInfo);
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            socketRef.current.send(JSON.stringify(userInfo));
+        if (sttWebsocket.current && sttWebsocket.current.readyState === WebSocket.OPEN) {
+            sttWebsocket.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } else {
             console.log("WebSocket connection is not open to send language info.");
@@ -394,20 +410,20 @@ const Video = forwardRef((props, ref) => {
             audio: true,
         })
 
-        socketRef.current = new WebSocket(`ws://localhost:8765`);
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
+        // socketRef.current = new WebSocket(`ws://localhost:8765`);
+        // socketRef.current.onopen = () => {
+        //     console.log('WebSocket connected');
+        // };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket closed');
-        };
+        // socketRef.current.onclose = () => {
+        //     console.log('WebSocket closed');
+        // };
 
         startRecording();
 
         localVideoRef.current.srcObject = stream;
         stream.getAudioTracks().enabled = isAudioEnabled;
-        stream.getVideoTracks().enabled = isVideoEnabled; // 비디오 비활성화
+        stream.getVideoTracks().enabled = isVideoEnabled;
         setLocalStream(stream);
 
         if (localVideoRef.current) {
@@ -495,20 +511,53 @@ const Video = forwardRef((props, ref) => {
 
         const chatRoomId = params.chatId;
         // socketRef.current = new WebSocket(`ws://ai.lingobell.xyz/ws/${chatRoomId}`);
-        socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connection for GPU STT opened');
-        };
+        // socketRef.current = new WebSocket(`ws://localhost:8765`);
+        // socketRef.current = new WebSocket(`ws://192.168.0.30:8765`);
+        // socketRef.current.onopen = () => {
+        //     console.log('WebSocket connection for GPU STT opened');
+        // };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
+        // socketRef.current.onclose = () => {
+        //     console.log('WebSocket connection closed');
+        // };
 
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.close();
+        // 프레임 캡처 및 전송 로직
+        const captureAndSendFrame = () => {
+            if (localVideoRef.current && canvasRef.current) {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.drawImage(localVideoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                
+                canvasRef.current.toBlob(blob => {
+                    socket.emit('video_frame', blob);
+                }, 'image/jpeg');
             }
         };
+
+        const intervalId = setInterval(captureAndSendFrame, 1000 / 30); // 30 FPS
+
+        // 서버로부터 처리된 프레임 수신
+        socket.on('processed_frame', (processedImageData) => {
+            const img = new Image();
+            img.onload = () => {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+            };
+            // img.src = processedImageData;
+            img.src = URL.createObjectURL(new Blob([processedImageData]));
+        });
+
+        return () => {
+            clearInterval(intervalId);
+            sttWebsocket.current.disconnect();
+            if (sttWebsocket.current) {
+                sttWebsocket.current.close();
+            }
+        };
+        // return () => {
+        //     if (socketRef.current) {
+        //         socketRef.current.close();
+        //     }
+        // };
     }
 
     const endCall = () => {
@@ -527,45 +576,45 @@ const Video = forwardRef((props, ref) => {
         }
     }
 
-    const startRecording = () => {
-        console.log(isAudioEnabled, socketRef.current)
-        if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    recorderRef.current = RecordRTC(stream, {
-                        type: 'audio',
-                        mimeType: 'audio/wav',
-                        recorderType: RecordRTC.StereoAudioRecorder,
-                        timeSlice: 500,
-                        // desiredSampRate: 16000,
-                        // numberOfAudioChannels: 1,
-                        ondataavailable: handleDataAvailable
-                    });
-                    recorderRef.current.startRecording();
-                    setIsRecording(true);
-                })
-                .catch(error => console.error('Error accessing the microphone', error));
-        }
-    };
+    // const startRecording = () => {
+    //     console.log(isAudioEnabled, socketRef.current)
+    //     if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+    //         navigator.mediaDevices.getUserMedia({ audio: true })
+    //             .then(stream => {
+    //                 recorderRef.current = RecordRTC(stream, {
+    //                     type: 'audio',
+    //                     mimeType: 'audio/wav',
+    //                     recorderType: RecordRTC.StereoAudioRecorder,
+    //                     timeSlice: 500,
+    //                     // desiredSampRate: 16000,
+    //                     // numberOfAudioChannels: 1,
+    //                     ondataavailable: handleDataAvailable
+    //                 });
+    //                 recorderRef.current.startRecording();
+    //                 setIsRecording(true);
+    //             })
+    //             .catch(error => console.error('Error accessing the microphone', error));
+    //     }
+    // };
 
     // STT 오디오 스트리밍 중지
-    const stopRecording = () => {
-        if (recorderRef.current) {
-            recorderRef.current.stopRecording(() => {
-                let blob = recorderRef.current.getBlob();
+    // const stopRecording = () => {
+    //     if (recorderRef.current) {
+    //         recorderRef.current.stopRecording(() => {
+    //             let blob = recorderRef.current.getBlob();
 
-                console.log('Recording stopped, blob created', blob);
-            });
-            setIsRecording(false);
-        }
-    };
+    //             console.log('Recording stopped, blob created', blob);
+    //         });
+    //         setIsRecording(false);
+    //     }
+    // };
 
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
             const reader = new FileReader();
 
             reader.onloadend = function () {
-                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                if (sttWebsocket.current && sttWebsocket.current.readyState === WebSocket.OPEN) {
                     const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
 
                     const message = {
@@ -573,10 +622,10 @@ const Video = forwardRef((props, ref) => {
                         userId: user.user.uid,
                         blob: base64Data // Blob 대신 Base64 데이터를 보냅니다.
                     };
-                    socketRef.current.send(JSON.stringify(message));
+                    sttWebsocket.current.send(JSON.stringify(message));
                     console.log("Sending audio blob as Base64:", message);
                 } else {
-                    console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+                    console.error("WebSocket is not open. Ready state:", sttWebsocket.current.readyState);
                 }
             };
             reader.readAsDataURL(blob);
@@ -587,6 +636,7 @@ const Video = forwardRef((props, ref) => {
 
     useEffect(() => {
         init();
+        connectSTTWebsocket();
 
         return () => {
             if (socket) {
@@ -602,6 +652,7 @@ const Video = forwardRef((props, ref) => {
             if (localStream) {
                 localStream.getTracks().forEach(track => track.stop());
             }
+            stopRecording();
         }
     }, [roomName])
 
@@ -618,7 +669,7 @@ const Video = forwardRef((props, ref) => {
         } else {
             stopRecording();
         }
-    }, [isAudioEnabled, socketRef.current]);
+    }, [isAudioEnabled]);
 
     useEffect(() => {
         onVideoStatusChange(isVideoEnabled);
@@ -637,6 +688,11 @@ const Video = forwardRef((props, ref) => {
                 const enabled = !isAudioEnabled;
                 localStream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
                 setIsAudioEnabled(enabled);
+                if (enabled) {
+                    startRecording();
+                } else {
+                    stopRecording();
+                }
             }
         },
         turnVideo() {
@@ -715,36 +771,36 @@ const Video = forwardRef((props, ref) => {
         }
     }, [faceLandmarker, localStream]);
 
-    // 프레임을 캡처하여 서버로 전송
-    const captureFrameAndSend = async () => {
-        if (!localVideoRef.current || !canvasRef.current) return;
+    // // 프레임을 캡처하여 서버로 전송
+    // const captureFrameAndSend = async () => {
+    //     if (!localVideoRef.current || !canvasRef.current) return;
 
-        const video = localVideoRef.current;
-        const canvas = canvasRef.current;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+    //     const video = localVideoRef.current;
+    //     const canvas = canvasRef.current;
+    //     canvas.width = video.videoWidth;
+    //     canvas.height = video.videoHeight;
 
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    //     const ctx = canvas.getContext('2d');
+    //     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // 이미지 데이터를 Blob으로 변환
-        canvas.toBlob((blob) => {
-            if (blob) {
-                // Blob 데이터를 socket을 통해 서버로 전송
-                socket.emit('FRAME_DATA', blob);
-                console.log('프레임 소켓으로 전송중.......')
-            }
-        }, 'image/jpeg');
-    };
+    //     // 이미지 데이터를 Blob으로 변환
+    //     canvas.toBlob((blob) => {
+    //         if (blob) {
+    //             // Blob 데이터를 socket을 통해 서버로 전송
+    //             socket.emit('FRAME_DATA', blob);
+    //             console.log('프레임 소켓으로 전송중.......')
+    //         }
+    //     }, 'image/jpeg');
+    // };
 
-    useEffect(() => {
-        // 주기적으로 프레임을 캡처하고 전송 (예: 200ms 마다 전송)
-        const intervalId = setInterval(() => {
-            captureFrameAndSend();
-        }, 200);
+    // useEffect(() => {
+    //     // 주기적으로 프레임을 캡처하고 전송 (예: 200ms 마다 전송)
+    //     const intervalId = setInterval(() => {
+    //         captureFrameAndSend();
+    //     }, 200);
 
-        return () => clearInterval(intervalId);
-    }, []);
+    //     return () => clearInterval(intervalId);
+    // }, []);
 
     return (
         <Wrap>
