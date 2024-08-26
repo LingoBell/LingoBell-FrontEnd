@@ -17,6 +17,7 @@ import { send_notification, getMyProfile } from '../../../apis/UserAPI';
 import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 import RecordRTC from 'recordrtc';
+import useSTT from './STT';
 
 const Wrap = styled.div`
     height : 100%;
@@ -245,6 +246,20 @@ const Video = forwardRef((props, ref) => {
         onVideoStatusChange,
         isMaskOn
     } = props
+
+    const {
+        isConnected,
+        isRecording,
+        transcription,
+        detectedLanguage,
+        processingTime,
+        error,
+        connectWebsocket,
+        startRecording,
+        stopRecording,
+        websocketRef
+    } = useSTT(userId, chatRoomId);
+
     const { chatId } = params
     const roomName = chatId;
     const localVideoRef = useRef(null);
@@ -262,14 +277,17 @@ const Video = forwardRef((props, ref) => {
     const [localMaskImage, setLocalMaskImage] = useState(defaultMaskImage);
     const [remoteMaskImage, setRemoteMaskImage] = useState(defaultMaskImage);
     const canvasRef = useRef(null);
-    const socketRef = useRef(null); // STT를 위한 WebSocket
+    // const socketRef = useRef(null); // STT를 위한 WebSocket
     const recorderRef = useRef(null); // GPU 서버 전달하기 위해
-    const [isRecording, setIsRecording] = useState(false);
+    // const [isRecording, setIsRecording] = useState(false);
     const [responses, setResponses] = useState([]);
     const [nativeLanguage, setNativeLanguage] = useState(null);
     const [learningLanguages, setLearningLanguages] = useState([]);
     const user = useSelector(state => state.user);
     const [selectedImage, setSelectedImage] = useState("image1");
+    const { chatId: chatRoomId } = useParams();
+    const userId = user?.uid;
+
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -278,7 +296,7 @@ const Video = forwardRef((props, ref) => {
                 setNativeLanguage(profileData.nativeLanguage);
                 setLearningLanguages(profileData.learningLanguages);
 
-                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
                     sendLanguageInfo();
                     console.log("useEffect안에서 fetchProfileData함수 실행 즉 sendLanguageInfo() 실행 완료");
                 }
@@ -325,8 +343,8 @@ const Video = forwardRef((props, ref) => {
         };
 
         console.log("여기에 userInfo가 찍히리라", userInfo);
-        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            socketRef.current.send(JSON.stringify(userInfo));
+        if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+            websocketRef.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
         } else {
             console.log("WebSocket connection is not open to send language info.");
@@ -394,14 +412,14 @@ const Video = forwardRef((props, ref) => {
             audio: true,
         })
 
-        socketRef.current = new WebSocket(`ws://localhost:8765`);
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connected');
-        };
+        // socketRef.current = new WebSocket(`ws://localhost:8765`);
+        // socketRef.current.onopen = () => {
+        //     console.log('WebSocket connected');
+        // };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket closed');
-        };
+        // socketRef.current.onclose = () => {
+        //     console.log('WebSocket closed');
+        // };
 
         startRecording();
 
@@ -493,22 +511,22 @@ const Video = forwardRef((props, ref) => {
 
         socket.emit('CREATE_OR_JOIN', roomName)
 
-        const chatRoomId = params.chatId;
+        // const chatRoomId = params.chatId;
         // socketRef.current = new WebSocket(`ws://ai.lingobell.xyz/ws/${chatRoomId}`);
-        socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
-        socketRef.current.onopen = () => {
-            console.log('WebSocket connection for GPU STT opened');
-        };
+        // socketRef.current = new WebSocket(`ws://localhost:38080/ws/${chatRoomId}`);
+        // socketRef.current.onopen = () => {
+        //     console.log('WebSocket connection for GPU STT opened');
+        // };
 
-        socketRef.current.onclose = () => {
-            console.log('WebSocket connection closed');
-        };
+        // socketRef.current.onclose = () => {
+        //     console.log('WebSocket connection closed');
+        // };
 
-        return () => {
-            if (socketRef.current) {
-                socketRef.current.close();
-            }
-        };
+        // return () => {
+        //     if (socketRef.current) {
+        //         socketRef.current.close();
+        //     }
+        // };
     }
 
     const endCall = () => {
@@ -527,45 +545,45 @@ const Video = forwardRef((props, ref) => {
         }
     }
 
-    const startRecording = () => {
-        console.log(isAudioEnabled, socketRef.current)
-        if (isAudioEnabled && socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    recorderRef.current = RecordRTC(stream, {
-                        type: 'audio',
-                        mimeType: 'audio/wav',
-                        recorderType: RecordRTC.StereoAudioRecorder,
-                        timeSlice: 500,
-                        // desiredSampRate: 16000,
-                        // numberOfAudioChannels: 1,
-                        ondataavailable: handleDataAvailable
-                    });
-                    recorderRef.current.startRecording();
-                    setIsRecording(true);
-                })
-                .catch(error => console.error('Error accessing the microphone', error));
-        }
-    };
+    // const startRecording = () => {
+    //     console.log(isAudioEnabled, websocketRef.current)
+    //     if (isAudioEnabled && websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
+    //         navigator.mediaDevices.getUserMedia({ audio: true })
+    //             .then(stream => {
+    //                 recorderRef.current = RecordRTC(stream, {
+    //                     type: 'audio',
+    //                     mimeType: 'audio/wav',
+    //                     recorderType: RecordRTC.StereoAudioRecorder,
+    //                     timeSlice: 500,
+    //                     // desiredSampRate: 16000,
+    //                     // numberOfAudioChannels: 1,
+    //                     ondataavailable: handleDataAvailable
+    //                 });
+    //                 recorderRef.current.startRecording();
+    //                 setIsRecording(true);
+    //             })
+    //             .catch(error => console.error('Error accessing the microphone', error));
+    //     }
+    // };
 
     // STT 오디오 스트리밍 중지
-    const stopRecording = () => {
-        if (recorderRef.current) {
-            recorderRef.current.stopRecording(() => {
-                let blob = recorderRef.current.getBlob();
+    // const stopRecording = () => {
+    //     if (recorderRef.current) {
+    //         recorderRef.current.stopRecording(() => {
+    //             let blob = recorderRef.current.getBlob();
 
-                console.log('Recording stopped, blob created', blob);
-            });
-            setIsRecording(false);
-        }
-    };
+    //             console.log('Recording stopped, blob created', blob);
+    //         });
+    //         setIsRecording(false);
+    //     }
+    // };
 
     const handleDataAvailable = (blob) => {
         if (blob.size > 0) {
             const reader = new FileReader();
 
             reader.onloadend = function () {
-                if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+                if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
                     const base64Data = reader.result.split(',')[1]; // Base64 부분만 추출
 
                     const message = {
@@ -573,10 +591,10 @@ const Video = forwardRef((props, ref) => {
                         userId: user.user.uid,
                         blob: base64Data // Blob 대신 Base64 데이터를 보냅니다.
                     };
-                    socketRef.current.send(JSON.stringify(message));
+                    websocketRef.current.send(JSON.stringify(message));
                     console.log("Sending audio blob as Base64:", message);
                 } else {
-                    console.error("WebSocket is not open. Ready state:", socketRef.current.readyState);
+                    console.error("WebSocket is not open. Ready state:", websocketRef.current.readyState);
                 }
             };
             reader.readAsDataURL(blob);
@@ -618,7 +636,7 @@ const Video = forwardRef((props, ref) => {
         } else {
             stopRecording();
         }
-    }, [isAudioEnabled, socketRef.current]);
+    }, [isAudioEnabled, websocketRef.current]);
 
     useEffect(() => {
         onVideoStatusChange(isVideoEnabled);

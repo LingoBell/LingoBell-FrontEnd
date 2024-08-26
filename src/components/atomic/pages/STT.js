@@ -161,7 +161,8 @@ const useSTT = (userId, chatRoomId) => {
     error,
     connectWebsocket,
     startRecording,
-    stopRecording
+    stopRecording,
+    websocketRef
   };
 };
 
