@@ -13,34 +13,82 @@ const useSTT = (userId, chatRoomId) => {
   const audioContextRef = useRef(null);
   const streamRef = useRef(null);
 
-  const connectWebsocket = useCallback(() => {
-    websocketRef.current = new WebSocket(`ws://localhost:8765`);
-    websocketRef.current.onopen = () => {
-      console.log("WebSocket connection established");
-      websocketRef.current.send(JSON.stringify({
-        type: 'config',
-        userId: userId,
-        chatRoomId: chatRoomId
-      }))
-      setIsConnected(true);
-    };
-    websocketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
-      setIsConnected(false);
-    };
-    websocketRef.current.onmessage = (event) => {
-        console.log("Message from server:", event.data);
-        const transcriptData = JSON.parse(event.data);
-        console.log('zzzzzzzzz', transcriptData)
-        // if (data.type === "transcription") {
-          updateTranscription(transcriptData);
-        // }
+  // const connectWebsocket = useCallback(() => {
+  //   websocketRef.current = new WebSocket(`ws://localhost:8765`);
+  //   websocketRef.current.onopen = () => {
+  //     console.log("WebSocket connection established");
+  //     websocketRef.current.send(JSON.stringify({
+  //       type: 'config',
+  //       userId: userId,
+  //       chatRoomId: chatRoomId
+  //     }))
+  //     setIsConnected(true);
+  //   };
+  //   websocketRef.current.onclose = () => {
+  //     console.log("WebSocket connection closed");
+  //     setIsConnected(false);
+  //   };
+  //   websocketRef.current.onmessage = (event) => {
+  //       console.log("Message from server:", event.data);
+  //       const transcriptData = JSON.parse(event.data);
+  //       console.log('transcriptData', transcriptData)
+  //       // if (data.type === "transcription") {
+  //         updateTranscription(transcriptData);
+  //       // }
         
+  //     };
+  // }, [userId, chatRoomId]);
+
+  const connectWebsocket = useCallback(() => {
+    const connect = () => {
+      console.log(`Attempting to connect to WebSocket... User ID: ${userId}, Chat Room ID: ${chatRoomId}`);
+      websocketRef.current = new WebSocket(`ws://localhost:8765`);
+  
+      websocketRef.current.onopen = (event) => {
+        console.log("WebSocket connection established", event);
+        try {
+          const config = {
+            type: 'config',
+            userId: userId,
+            chatRoomId: chatRoomId
+          };
+          websocketRef.current.send(JSON.stringify(config));
+          console.log("Config sent successfully", config);
+        } catch (error) {
+          console.error("Error sending config:", error);
+        }
+        setIsConnected(true);
       };
-  }, [userId, chatRoomId]);
+  
+      websocketRef.current.onclose = (event) => {
+        console.log(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}, Was Clean: ${event.wasClean}`);
+        setIsConnected(false);
+        if (event.code !== 1000) {
+          console.log("Attempting to reconnect in 5 seconds...");
+          setTimeout(connect, 5000);
+        }
+      };
+  
+      websocketRef.current.onerror = (error) => {
+        console.error("WebSocket error observed:", error);
+      };
+  
+      websocketRef.current.onmessage = (event) => {
+        console.log("Message from server:", event.data);
+        try {
+          const transcriptData = JSON.parse(event.data);
+          console.log('Parsed transcriptData:', transcriptData);
+          updateTranscription(transcriptData);
+        } catch (error) {
+          console.error("Error parsing message:", error);
+        }
+      };
+    };
+  
+    connect();
+  }, [userId, chatRoomId, updateTranscription]);
 
   const updateTranscription = useCallback((transcriptData) => {
-    console.log('왜안돼,,ㅡㅡ')
     if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
       setTranscription(prev => [...prev, transcriptData.words]);
     } else if (transcriptData.text) {
@@ -105,11 +153,7 @@ const useSTT = (userId, chatRoomId) => {
     setIsRecording(false);
   }, []);
 
-  const processAudio = useCallback((sampleData) => {
-    const outputSampleRate = 16000;
-    const decreaseResultBuffer = decreaseSampleRate(sampleData, audioContextRef.current.sampleRate, outputSampleRate);
-    const audioData = convertFloat32ToInt16(decreaseResultBuffer);
-
+  const processAudio = useCallback((audioData) => {
     if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
       websocketRef.current.send(audioData);
     }
@@ -161,7 +205,9 @@ const useSTT = (userId, chatRoomId) => {
     error,
     connectWebsocket,
     startRecording,
-    stopRecording
+    stopRecording,
+    websocket: websocketRef.current,
+    processAudio
   };
 };
 
