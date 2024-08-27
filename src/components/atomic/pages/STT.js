@@ -15,7 +15,7 @@ const useSTT = (userId, chatRoomId) => {
   const streamRef = useRef(null);
 
   const connectWebsocket = useCallback(() => {
-    websocketRef.current = new WebSocket(`ws://192.168.0.182:8765`);
+    websocketRef.current = new WebSocket(`ws://socket.lingobell.xyz`);
     websocketRef.current.onopen = () => {
       console.log("WebSocket connection established");
       websocketRef.current.send(JSON.stringify({
