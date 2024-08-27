@@ -1,3 +1,4 @@
+import { current } from '@reduxjs/toolkit';
 import { useState, useRef, useEffect, useCallback } from 'react';
 
 const useSTT = (userId, chatRoomId) => {
@@ -28,35 +29,44 @@ const useSTT = (userId, chatRoomId) => {
       console.log("WebSocket connection closed");
       setIsConnected(false);
     };
+    // websocketRef.current.onmessage = (event) => {
+    //     console.log("Message from server:", event.data);
+    //     const transcriptData = JSON.parse(event.data);
+    //     console.log('transcriptData', transcriptData);
+    //       updateTranscription(transcriptData);
+    //   };
+
     websocketRef.current.onmessage = (event) => {
-        console.log("Message from server:", event.data);
-        const transcriptData = JSON.parse(event.data);
-        console.log('zzzzzzzzz', transcriptData)
-        // if (data.type === "transcription") {
-          updateTranscription(transcriptData);
-        // }
-        
-      };
+      console.log("서버로부터의 메시지:", event.data);
+      const transcriptData = JSON.parse(event.data);
+      console.log('transcriptData', transcriptData);
+        updateTranscription(transcriptData.user_id, transcriptData.text, transcriptData.translation);
+    };
   }, [userId, chatRoomId]);
 
-  const updateTranscription = useCallback((transcriptData) => {
-    console.log('왜안돼,,ㅡㅡ')
-    if (Array.isArray(transcriptData.words) && transcriptData.words.length > 0) {
-      setTranscription(prev => [...prev, transcriptData.words]);
-    } else if (transcriptData.text) {
-      setTranscription(prev => [...prev, [{ word: transcriptData.text, translation: transcriptData.translated_message, probability: 1 }]]);
+  // const updateTranscription = useCallback((transcriptData) => {
+  //   console.log('왜안돼,,ㅡㅡ')
+  //   if (transcriptData.text) {
+  //     console.log('if')
+  //     setTranscription(prev => [...prev, transcriptData.words]);
+  //   } else if (transcriptData.text) {
+  //     setTranscription(prev => [...prev, [{ word: transcriptData.text, translation: transcriptData.translated_message, probability: 1 }]]);
+  //   }
 
-    }
+  //   if (transcriptData.language && transcriptData.language_probability) {
+  //     setDetectedLanguage(`${transcriptData.language} (${transcriptData.language_probability.toFixed(2)})`);
+  //   }
 
-    if (transcriptData.language && transcriptData.language_probability) {
-      setDetectedLanguage(`${transcriptData.language} (${transcriptData.language_probability.toFixed(2)})`);
-    }
+  //   if (transcriptData.processing_time) {
+  //     setProcessingTime(`Processing time: ${transcriptData.processing_time.toFixed(2)} seconds`);
+  //   }
 
-    if (transcriptData.processing_time) {
-      setProcessingTime(`Processing time: ${transcriptData.processing_time.toFixed(2)} seconds`);
-    }
-  }, []);
+  // }, []);
 
+  function updateTranscription(userId, stt, translation) {
+  setTranscription(prev => [...prev, [{ word: stt, translation: translation, userId}]]);
+  }
+  
   const startRecording = useCallback(async () => {
     setError(null);
     audioContextRef.current = new AudioContext();
