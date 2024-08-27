@@ -346,11 +346,13 @@ function LiveChat() {
                 type: userId === user.uid ? 'me' : 'partner'
             };
             setMessages(prev => [...prev, newMessage]);
-            document.querySelector('#user-chat-form-wrap')?.scrollTo({
-                    top: 999999999999999999,
+            setTimeout(() => {
+                document.querySelector('#user-chat-form-wrap')?.scrollTo({
+                    top: document.querySelector('#user-chat-form-wrap').scrollHeight,
                     behavior: 'smooth'
-                })
-        }
+                });
+            }, 100);
+            }
     }, [transcription, userId, user.uid]);
 
     // const send_notification = async () => {
