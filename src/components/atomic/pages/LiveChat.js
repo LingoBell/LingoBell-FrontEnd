@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import ChatForm from "../molecules/ChatForm";
 import styled, { createGlobalStyle, keyframes } from "styled-components";
-import { USER_SAMPLE_DATA } from "../../../consts/sampleData";
 import CenteredMainLayout from "../templates/CenteredMainLayout";
-import axios from "axios";
 import Video from "./Video";
 import { useNavigate, useParams } from "react-router-dom";
 import { CreateQuizzes, CreateRecommendations, GetQuizzes, GetQuizzez, GetRecommendations, getChatRoomStatus, getSttAndTranslatedMessages } from "../../../apis/ChatAPI";
@@ -228,7 +226,6 @@ const spin = keyframes`
     100% { transform: rotate(360deg); }
 `;
 
-
 const Loader = styled.div`
     border: 8px solid #f3f3f3;
     border-top: 8px solid ${PRIMARY_COLOR};
@@ -282,20 +279,15 @@ const MaskButton = styled(BaseImage)`
   &:hover {
     transform: scale(1.4);
   }
-
-    
 `
 
 const HoverWrap = styled.div`
     display : flex;
     justify-content : space-evenly;
     padding : 6px;
-
 `
 
 const ResponsiveChat = styled.div`
-
-
     @media screen and (min-width : 600px) and (max-width : 1023px) {
         display : flex;
         gap: 2px;
@@ -308,10 +300,7 @@ const ResponsiveChat = styled.div`
         order : 2;
 
     }
-    
-   
 `
-
 
 function LiveChat() {
     const [openedTab, setOpenedTab] = useState('AI')
@@ -331,6 +320,7 @@ function LiveChat() {
     const [isMaskOn, setIsMaskOn] = useState(true);
     const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
+    const [isVideoConnected, setIsVideoConnected] = useState(false);
 
     const { user } = useSelector((state) => state.user);
     const userId = user?.uid;
@@ -339,9 +329,6 @@ function LiveChat() {
         isConnected,
         isRecording,
         transcription,
-        detectedLanguage,
-        processingTime,
-        error,
         connectWebsocket,
         startRecording,
         stopRecording
@@ -349,37 +336,16 @@ function LiveChat() {
 
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const fetchMessages = async () => {
-    //         try {
-    //             const data = await getSttAndTranslatedMessages(chatRoomId);
-    //             setMessages(data.messages);
-    //             // document.querySelector('#user-chat-form-wrap')?.scrollTo({
-    //             //     top: 999999999999999999,
-    //             //     behavior: 'smooth'
-    //             // })
-
-    //         } catch (err) {
-    //             console.error('Error fetching STT messages on LiveChat useEffect', err);
-    //         }
-    //     };
-
-    //     const intervalId = setInterval(fetchMessages, 1000);
-    //     return () => clearInterval(intervalId);
-    // }, [chatRoomId]);
-
     useEffect(() => {
-        console.log('transcription', transcription);
         if (transcription.length > 0) {
             const latestTranscription = transcription[transcription.length - 1];
             const newMessage = {
                 messageSenderId: latestTranscription[0].userId,
                 originalMessage: latestTranscription.map(word => word.word).join(' '),
-                translatedMessage: latestTranscription.map(translation => translation.translation).join(' '),  // 번역 로직이 필요하다면 여기에 추가
+                translatedMessage: latestTranscription.map(translation => translation.translation).join(' '),
                 type: userId === user.uid ? 'me' : 'partner'
             };
             setMessages(prev => [...prev, newMessage]);
-            console.log('message', messages);
             setTimeout(() => {
                 document.querySelector('#user-chat-form-wrap')?.scrollTo({
                     top: document.querySelector('#user-chat-form-wrap').scrollHeight,
@@ -475,8 +441,6 @@ function LiveChat() {
         }
     }
 
-    // console.log('wwww',quiz)
-
     const toggleTranslation = () => {
         setShowTranslation(!showTranslation);
     };
@@ -515,10 +479,16 @@ function LiveChat() {
 
     const handleMaskClick = (value) => {
         if (videoRef.current) {
-            videoRef.current.changeSelection(value); // 자식 컴포넌트의 메서드를 호출
+            videoRef.current.changeSelection(value);
         }
     };
 
+    const handleVideoConnectionChange = (status) => {
+        setIsVideoConnected(status);
+        if (status && !isConnected) {
+            connectWebsocket();
+        }
+    };
 
     const maskList = [
         { src: 'https://storage.googleapis.com/lingobellstorage/Hamzzi.png', value: 'image1' },
@@ -528,7 +498,6 @@ function LiveChat() {
         { src: 'https://storage.googleapis.com/lingobellstorage/gaksital.png', value: 'image5' },
         { src: 'https://storage.googleapis.com/lingobellstorage/Joker.jpeg', value: 'image6' }
     ]
-
 
     useEffect(() => {
         // 600 ~ 1023px 사이에서 레이아웃 조건부 변화 
@@ -542,8 +511,6 @@ function LiveChat() {
         }, 200) // 지연시간 -> debounce는 200ms 동안 크기가 변경되지 않으면 마지막에 한 번만 실행
         // throttle은 200ms 간격으로 실행
         handleResize()
-
-
         window.addEventListener('resize', handleResize);
 
         return () => {
@@ -551,8 +518,6 @@ function LiveChat() {
         };
 
     }, [])
-
-
 
     return (
         <StyledCenteredLayout>
@@ -564,6 +529,7 @@ function LiveChat() {
                         ref={videoRef}
                         onAudioStatusChange={handleAudioStatusChange}
                         onVideoStatusChange={handleVideoStatusChange}
+                        onConnectionChange={handleVideoConnectionChange}
                         isMaskOn={isMaskOn}
                     />
                     {/* 챗폼 버튼 */}
@@ -617,11 +583,11 @@ function LiveChat() {
                                     {isMaskOn ? 'face' : 'face_retouching_off'}
                                 </span>
                             </CallButton>
-                            <CallButton onClick={connectWebsocket} disabled={isConnected}>
+                            {/* <CallButton onClick={connectWebsocket} disabled={isConnected}>
                                 <span className='material-icons'>
                                     {isConnected ? 'link' : 'link_off'}
                                 </span>
-                            </CallButton>
+                            </CallButton> */}
                             <CallButton onClick={isRecording ? stopRecording : startRecording}>
                                 <span className='material-icons'>
                                     {isRecording ? 'stop' : 'mic'}
@@ -630,8 +596,6 @@ function LiveChat() {
                         </div>
                     </ButtonWrap>
                 </VideoWrap>
-
-
 
                 {responsive && ( // 600 ~ 1023px일때 다른 레이아웃)
                     <>
