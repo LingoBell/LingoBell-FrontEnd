@@ -168,7 +168,6 @@ export default () => {
           <Route path="/live-chat/:chatId" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
           <Route path='/video' element={<Video />} />
-          <Route path='/stt' element={<STT />} />
         </>
       )
     }

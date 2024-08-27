@@ -320,6 +320,7 @@ function LiveChat() {
     const [isMaskOn, setIsMaskOn] = useState(true);
     const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
+    const [isVideoConnected, setIsVideoConnected] = useState(false);
 
     const { user } = useSelector((state) => state.user);
     const userId = user?.uid;
@@ -476,7 +477,14 @@ function LiveChat() {
 
     const handleMaskClick = (value) => {
         if (videoRef.current) {
-            videoRef.current.changeSelection(value); // 자식 컴포넌트의 메서드를 호출
+            videoRef.current.changeSelection(value);
+        }
+    };
+
+    const handleVideoConnectionChange = (status) => {
+        setIsVideoConnected(status);
+        if (status && !isConnected) {
+            connectWebsocket();
         }
     };
 
@@ -519,6 +527,7 @@ function LiveChat() {
                         ref={videoRef}
                         onAudioStatusChange={handleAudioStatusChange}
                         onVideoStatusChange={handleVideoStatusChange}
+                        onConnectionChange={handleVideoConnectionChange}
                         isMaskOn={isMaskOn}
                     />
                     {/* 챗폼 버튼 */}
@@ -572,11 +581,11 @@ function LiveChat() {
                                     {isMaskOn ? 'face' : 'face_retouching_off'}
                                 </span>
                             </CallButton>
-                            <CallButton onClick={connectWebsocket} disabled={isConnected}>
+                            {/* <CallButton onClick={connectWebsocket} disabled={isConnected}>
                                 <span className='material-icons'>
                                     {isConnected ? 'link' : 'link_off'}
                                 </span>
-                            </CallButton>
+                            </CallButton> */}
                             <CallButton onClick={isRecording ? stopRecording : startRecording}>
                                 <span className='material-icons'>
                                     {isRecording ? 'stop' : 'mic'}
