@@ -243,6 +243,7 @@ const Video = forwardRef((props, ref) => {
         notifyDiscon,
         onAudioStatusChange,
         onVideoStatusChange,
+        onConnectionChange,
         isMaskOn
     } = props
 
@@ -467,6 +468,8 @@ const Video = forwardRef((props, ref) => {
         })
 
         socket.emit('CREATE_OR_JOIN', roomName)
+
+        props.onConnectionChange(true);
     };
 
     const endCall = () => {
@@ -480,9 +483,12 @@ const Video = forwardRef((props, ref) => {
             setLocalStream(null)
         }
         if (socket) {
-            socket.emit('DISCONNECTED', roomName)
-            socket.close()
+            socket.emit('DISCONNECTED', roomName);
+            socket.close();
+            props.onConnectionChange(false);
+            websocketRef.close();
         }
+        
     };
 
     useEffect(() => {
@@ -492,6 +498,7 @@ const Video = forwardRef((props, ref) => {
             if (socket) {
                 socket.emit('DISCONNECTED', roomName)
                 socket.close()
+                props.onConnectionChange(false);
             }
             console.log('closing')
             if (pc) {
