@@ -34,7 +34,7 @@ const AiMessageWrapper = styled.div`
 `;
 
 function ChatForm(props, ref) {
-    const { data, className, id } = props
+    const { data, className, id, lastMessageRef } = props
 
     const { user } = useSelector((state) => {
         return { user: state.user?.user}
@@ -60,11 +60,14 @@ function ChatForm(props, ref) {
                         };
                     }
                 }
+
+                const isLastMessage = index === data.length - 1; // 마지막 메시지인지 확인
+
                 
                 return (
                     <React.Fragment key={index}>
                         {(message.type === 'me' || message.type === 'partner') && (
-                            <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType}>
+                            <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType} ref={isLastMessage ? lastMessageRef : null}>
                                 <ChatMessage
                                     type={message.type}
                                     isOriginal={true}

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { AI_SAMPLE_DATA, PROFILE_DATA, USER_SAMPLE_DATA } from '../../../consts/sampleData'
 import ChatCard from '../templates/ChatSectionCard'
@@ -95,6 +95,8 @@ export default props => {
   const [data, setData] = useState();
   const [recommendation, setRecommendation] = useState([])
   const [messages, setMessages] = useState([]);
+  const lastMessageRef = useRef(null);
+  const [isFirstRender, setIsFirstRender] = useState(true);
 
   const fetchAiRecommendations = async () => {
     const recommendData = await GetRecommendations(chatRoomId);
@@ -143,6 +145,13 @@ export default props => {
     }
   }, [chatRoomId])
 
+  useEffect(() => {
+    if (isFirstRender && lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+      setIsFirstRender(false); // 첫 렌더링 이후로는 자동 스크롤 비활성화
+    }
+  }, [messages]);
+
   console.log('dwdwdd', recommendation)
   console.log("messages", messages);
 
@@ -157,7 +166,10 @@ export default props => {
       <ChatWrap>
         <AIChatForm data={recommendation} />
         <div style={{height : '36px'}}></div>
-        <UserChatForm data={messages} />
+        <UserChatForm 
+          data={messages}
+          lastMessageRef={lastMessageRef} 
+        />
       </ChatWrap>
     </HistorySection>
   )

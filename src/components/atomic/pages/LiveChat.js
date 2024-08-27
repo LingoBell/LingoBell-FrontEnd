@@ -380,7 +380,13 @@ function LiveChat() {
             };
             setMessages(prev => [...prev, newMessage]);
             console.log('message', messages);
-        }
+            setTimeout(() => {
+                document.querySelector('#user-chat-form-wrap')?.scrollTo({
+                    top: document.querySelector('#user-chat-form-wrap').scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 100);
+            }
     }, [transcription, userId, user.uid]);
 
     // const send_notification = async () => {

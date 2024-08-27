@@ -15,7 +15,7 @@ const useSTT = (userId, chatRoomId) => {
   const streamRef = useRef(null);
 
   const connectWebsocket = useCallback(() => {
-    websocketRef.current = new WebSocket(`ws://localhost:8765`);
+    websocketRef.current = new WebSocket(`ws://192.168.0.182:8765`);
     websocketRef.current.onopen = () => {
       console.log("WebSocket connection established");
       websocketRef.current.send(JSON.stringify({
@@ -40,7 +40,7 @@ const useSTT = (userId, chatRoomId) => {
       console.log("서버로부터의 메시지:", event.data);
       const transcriptData = JSON.parse(event.data);
       console.log('transcriptData', transcriptData);
-        updateTranscription(transcriptData.user_id, transcriptData.text, transcriptData.translation);
+      updateTranscription(transcriptData.user_id, transcriptData.text, transcriptData.translated_message);
     };
   }, [userId, chatRoomId]);
 
