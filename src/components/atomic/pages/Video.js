@@ -486,7 +486,8 @@ const Video = forwardRef((props, ref) => {
             socket.emit('DISCONNECTED', roomName);
             socket.close();
             props.onConnectionChange(false);
-            websocketRef.close();
+            // websocketRef.current.onclose;
+            
         }
         
     };
@@ -667,7 +668,6 @@ const Video = forwardRef((props, ref) => {
                                 width: `100%`,
                                 height: '100%',
                                 pointerEvents: 'none',
-
                             }}
                             orthographic
                             camera={{ zoom: 1, position: [0, 0, 500] }}
