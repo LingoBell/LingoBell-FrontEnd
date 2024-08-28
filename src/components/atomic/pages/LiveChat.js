@@ -321,6 +321,7 @@ function LiveChat() {
     const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
     const [isVideoConnected, setIsVideoConnected] = useState(false);
+    const [isAudioAndRecordingEnabled, setIsAudioAndRecordingEnabled] = useState(false);
 
     const { user } = useSelector((state) => state.user);
     const userId = user?.uid;
@@ -445,6 +446,26 @@ function LiveChat() {
         setShowTranslation(!showTranslation);
     };
 
+    const handleAudioAndRecordingClick = () => {
+        if (videoRef.current) {
+            videoRef.current.turnAudio();
+        }
+        if (isAudioAndRecordingEnabled) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+        setIsAudioAndRecordingEnabled(!isAudioAndRecordingEnabled);
+    }
+
+    const handleAudioStatusChange = (status) => {
+        setIsAudioEnabled(status);
+        setIsAudioAndRecordingEnabled(status);
+        if (!status && isRecording) {
+            stopRecording();
+        }
+    }
+
     const handleAudioClick = () => {
         if (videoRef.current) {
             videoRef.current.turnAudio();
@@ -465,9 +486,9 @@ function LiveChat() {
         }
     }
 
-    const handleAudioStatusChange = (status) => {
-        setIsAudioEnabled(status);
-    }
+    // const handleAudioStatusChange = (status) => {
+    //     setIsAudioEnabled(status);
+    // }
 
     const handleVideoStatusChange = (status) => {
         setIsVideoEnabled(status);
@@ -546,7 +567,7 @@ function LiveChat() {
                             )}
                         </HoverWrap>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around' }}>
-                            <CallButton onClick={handleAudioClick}>
+                            <CallButton onClick={handleAudioAndRecordingClick}>
                                 <span className='material-icons'>
                                     {isAudioEnabled ? 'mic' : 'mic_off'}
                                 </span>
@@ -588,11 +609,11 @@ function LiveChat() {
                                     {isConnected ? 'link' : 'link_off'}
                                 </span>
                             </CallButton> */}
-                            <CallButton onClick={isRecording ? stopRecording : startRecording}>
+                            {/* <CallButton onClick={isRecording ? stopRecording : startRecording}>
                                 <span className='material-icons'>
                                     {isRecording ? 'stop' : 'mic'}
                                 </span>
-                            </CallButton>
+                            </CallButton> */}
                         </div>
                     </ButtonWrap>
                 </VideoWrap>
