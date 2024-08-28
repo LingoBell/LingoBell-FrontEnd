@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import BaseImage, { Tag } from '../atoms/BaseImage'
 import { Paragraph, Title } from '../atoms/Typograpy'
 import LanguageGauge from './LanguageGauge'
-import Flag from 'react-world-flags'
+// import Flag from 'react-world-flags'
 import { calculateAge } from '../../../consts/calculateAge'
 import Button from '../atoms/Button'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -44,7 +44,7 @@ const FlagContainer = styled.div`
       height : 26px;
     `}
 `
-const RoundFlag = styled(Flag)`
+const RoundFlag = styled.svg`
   width : auto;
   height : auto;
   min-height : 100%;
@@ -201,7 +201,7 @@ export default props => {
         <ProfileImage src={props.profileImages ? props.profileImages
           : 'https://storage.googleapis.com/lingobellstorage/lingobellLogo.png'}>
           <FlagContainer $isSmall={props.isSmall}>
-            <RoundFlag code={props?.nation} />
+            <RoundFlag src={`/flags/${props?.nation}.svg`} />
           </FlagContainer>
         </ProfileImage>
         <Wrap>

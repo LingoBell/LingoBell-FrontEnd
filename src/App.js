@@ -1,27 +1,25 @@
 import * as React from "react";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import axios from 'axios'
-import Main from "./components/atomic/pages/Main";
-import ChatForm from "./components/atomic/molecules/ChatForm";
+
+// import ChatForm from "./components/atomic/molecules/ChatForm";
 import Layout from "./components/layout";
-import IndexPage from "./components/atomic/pages/IndexPage";
-import ProfileList from "./components/atomic/pages/ProfileList";
-import Header from "./components/layout/Header";
-import LiveChat from "./components/atomic/pages/LiveChat";
+
+
+import Main from "./components/atomic/pages/Main";
 import { auth, database, generateToken, googleProvider, messaging, requestPermission } from './firebase/firebase'; //파이어베이스 구글인증
 import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth"; // Firebase 함수 임포트
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser, setProcessFinished, checkFirstLogin } from './redux/userSlice';
 import useAuth from "./useAuth";
-import ChatHistory from "./components/atomic/pages/ChatHistory";
-import Video from "./components/atomic/pages/Video";
-import ProfilePage from "./components/atomic/pages/ProfilePage";
+
 import { onMessage } from "firebase/messaging";
 import { registerFcm } from "./apis/UserAPI";
 import { UpdateChatRoomStatus } from "./apis/ChatAPI";
 import { onDisconnect, onValue, ref, serverTimestamp, set } from "firebase/database";
-import STT from "./components/atomic/pages/STT";
-
+// import STT from "./components/atomic/pages/STT";
+import Loadable from 'react-loadable';
+import Loading from "./components/layout/Loading";
 
 export let mainDomain = ''// 'http://localhost:8000'
 axios.defaults.baseURL = mainDomain + "/api" //api엔드포인트 defualtUrl설정
@@ -29,6 +27,13 @@ axios.defaults.withCredentials = true;
 
 // axios.defaults.headers.common.Authorization = window.localStorage.getItem('AUTH_USER')
 
+const Header = Loadable({loader: () => import("./components/layout/Header"), loading: () => <Loading />});
+const LiveChat = Loadable({loader: () => import("./components/atomic/pages/LiveChat"), loading: () => <Loading />});
+const ChatHistory = Loadable({loader: () => import("./components/atomic/pages/ChatHistory"), loading: () => <Loading />});
+const ChatForm = Loadable({loader: () => import("./components/atomic/molecules/ChatForm"), loading: () => <Loading />});
+const ProfilePage = Loadable({loader: () => import("./components/atomic/pages/ProfilePage"), loading: () => <Loading />});
+const IndexPage = Loadable({loader: () => import("./components/atomic/pages/IndexPage"), loading: () => <Loading />});
+const ProfileList = Loadable({loader: () => import("./components/atomic/pages/ProfileList"), loading: () => <Loading />});
 window.accessToken = null
 
 if ('serviceWorker' in navigator) {
@@ -167,7 +172,7 @@ export default () => {
           <Route path="/chat" element={<ChatForm />} />
           <Route path="/live-chat/:chatId" element={<LiveChat />} />
           <Route path="/test" element={Header}></Route>
-          <Route path='/video' element={<Video />} />
+          {/* <Route path='/video' element={<Video />} /> */}
         </>
       )
     }

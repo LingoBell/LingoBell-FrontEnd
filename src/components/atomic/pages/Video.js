@@ -94,9 +94,18 @@ const VideoWrap2 = styled.div`
 `
 
 const socket = io(window.location.host.includes('lingobell.xyz') ? 'https://socket.lingobell.xyz' : "")
-let pc1 = new RTCPeerConnection()
 let pc = null
 let isCaller = false
+const pcConfig = {
+    'iceServers': [{
+        urls: 'stun:stun.l.google.com:19302'
+    },
+    {
+        urls: "turn:numb.viagenie.ca",
+        credential: "muazkh",
+        username: "webrtc@live.com"
+    }]
+};
 
 const ImageSelector = styled.select`
   display : none;
@@ -391,7 +400,7 @@ const Video = forwardRef((props, ref) => {
             localVideoRef.current.muted = true;
         }
 
-        pc = new RTCPeerConnection()
+        pc = new RTCPeerConnection(pcConfig)
         console.log('pc done')
         pc.onicecandidate = event => {
             if (event.candidate) {
