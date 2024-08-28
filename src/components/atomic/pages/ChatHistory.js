@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
-import ProfileItem from '../molecules/ProfileItem'
-import ChatCard from '../templates/ChatSectionCard'
-import ChatForm from '../molecules/ChatForm'
 import { useLocation, useHistory, useNavigate, useParams } from 'react-router-dom'
 import ChatHistoryList from '../organisms/ChatHistoryList'
 import ChatHistoryDetail from '../organisms/ChatHistoryDetail'
