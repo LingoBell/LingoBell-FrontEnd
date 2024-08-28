@@ -4,17 +4,26 @@ import styled from 'styled-components';
 import io from "socket.io-client";
 import { FaceLandmarker, FilesetResolver, DrawingUtils } from '@mediapipe/tasks-vision';
 import { Canvas, useLoader, useFrame, useThree } from '@react-three/fiber';
-import * as THREE from 'three';
+// import * as THREE from 'three';
+import {
+    TextureLoader,
+    BufferGeometry,
+    // sRGBEncoding,
+    ShaderMaterial,
+    DoubleSide,
+    Mesh,
+    Float32BufferAttribute,
+} from 'three'
 import defaultMaskImage from '../../../assets/images/hamzzi.png'
 import action from '../../../assets/images/action.jpg'
 import bono from '../../../assets/images/bono.png'
 import ddung from '../../../assets/images/ddung.png'
 import gaksital from '../../../assets/images/gaksital.png'
 import jocker from '../../../assets/images/jocker.jpg'
-import axios from "axios";
-import { createFaceLandmark } from '../../../apis/FaceAPI';
+// import axios from "axios";
+// import { createFaceLandmark } from '../../../apis/FaceAPI';
 import { send_notification, getMyProfile } from '../../../apis/UserAPI';
-import { log } from 'three/webgpu';
+// import { log } from 'three/webgpu';
 import { useSelector } from 'react-redux';
 import useSTT from './STT';
 
@@ -120,7 +129,7 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
     const meshRef = useRef();
     const { scene, camera } = useThree();
 
-    const texture = useLoader(THREE.TextureLoader, maskImage);
+    const texture = useLoader(TextureLoader, maskImage);
 
     useEffect(() => {
         camera.left = -videoWidth / 2;
@@ -133,13 +142,13 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
         camera.updateProjectionMatrix();
     }, [camera, videoWidth, videoHeight]);
 
-    const geometry = useMemo(() => new THREE.BufferGeometry(), []);
+    const geometry = useMemo(() => new BufferGeometry(), []);
 
     const material = useMemo(() => {
-        texture.encoding = THREE.sRGBEncoding;
+        // texture.encoding = sRGBEncoding;
         texture.anisotropy = 16;
 
-        return new THREE.ShaderMaterial({
+        return new ShaderMaterial({
             uniforms: {
                 map: { value: texture },
                 opacity: { value: 1 },
@@ -161,12 +170,12 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
                 }
             `,
             transparent: true,
-            side: THREE.DoubleSide,
+            side: DoubleSide,
         });
     }, [texture]);
 
     useEffect(() => {
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new Mesh(geometry, material);
         scene.add(mesh);
         meshRef.current = mesh;
 
@@ -233,8 +242,8 @@ function FaceMask({ faceData, videoWidth, videoHeight, maskImage }) {
                 });
             });
 
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-            geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+            geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
+            geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
             geometry.setIndex(indices);
             geometry.computeVertexNormals();
 

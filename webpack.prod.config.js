@@ -10,7 +10,55 @@ module.exports = {
     publicPath: '/'
   },
   mode: 'production',
-
+  optimization: {
+    
+    splitChunks: {
+      chunks: 'async',
+      minSize: 20000,
+      minRemainingSize: 0,
+      minChunks: 1,
+      maxAsyncRequests: 30,
+      maxInitialRequests: 30,
+      enforceSizeThreshold: 50000,
+      cacheGroups: {
+        // defaultVendors: {
+        //   test: /[\\/]node_modules[\\/]/,
+        //   priority: -10,
+        //   reuseExistingChunk: true,
+        // },
+        threeJS: {
+          test: /[\\/]node_modules[\\/]three[\\/]/,
+          name: 'three',
+          chunks: 'all',
+        },
+        mediaPipe: {
+          test: /[\\/]node_modules[\\/]@mediapipe\/tasks-vision[\\/]/,
+          name: 'mediapipe',
+          chunks: 'all',
+        },
+        firebaseDatabase: {
+          test: /[\\/]node_modules[\\/]@firebase\/database[\\/]/,
+          name: 'firebaseDatabase',
+          chunks: 'all',
+        },
+        firebaseAuth: {
+          test: /[\\/]node_modules[\\/]@firebase\/auth[\\/]/,
+          name: 'firebaseAuth',
+          chunks: 'all',
+        },
+        react: {
+          test: /[\\/]node_modules[\\/]react[\\/]/,
+          name: 'react',
+          chunks: 'all',
+        },
+        default: {
+          minChunks: 2,
+          priority: -20,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
   module: {
     rules: [
       {
@@ -42,7 +90,7 @@ module.exports = {
     extensions: ['.js', '.jsx', '.css'],
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new HtmlWebpackPlugin({
       template: './index.html',
       filename: 'index.html',
