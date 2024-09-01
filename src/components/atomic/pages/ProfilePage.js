@@ -190,9 +190,16 @@ export default props => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const response = await uploadImage(image)
+        const formData = new FormData();
+        if (image) {
+            formData.append('image', image);
+        }
+    
+        
 
-        const formData = {
+        const response = await uploadImage(formData)
+
+        const formDataForProfile = {
             selectedInterests,
             gender,
             name,
@@ -218,7 +225,7 @@ export default props => {
             alert('user introduction fields cannot exceed 255words')
         }
         else {
-            await AddUserProfile(formData)
+            await AddUserProfile(formDataForProfile)
                 .then(() => {
                     dispatch(checkFirstLogin())
                     navigate('/')
@@ -238,9 +245,15 @@ export default props => {
     const handleEditSubmit = async (e) => {
         e.preventDefault();
 
-        const response = await uploadImage(image)
+        const formData = new FormData();
+        if (image) {
+            formData.append('image', image);
+        }
+    
 
-        const formData = {
+        const response = await uploadImage(formData)
+
+        const formDataForProfile = {
             selectedInterests,
             gender,
             name,
@@ -266,7 +279,7 @@ export default props => {
             alert('user introduction fields cannot exceed 255 characters!')
         }
         else {
-            await UpdateUserProfile(formData)
+            await UpdateUserProfile(formDataForProfile)
                 .then(() => {
                     dispatch(checkFirstLogin())
                     navigate('/')

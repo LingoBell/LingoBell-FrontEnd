@@ -44,7 +44,7 @@ export const UpdateUserProfile = async (formData) => {
     }
 }
 
-export const uploadImage = async (image) => {
+export const uploadImage = async (formData) => {
 
     try {
         const response = await axios.post('/users/image-upload', formData, {
@@ -52,7 +52,6 @@ export const uploadImage = async (image) => {
                 'Content-Type': 'multipart/form-data',
             },
         })
-        console.log('dddd', response)
         return response.data
 
     } catch (error) {
