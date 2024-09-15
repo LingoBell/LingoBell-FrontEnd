@@ -125,7 +125,6 @@ export default props => {
   const fetchSttAndTranslatedMessages = async (chatRoomId) => {
     try {
       const data = await getSttAndTranslatedMessages(chatRoomId);
-      console.log("fetchSttAndTranslatedMessages result", data);
       setMessages(data.messages);
     } catch (error) {
       console.log("Error occured while fetchSttAndTranslatedMessages on ChatHistoryDetail");
@@ -152,9 +151,6 @@ export default props => {
     }
   }, [messages]);
 
-  console.log('dwdwdd', recommendation)
-  console.log("messages", messages);
-
   return (
     <HistorySection>
       <StyledChatCard>
@@ -168,7 +164,7 @@ export default props => {
         <div style={{height : '36px'}}></div>
         <UserChatForm 
           data={messages}
-          lastMessageRef={lastMessageRef} 
+          lastMessageRef={lastMessageRef}
         />
       </ChatWrap>
     </HistorySection>

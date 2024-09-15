@@ -4,20 +4,33 @@ import { ChatMessage } from "../atoms/ChatMessage";
 import { ORIGINAL_PARTNER_MESSAGE } from "../atoms/Color";
 import ChatCard from "../templates/ChatSectionCard";
 import { useSelector } from "react-redux";
+
 const StyledChatCard = styled(ChatCard)`
-    /* width: 450px; */
-    /* height: 600px; */
     background-color: white;
     border: 2px solid #283593;
     overflow-y: auto;
     padding: 10px;
     border-radius: 8px;
+    
     ::-webkit-scrollbar {
-        width: 0px;
-        background: transparent; /* make scrollbar transparent */
+        width: 8px;
     }
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    -ms-overflow-style: auto;
+    scrollbar-width: thin;
 `;
 
 const ChatMessageWrapper = styled.div`
@@ -40,8 +53,6 @@ function ChatForm(props, ref) {
         return { user: state.user?.user}
     })
 
-
-
     return (
         <StyledChatCard id={id} className={className} ref={ref}>
             {data && data?.map((message, index) => {
@@ -63,7 +74,6 @@ function ChatForm(props, ref) {
 
                 const isLastMessage = index === data.length - 1; // 마지막 메시지인지 확인
 
-                
                 return (
                     <React.Fragment key={index}>
                         {(message.type === 'me' || message.type === 'partner') && (
