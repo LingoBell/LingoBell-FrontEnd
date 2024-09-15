@@ -64,6 +64,45 @@ const PartnersBtn = styled.button`
   }
 `;
 
+const FilterSelect = styled.div`
+ padding: 8px;
+ margin: 5px;
+ border-radius: 4px;
+ border: 1px solid #ccc;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-bottom: 20px;
+`;
+
+const FilterGroup = styled.div`
+  flex: 1;
+  margin: 0 10px;
+`;
+
+const FilterTitle = styled.h3`
+  margin-bottom: 10px;
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`;
+
+const CheckboxLabel = styled.label`
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  margin-bottom: 5px;
+`;
+
+const Checkbox = styled.input`
+  margin-right: 5px;
+`;
+
 export default props => {
   const navigate = useNavigate()
   const [isOpened, setIsOpened] = useState(false);
@@ -72,6 +111,8 @@ export default props => {
   const [profiles, setProfiles] = useState([]);
   const [activeTab, setActiveTab] = useState('find');
   const [chatRequests, setChatRequests] = useState([]);
+  const [selectedInterests, setSelectedInterests] = useState([]);
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
 
   const user = useSelector((state) => state.user.user);
 
@@ -94,6 +135,48 @@ export default props => {
       console.log('유저 리스트 불러오기 실패 : ', error);
     }
   };
+
+  const filterProfiles = (profiles) => {
+    return profiles.filter(profile => {
+      const interestMatch = selectedInterests.length === 0 || 
+        profile.interests.some(interest => selectedInterests.includes(interest));
+      const languageMatch = selectedLanguages.length === 0 || 
+        profile.learningLanguages.some(lang => selectedLanguages.includes(lang.language));
+      return interestMatch && languageMatch;
+    });
+  };
+
+  const getUniqueValues = (profiles, key) => {
+    const allValues = profiles.flatMap(profile => {
+      if (key === 'interests') {
+        return profile[key];
+      } else if (key === 'learningLanguages') {
+        return profile[key].map(lang => lang.language);
+      }
+      return [];
+    });
+    return [...new Set(allValues)];
+  };
+
+  const handleInterestChange = (interest) => {
+    setSelectedInterests(prev => 
+      prev.includes(interest)
+        ? prev.filter(i => i !== interest)
+        : [...prev, interest]
+    );
+  };
+
+  const handleLanguageChange = (language) => {
+    setSelectedLanguages(prev => 
+      prev.includes(language)
+        ? prev.filter(l => l !== language)
+        : [...prev, language]
+    );
+  };
+
+  const filteredProfiles = filterProfiles(profiles);
+  const allInterests = getUniqueValues(profiles, 'interests');
+  const allLanguages = getUniqueValues(profiles, 'learningLanguages');
 
   /* Chat Request Partners */
   const fetchRequestProfiles = async () => {
@@ -209,6 +292,42 @@ export default props => {
         <PartnersBtn onClick={() => setActiveTab('find')}>Find Partners</PartnersBtn><br />
         <PartnersBtn onClick={() => setActiveTab('requests')}>Chat Request Partners</PartnersBtn>
       </PartnersTab>
+
+      {activeTab === 'find' && (
+        <FilterContainer>
+          <FilterGroup>
+            <FilterTitle>Interests</FilterTitle>
+            <CheckboxContainer>
+              {allInterests.map((interest, index) => (
+                <CheckboxLabel key={index}>
+                  <Checkbox
+                    type="checkbox"
+                    checked={selectedInterests.includes(interest)}
+                    onChange={() => handleInterestChange(interest)}
+                  />
+                  {interest}
+                </CheckboxLabel>
+              ))}
+            </CheckboxContainer>
+          </FilterGroup>
+          <FilterGroup>
+            <FilterTitle>Languages</FilterTitle>
+            <CheckboxContainer>
+              {allLanguages.map((language, index) => (
+                <CheckboxLabel key={index}>
+                  <Checkbox
+                    type="checkbox"
+                    checked={selectedLanguages.includes(language)}
+                    onChange={() => handleLanguageChange(language)}
+                  />
+                  {language}
+                </CheckboxLabel>
+              ))}
+            </CheckboxContainer>
+          </FilterGroup>
+        </FilterContainer>
+      )}
+
       <Container>
         {selectedProfile && !selectedChatRoom && (
           <Modal
@@ -222,7 +341,7 @@ export default props => {
           />
         )}
         {activeTab === 'find' &&
-          profiles?.sort((a,b)=>{
+          filteredProfiles?.sort((a,b)=>{
             if(a.userStatus === 'online' && b.userStatus !=='online') return -1;
             if(a.userStatus !== 'online' && b.userStatus === 'online') return 1;
             return 0
