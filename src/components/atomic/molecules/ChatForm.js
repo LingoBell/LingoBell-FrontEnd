@@ -39,6 +39,14 @@ const ChatMessageWrapper = styled.div`
     align-items: ${props => props.type === 'me' ? 'flex-end' : 'flex-start'};
     margin-bottom: ${props => (props.isDifferentType ? 'none' : '30px')};
 `;
+
+const TimeStamp = styled.div`
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 4px;
+    ${props => props.type === 'me' ? 'align-self: flex-end;' : 'align-self: flex-start;'}
+`;
+
 const AiMessageWrapper = styled.div`
     flex-direction: column;
     margin-bottom: 30px;
@@ -73,6 +81,9 @@ function ChatForm(props, ref) {
                 }
 
                 const isLastMessage = index === data.length - 1; // 마지막 메시지인지 확인
+                const dateTimeString = message.messageTime && typeof message.messageTime === 'string'
+                ? message.messageTime.replace(' ', 'T') : null;
+                const dateTime = dateTimeString ? new Date(dateTimeString) : null;
 
                 return (
                     <React.Fragment key={index}>
@@ -92,6 +103,9 @@ function ChatForm(props, ref) {
                                     {message.translatedMessage}
                                 </ChatMessage>
                                 )}
+                                <TimeStamp type={message.type}>
+                                    {dateTime && !isNaN(dateTime.getTime()) ? dateTime.toLocaleString() : 'Invalid Date'}
+                                </TimeStamp>
                             </ChatMessageWrapper>
                         )}
                         {message.type === 'ai' && (
