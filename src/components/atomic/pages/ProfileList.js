@@ -64,13 +64,6 @@ const PartnersBtn = styled.button`
   }
 `;
 
-const FilterSelect = styled.div`
- padding: 8px;
- margin: 5px;
- border-radius: 4px;
- border: 1px solid #ccc;
-`;
-
 const FilterContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -85,22 +78,34 @@ const FilterGroup = styled.div`
 
 const FilterTitle = styled.h3`
   margin-bottom: 10px;
+  font-size: 20px;
 `;
 
 const CheckboxContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  gap: 10px;
 `;
 
 const CheckboxLabel = styled.label`
   display: flex;
   align-items: center;
-  margin-right: 10px;
-  margin-bottom: 5px;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: ${props => props.checked ? '#7086F3' : '#f0f2f5'};
+  border: 2px solid ${props => props.checked ? '#7086F3' : 'transparent'};
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: ${props => props.checked ? '#7086F3' : '#e4e6eb'};
+  }
 `;
 
-const Checkbox = styled.input`
-  margin-right: 5px;
+const HiddenCheckbox = styled.input.attrs({ type: 'checkbox' })`
+  display: none;
 `;
 
 export default props => {
@@ -138,9 +143,9 @@ export default props => {
 
   const filterProfiles = (profiles) => {
     return profiles.filter(profile => {
-      const interestMatch = selectedInterests.length === 0 || 
+      const interestMatch = selectedInterests.length === 0 ||
         profile.interests.some(interest => selectedInterests.includes(interest));
-      const languageMatch = selectedLanguages.length === 0 || 
+      const languageMatch = selectedLanguages.length === 0 ||
         profile.learningLanguages.some(lang => selectedLanguages.includes(lang.language));
       return interestMatch && languageMatch;
     });
@@ -159,7 +164,7 @@ export default props => {
   };
 
   const handleInterestChange = (interest) => {
-    setSelectedInterests(prev => 
+    setSelectedInterests(prev =>
       prev.includes(interest)
         ? prev.filter(i => i !== interest)
         : [...prev, interest]
@@ -167,7 +172,7 @@ export default props => {
   };
 
   const handleLanguageChange = (language) => {
-    setSelectedLanguages(prev => 
+    setSelectedLanguages(prev =>
       prev.includes(language)
         ? prev.filter(l => l !== language)
         : [...prev, language]
@@ -187,7 +192,7 @@ export default props => {
         const userStatus = userState[request.userCode]?.status?.state;
 
         return {
-          ...request, userStatus : userStatus
+          ...request, userStatus: userStatus
         }
       })
       setChatRequests(newRequestUserList);
@@ -199,7 +204,7 @@ export default props => {
 
   useEffect(() => {
     /* Find Partners */
-    
+
 
     fetchProfiles();
     fetchRequestProfiles();
@@ -299,9 +304,8 @@ export default props => {
             <FilterTitle>Interests</FilterTitle>
             <CheckboxContainer>
               {allInterests.map((interest, index) => (
-                <CheckboxLabel key={index}>
-                  <Checkbox
-                    type="checkbox"
+                <CheckboxLabel key={index} checked={selectedInterests.includes(interest)}>
+                  <HiddenCheckbox
                     checked={selectedInterests.includes(interest)}
                     onChange={() => handleInterestChange(interest)}
                   />
@@ -314,9 +318,8 @@ export default props => {
             <FilterTitle>Languages</FilterTitle>
             <CheckboxContainer>
               {allLanguages.map((language, index) => (
-                <CheckboxLabel key={index}>
-                  <Checkbox
-                    type="checkbox"
+                <CheckboxLabel key={index} checked={selectedLanguages.includes(language)}>
+                  <HiddenCheckbox
                     checked={selectedLanguages.includes(language)}
                     onChange={() => handleLanguageChange(language)}
                   />
@@ -341,42 +344,42 @@ export default props => {
           />
         )}
         {activeTab === 'find' &&
-          filteredProfiles?.sort((a,b)=>{
-            if(a.userStatus === 'online' && b.userStatus !=='online') return -1;
-            if(a.userStatus !== 'online' && b.userStatus === 'online') return 1;
+          filteredProfiles?.sort((a, b) => {
+            if (a.userStatus === 'online' && b.userStatus !== 'online') return -1;
+            if (a.userStatus !== 'online' && b.userStatus === 'online') return 1;
             return 0
           })
-          .map((profile, index) => {
+            .map((profile, index) => {
 
-            const { description,
-              gender,
-              interests,
-              learningLanguages,
-              nation,
-              nativeLanguage,
-              userName,
-              profileImages,
-              birthday,
-              userStatus,
-            } = profile;
+              const { description,
+                gender,
+                interests,
+                learningLanguages,
+                nation,
+                nativeLanguage,
+                userName,
+                profileImages,
+                birthday,
+                userStatus,
+              } = profile;
 
-            return (
-              <StyledProfileItem
-                key={index}
-                userName={userName}
-                nativeLanguage={nativeLanguage}
-                content={description}
-                gender={gender}
-                interests={interests}
-                learningLanguages={learningLanguages}
-                nation={nation}
-                profileImages={profileImages}
-                hideContent={false}
-                birthday={birthday}
-                userStatus={userStatus}
-                onClick={() => handleOpenRequestModal(profile)} />
-            )
-          })
+              return (
+                <StyledProfileItem
+                  key={index}
+                  userName={userName}
+                  nativeLanguage={nativeLanguage}
+                  content={description}
+                  gender={gender}
+                  interests={interests}
+                  learningLanguages={learningLanguages}
+                  nation={nation}
+                  profileImages={profileImages}
+                  hideContent={false}
+                  birthday={birthday}
+                  userStatus={userStatus}
+                  onClick={() => handleOpenRequestModal(profile)} />
+              )
+            })
         }
         {selectedChatRoom && (
           <Modal
@@ -388,42 +391,42 @@ export default props => {
           />
         )}
         {activeTab === 'requests' &&
-          chatRequests?.sort((a,b)=>{
-            if(a.userStatus === 'online' && b.userStatus !=='online') return -1;
-            if(a.userStatus !== 'online' && b.userStatus === 'online') return 1;
+          chatRequests?.sort((a, b) => {
+            if (a.userStatus === 'online' && b.userStatus !== 'online') return -1;
+            if (a.userStatus !== 'online' && b.userStatus === 'online') return 1;
             return 0
           })
-          .map((request, index) => {
-            const { description,
-              gender,
-              interests,
-              learningLanguages,
-              nation,
-              nativeLanguage,
-              userName,
-              profileImages,
-              birthday,
-              userStatus,
-            } = request
+            .map((request, index) => {
+              const { description,
+                gender,
+                interests,
+                learningLanguages,
+                nation,
+                nativeLanguage,
+                userName,
+                profileImages,
+                birthday,
+                userStatus,
+              } = request
 
-            return (
-              <StyledProfileItem
-                key={index}
-                userName={userName}
-                nativeLanguage={nativeLanguage}
-                content={description}
-                gender={gender}
-                interests={interests}
-                learningLanguages={learningLanguages}
-                nation={nation}
-                profileImages={profileImages}
-                hideContent={false}
-                birthday={birthday}
-                userStatus={userStatus}
-                onClick={() => handleOpenResponseModal(request)}
-              />
-            )
-          })
+              return (
+                <StyledProfileItem
+                  key={index}
+                  userName={userName}
+                  nativeLanguage={nativeLanguage}
+                  content={description}
+                  gender={gender}
+                  interests={interests}
+                  learningLanguages={learningLanguages}
+                  nation={nation}
+                  profileImages={profileImages}
+                  hideContent={false}
+                  birthday={birthday}
+                  userStatus={userStatus}
+                  onClick={() => handleOpenResponseModal(request)}
+                />
+              )
+            })
         }
       </Container>
     </CenteredMainLayout>
