@@ -145,8 +145,8 @@ export default props => {
     return profiles.filter(profile => {
       const interestMatch = selectedInterests.length === 0 ||
         profile.interests.some(interest => selectedInterests.includes(interest));
-      const languageMatch = selectedLanguages.length === 0 ||
-        profile.learningLanguages.some(lang => selectedLanguages.includes(lang.language));
+        const languageMatch = selectedLanguages.length === 0 ||
+        selectedLanguages.includes(profile.nativeLanguage);
       return interestMatch && languageMatch;
     });
   };
@@ -155,8 +155,8 @@ export default props => {
     const allValues = profiles.flatMap(profile => {
       if (key === 'interests') {
         return profile[key];
-      } else if (key === 'learningLanguages') {
-        return profile[key].map(lang => lang.language);
+      } else if (key === 'nativeLanguage') {
+        return [...new Set(profiles.map(profile => profile[key]))];
       }
       return [];
     });
@@ -181,7 +181,7 @@ export default props => {
 
   const filteredProfiles = filterProfiles(profiles);
   const allInterests = getUniqueValues(profiles, 'interests');
-  const allLanguages = getUniqueValues(profiles, 'learningLanguages');
+  const allLanguages = getUniqueValues(profiles, 'nativeLanguage');
 
   /* Chat Request Partners */
   const fetchRequestProfiles = async () => {
@@ -315,7 +315,7 @@ export default props => {
             </CheckboxContainer>
           </FilterGroup>
           <FilterGroup>
-            <FilterTitle>Languages</FilterTitle>
+            <FilterTitle>Native Languages</FilterTitle>
             <CheckboxContainer>
               {allLanguages.map((language, index) => (
                 <CheckboxLabel key={index} checked={selectedLanguages.includes(language)}>
