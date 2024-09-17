@@ -54,12 +54,31 @@ const AiMessageWrapper = styled.div`
     display: flex;
 `;
 
+const DateSeparator = styled.div`
+    text-align: center;
+    color: #999;
+    font-size: 0.85rem;
+    margin: 20px 0;
+`;
+
+function formatDate(date) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric', weekday: 'long' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+function formatTime(date) {
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return date.toLocaleTimeString('en-US', options).replace('AM', 'am').replace('PM', 'pm');
+}
+
 function ChatForm(props, ref) {
     const { data, className, id, lastMessageRef } = props
 
     const { user } = useSelector((state) => {
         return { user: state.user?.user}
-    })
+    });
+
+    let lastMessageDate = null;
 
     return (
         <StyledChatCard id={id} className={className} ref={ref}>
@@ -85,8 +104,13 @@ function ChatForm(props, ref) {
                 ? message.messageTime.replace(' ', 'T') : null;
                 const dateTime = dateTimeString ? new Date(dateTimeString) : null;
 
+                const messageDate = dateTime ? dateTime.toDateString() : null;
+                const showDateSeparator = messageDate && messageDate !== lastMessageDate;
+                lastMessageDate = messageDate;
+
                 return (
                     <React.Fragment key={index}>
+                        {showDateSeparator && <DateSeparator>{formatDate(dateTime)}</DateSeparator>}
                         {(message.type === 'me' || message.type === 'partner') && (
                             <ChatMessageWrapper key={index} type={message.type} isDifferentType={isDifferentType} ref={isLastMessage ? lastMessageRef : null}>
                                 <ChatMessage
@@ -104,7 +128,7 @@ function ChatForm(props, ref) {
                                 </ChatMessage>
                                 )}
                                 <TimeStamp type={message.type}>
-                                    {dateTime && !isNaN(dateTime.getTime()) ? dateTime.toLocaleString() : 'Invalid Date'}
+                                    {dateTime && !isNaN(dateTime.getTime()) ? formatTime(dateTime) : 'Invalid Date'}
                                 </TimeStamp>
                             </ChatMessageWrapper>
                         )}
