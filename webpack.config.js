@@ -69,8 +69,8 @@ module.exports = {
     }, {
       context: ['/socket.io'],
 
-      // target: 'http://localhost:8080',
-      target: 'http://172.30.27.189:8080',
+      target: 'http://localhost:8080',
+      // target: 'http://192.168.10.107:8080',
       // target: 'http://192.168.0.223:8080',
       // target: 'http://192.168.0.182:8080',
       ws:true
