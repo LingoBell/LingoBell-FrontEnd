@@ -102,7 +102,7 @@ const VideoWrap2 = styled.div`
     }
 `
 
-const socket = io(window.location.host.includes('lingobell.xyz') ? 'https://socket.lingobell.xyz' : "")
+const socket = io(window.location.host.includes('lingobell.xyz') ? 'https://socket.lingobell.xyz' : "https://socket.localhost:8080")
 let pc = null
 let isCaller = false
 const pcConfig = {
@@ -286,7 +286,7 @@ const Video = forwardRef((props, ref) => {
     // const [peerConnection, setPeerConnection] = useState(null)
     const peerConnection = useRef(null)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 처음비디오 꺼짐
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [faceLandmarker, setFaceLandmarker] = useState(null);
     const [faceData, setFaceData] = useState(null);
     const [remoteFaceData, setRemoteFaceData] = useState(null);
@@ -324,8 +324,6 @@ const Video = forwardRef((props, ref) => {
     }, []);
 
     const sendLanguageInfo = () => {
-        console.log("sendLanguageInfo called");
-
         const userInfo = {
             type: "language",
             userId: user.user.uid,
@@ -333,7 +331,6 @@ const Video = forwardRef((props, ref) => {
             learningLanguages: learningLanguages
         };
 
-        console.log("여기에 userInfo가 찍히리라", userInfo);
         if (websocketRef.current && websocketRef.current.readyState === WebSocket.OPEN) {
             websocketRef.current.send(JSON.stringify(userInfo));
             console.log("WebSocket message sent:", JSON.stringify(userInfo));
@@ -539,6 +536,7 @@ const Video = forwardRef((props, ref) => {
 
     useEffect(() => {
         onAudioStatusChange(isAudioEnabled);
+        
         if (isAudioEnabled) {
             startRecording();
         } else {

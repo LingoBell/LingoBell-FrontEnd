@@ -315,13 +315,13 @@ function LiveChat() {
     const aiChatWrapRef = useRef(null)
     const audioRef = useRef(null);
     const videoRef = useRef(null);
-    const [isAudioEnabled, setIsAudioEnabled] = useState(false);
-    const [isVideoEnabled, setIsVideoEnabled] = useState(true); // 초기 비디오 비활성화
+    const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+    const [isVideoEnabled, setIsVideoEnabled] = useState(true);
     const [isMaskOn, setIsMaskOn] = useState(true);
     const [responsive, setResponsive] = useState(false)
     const maskRef = useRef(null);
     const [isVideoConnected, setIsVideoConnected] = useState(false);
-    const [isAudioAndRecordingEnabled, setIsAudioAndRecordingEnabled] = useState(false);
+    const [isAudioAndRecordingEnabled, setIsAudioAndRecordingEnabled] = useState(true);
 
     const { user } = useSelector((state) => state.user);
     const userId = user?.uid;
@@ -450,18 +450,24 @@ function LiveChat() {
         if (videoRef.current) {
             videoRef.current.turnAudio();
         }
-        if (isAudioAndRecordingEnabled) {
+        if (isAudioEnabled && isConnected) {
             stopRecording();
+        } else if (isAudioEnabled && !isConnected) {
+            console.warn('WebSocket is not connected. Cannot start STT recording.');
         } else {
             startRecording();
         }
+    
         setIsAudioAndRecordingEnabled(!isAudioAndRecordingEnabled);
     }
 
     const handleAudioStatusChange = (status) => {
         setIsAudioEnabled(status);
         setIsAudioAndRecordingEnabled(status);
-        if (!status && isRecording) {
+    
+        if (status) {
+            startRecording();
+        } else {
             stopRecording();
         }
     }
@@ -537,7 +543,6 @@ function LiveChat() {
         return () => {
             window.removeEventListener('resize', handleResize);
         };
-
     }, [])
 
     return (

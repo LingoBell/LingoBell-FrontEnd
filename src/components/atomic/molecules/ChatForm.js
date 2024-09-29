@@ -100,9 +100,7 @@ function ChatForm(props, ref) {
                 }
 
                 const isLastMessage = index === data.length - 1; // 마지막 메시지인지 확인
-                const dateTimeString = message.messageTime && typeof message.messageTime === 'string'
-                ? message.messageTime.replace(' ', 'T') : null;
-                const dateTime = dateTimeString ? new Date(dateTimeString) : null;
+                const dateTime = message.messageTime ? new Date(message.messageTime) : null;
 
                 const messageDate = dateTime ? dateTime.toDateString() : null;
                 const showDateSeparator = messageDate && messageDate !== lastMessageDate;
