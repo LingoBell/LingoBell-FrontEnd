@@ -94,6 +94,7 @@ const CheckboxLabel = styled.label`
   padding: 10px 20px;
   background-color: ${props => props.checked ? '#7086F3' : '#f0f2f5'};
   border: 2px solid ${props => props.checked ? '#7086F3' : 'transparent'};
+  color: ${props =>  props.checked ? 'white' : 'black'};
   border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
@@ -101,6 +102,7 @@ const CheckboxLabel = styled.label`
 
   &:hover {
     background-color: ${props => props.checked ? '#7086F3' : '#e4e6eb'};
+    color: ${props =>  props.checked ? 'white' : 'black'};
   }
 `;
 
