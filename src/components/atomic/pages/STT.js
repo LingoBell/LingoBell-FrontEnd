@@ -17,13 +17,13 @@ const useSTT = (userId, chatRoomId) => {
   const connectWebsocket = useCallback(() => {
     websocketRef.current = new WebSocket(`wss://socket.lingobell.xyz`);
     websocketRef.current.onopen = () => {
+      setIsConnected(true);
       console.log("WebSocket connection established");
       websocketRef.current.send(JSON.stringify({
         type: 'config',
         userId: userId,
         chatRoomId: chatRoomId
       }))
-      setIsConnected(true);
     };
     websocketRef.current.onclose = () => {
       console.log("WebSocket connection closed");
@@ -32,12 +32,32 @@ const useSTT = (userId, chatRoomId) => {
 
     websocketRef.current.onmessage = (event) => {
       const transcriptData = JSON.parse(event.data);
-      updateTranscription(transcriptData.user_id, transcriptData.text, transcriptData.translated_message);
+      console.log("Parsed transcript data:", transcriptData);
+      updateTranscription(transcriptData.user_id, transcriptData.text, transcriptData.translated_message, transcriptData.messageTime);
     };
   }, [userId, chatRoomId]);
 
-  function updateTranscription(userId, stt, translation) {
-  setTranscription(prev => [...prev, [{ word: stt, translation: translation, userId}]]);
+  function getKSTCurrentTime() {
+    const currentUTCDate = new Date();
+    currentUTCDate.setHours(currentUTCDate.getHours() + 9);
+    return currentUTCDate.toISOString();
+  }
+
+  function updateTranscription(userId, stt, translation, messageTime) {
+    if (messageTime) {
+      const formattedMessageTime = new Date(messageTime);
+      console.log("Formatted messageTime:", formattedMessageTime.toISOString());
+      
+      setTranscription(prev => [
+        ...prev,
+        [{ word: stt, translation: translation, userId, messageTime: formattedMessageTime.toISOString() }],
+      ]);
+    } else {
+      setTranscription(prev => [
+        ...prev,
+        [{ word: stt, translation: translation, userId, messageTime: getKSTCurrentTime() }],
+      ]);
+    }
   }
   
   const startRecording = useCallback(async () => {
