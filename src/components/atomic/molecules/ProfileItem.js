@@ -45,8 +45,8 @@ const FlagContainer = styled.div`
     `}
 `
 const RoundFlag = styled.svg`
-  width : auto;
-  height : auto;
+  width : 100%;
+  height : 100%;
   min-height : 100%;
 `
 const Wrap = styled.div`
